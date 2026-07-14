@@ -3,6 +3,7 @@ import 'package:dio/dio.dart';
 import '../domain/models/address_suggestion.dart';
 import '../domain/models/trip_cost_breakdown.dart';
 import '../domain/models/vehicle_model.dart';
+import '../domain/models/vehicle_model_summary.dart';
 
 /// Client HTTP para o back-end do RotaCusto.
 /// Em desktop/mobile nativo, `localhost` aponta para a própria máquina.
@@ -14,17 +15,20 @@ class ApiClient {
   ApiClient({String baseUrl = 'http://localhost:8080/api'})
       : _dio = Dio(BaseOptions(baseUrl: baseUrl, connectTimeout: const Duration(seconds: 10)));
 
-  Future<List<VehicleModel>> fetchVehicleModels({String? marca}) async {
-    final response = await _dio.get('/vehicle-models', queryParameters: {
-      if (marca != null && marca.isNotEmpty) 'marca': marca,
-    });
+  /// Passo 1 da escolha de veículo: marca+modelo distintos (sem ano ainda).
+  Future<List<VehicleModelSummary>> searchVehicleModels(String query) async {
+    final response = await _dio.get('/vehicle-models/search', queryParameters: {'q': query});
     return (response.data as List<dynamic>)
-        .map((json) => VehicleModel.fromJson(json as Map<String, dynamic>))
+        .map((json) => VehicleModelSummary.fromJson(json as Map<String, dynamic>))
         .toList();
   }
 
-  Future<List<VehicleModel>> searchVehicleModels(String query) async {
-    final response = await _dio.get('/vehicle-models', queryParameters: {'q': query});
+  /// Passo 2: anos/versões disponíveis do marca+modelo escolhido no passo 1.
+  Future<List<VehicleModel>> fetchVehicleVersions(String marca, String modelo) async {
+    final response = await _dio.get('/vehicle-models/versions', queryParameters: {
+      'marca': marca,
+      'modelo': modelo,
+    });
     return (response.data as List<dynamic>)
         .map((json) => VehicleModel.fromJson(json as Map<String, dynamic>))
         .toList();

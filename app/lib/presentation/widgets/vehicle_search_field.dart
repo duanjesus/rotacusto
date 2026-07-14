@@ -2,16 +2,16 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import '../../domain/models/vehicle_model.dart';
+import '../../domain/models/vehicle_model_summary.dart';
 
-/// Campo de texto com dropdown de sugestões de veículo, buscando no
-/// back-end (marca ou modelo) conforme o usuário digita, com debounce.
-/// Necessário porque o catálogo tem centenas de veículos — um dropdown
-/// simples com todos eles listados não é usável.
+/// Campo de texto com dropdown de sugestões de veículo (passo 1: marca+modelo,
+/// sem ano ainda), buscando no back-end conforme o usuário digita, com
+/// debounce. Necessário porque o catálogo tem centenas de modelos — um
+/// dropdown simples com todos eles listados não é usável.
 class VehicleSearchField extends StatefulWidget {
-  final VehicleModel? initialValue;
-  final Future<List<VehicleModel>> Function(String query) fetchSuggestions;
-  final void Function(VehicleModel?) onSelected;
+  final VehicleModelSummary? initialValue;
+  final Future<List<VehicleModelSummary>> Function(String query) fetchSuggestions;
+  final void Function(VehicleModelSummary?) onSelected;
 
   const VehicleSearchField({
     super.key,
@@ -30,7 +30,7 @@ class _VehicleSearchFieldState extends State<VehicleSearchField> {
 
   late final TextEditingController _controller;
   Timer? _debounce;
-  List<VehicleModel> _suggestions = [];
+  List<VehicleModelSummary> _suggestions = [];
   bool _loading = false;
 
   @override
@@ -76,7 +76,7 @@ class _VehicleSearchFieldState extends State<VehicleSearchField> {
     }
   }
 
-  void _select(VehicleModel vehicle) {
+  void _select(VehicleModelSummary vehicle) {
     _controller.text = vehicle.displayName;
     widget.onSelected(vehicle);
     setState(() => _suggestions = []);

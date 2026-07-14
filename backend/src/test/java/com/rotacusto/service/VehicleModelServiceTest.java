@@ -14,6 +14,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import com.rotacusto.dto.response.VehicleModelSummaryDTO;
 import com.rotacusto.entity.VehicleModel;
 import com.rotacusto.repository.VehicleModelRepository;
 
@@ -24,9 +25,14 @@ class VehicleModelServiceTest {
     private VehicleModelRepository repository;
 
     private static VehicleModel vehicle(String marca, String modelo) {
+        return vehicle(marca, modelo, null);
+    }
+
+    private static VehicleModel vehicle(String marca, String modelo, Integer ano) {
         VehicleModel v = new VehicleModel();
         v.setMarca(marca);
         v.setModelo(modelo);
+        v.setAno(ano);
         return v;
     }
 
@@ -34,8 +40,8 @@ class VehicleModelServiceTest {
     void returnsEmptyListForQueriesShorterThanTwoChars() {
         VehicleModelService service = new VehicleModelService(repository);
 
-        assertTrue(service.search("C").isEmpty());
-        assertTrue(service.search("").isEmpty());
+        assertTrue(service.searchModels("C").isEmpty());
+        assertTrue(service.searchModels("").isEmpty());
         verify(repository, never()).findAll();
     }
 
@@ -46,10 +52,10 @@ class VehicleModelServiceTest {
                 vehicle("TOYOTA", "COROLLA"),
                 vehicle("HONDA", "CIVIC")));
 
-        List<VehicleModel> result = service.search("Corolla");
+        List<VehicleModelSummaryDTO> result = service.searchModels("Corolla");
 
         assertEquals(1, result.size());
-        assertEquals("COROLLA", result.get(0).getModelo());
+        assertEquals("COROLLA", result.get(0).modelo());
     }
 
     @Test
@@ -62,10 +68,10 @@ class VehicleModelServiceTest {
                 vehicle("HONDA", "CIVIC"),
                 vehicle("TOYOTA", "COROLLA")));
 
-        List<VehicleModel> result = service.search("honda hr-v");
+        List<VehicleModelSummaryDTO> result = service.searchModels("honda hr-v");
 
         assertEquals(1, result.size());
-        assertEquals("HR-V", result.get(0).getModelo());
+        assertEquals("HR-V", result.get(0).modelo());
     }
 
     @Test
@@ -73,9 +79,22 @@ class VehicleModelServiceTest {
         VehicleModelService service = new VehicleModelService(repository);
         when(repository.findAll()).thenReturn(List.of(vehicle("HONDA", "HR-V")));
 
-        List<VehicleModel> result = service.search("hr-v honda");
+        List<VehicleModelSummaryDTO> result = service.searchModels("hr-v honda");
 
         assertEquals(1, result.size());
+    }
+
+    @Test
+    void collapsesMultipleYearsOfTheSameModelIntoOneSummary() {
+        VehicleModelService service = new VehicleModelService(repository);
+        when(repository.findAll()).thenReturn(List.of(
+                vehicle("HONDA", "HR-V", 2023),
+                vehicle("HONDA", "HR-V", 2022),
+                vehicle("HONDA", "HR-V", 2021)));
+
+        List<VehicleModelSummaryDTO> result = service.searchModels("hr-v");
+
+        assertEquals(1, result.size(), "os 3 anos do mesmo modelo devem virar 1 resultado só no passo 1");
     }
 
     @Test
@@ -86,8 +105,37 @@ class VehicleModelServiceTest {
                 .toList();
         when(repository.findAll()).thenReturn(manyMatches);
 
-        List<VehicleModel> result = service.search("ma");
+        List<VehicleModelSummaryDTO> result = service.searchModels("ma");
 
         assertEquals(20, result.size());
+    }
+
+    @Test
+    void findVersionsReturnsOneEntryPerYearMostRecentFirst() {
+        VehicleModelService service = new VehicleModelService(repository);
+        when(repository.findByMarcaIgnoreCaseAndModeloIgnoreCaseOrderByAnoDesc("HONDA", "HR-V"))
+                .thenReturn(List.of(
+                        vehicle("HONDA", "HR-V", 2023),
+                        vehicle("HONDA", "HR-V", 2022)));
+
+        List<VehicleModel> result = service.findVersions("HONDA", "HR-V");
+
+        assertEquals(2, result.size());
+        assertEquals(2023, result.get(0).getAno());
+        assertEquals(2022, result.get(1).getAno());
+    }
+
+    @Test
+    void findVersionsDropsDuplicateTrimsOfTheSameYear() {
+        VehicleModelService service = new VehicleModelService(repository);
+        when(repository.findByMarcaIgnoreCaseAndModeloIgnoreCaseOrderByAnoDesc("HONDA", "HR-V"))
+                .thenReturn(List.of(
+                        vehicle("HONDA", "HR-V", 2023),
+                        vehicle("HONDA", "HR-V", 2023), // trim diferente, mesmo ano
+                        vehicle("HONDA", "HR-V", 2022)));
+
+        List<VehicleModel> result = service.findVersions("HONDA", "HR-V");
+
+        assertEquals(2, result.size(), "não deveria haver dois '2023' indistinguíveis no dropdown");
     }
 }

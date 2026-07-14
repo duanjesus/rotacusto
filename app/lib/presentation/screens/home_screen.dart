@@ -5,6 +5,7 @@ import '../../data/api_client.dart';
 import '../../domain/models/address_suggestion.dart';
 import '../../domain/models/trip_cost_breakdown.dart';
 import '../../domain/models/vehicle_model.dart';
+import '../../domain/models/vehicle_model_summary.dart';
 import '../widgets/address_field.dart';
 import '../widgets/trip_map.dart';
 import '../widgets/vehicle_search_field.dart';
@@ -25,19 +26,15 @@ class _HomeScreenState extends State<HomeScreen> {
   final _destinoController = TextEditingController(text: 'Guarapari, ES');
   final _precoController = TextEditingController(text: _precoCombustaoPadrao);
 
+  VehicleModelSummary? _selectedModelSummary;
+  List<VehicleModel> _availableVersions = [];
+  bool _loadingVersions = false;
   VehicleModel? _selectedVehicle;
   AddressSuggestion? _origemSelecionada;
   AddressSuggestion? _destinoSelecionado;
-  bool _loadingModels = true;
   bool _loadingEstimate = false;
   TripCostBreakdown? _breakdown;
   String? _errorMessage;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadVehicleModels();
-  }
 
   @override
   void dispose() {
@@ -47,21 +44,31 @@ class _HomeScreenState extends State<HomeScreen> {
     super.dispose();
   }
 
-  Future<void> _loadVehicleModels() async {
+  Future<void> _onModelSelected(VehicleModelSummary? summary) async {
+    setState(() {
+      _selectedModelSummary = summary;
+      _availableVersions = [];
+      _selectedVehicle = null;
+    });
+    if (summary == null) return;
+
+    setState(() => _loadingVersions = true);
     try {
-      // Só usado pra pré-selecionar um veículo padrão ao abrir a tela; a
-      // partir daí, VehicleSearchField busca sob demanda (o catálogo tem
-      // centenas de modelos, carregar tudo de uma vez não escala).
-      final models = await _apiClient.fetchVehicleModels();
+      final versions = await _apiClient.fetchVehicleVersions(summary.marca, summary.modelo);
+      if (!mounted) return;
       setState(() {
-        _selectedVehicle = models.isNotEmpty ? models.first : null;
-        _loadingModels = false;
+        _availableVersions = versions;
+        _loadingVersions = false;
       });
+      // Anos vêm do mais recente pro mais antigo — pré-seleciona o mais recente.
+      if (versions.isNotEmpty) {
+        _onVehicleSelected(versions.first);
+      }
     } catch (_) {
+      if (!mounted) return;
       setState(() {
-        _loadingModels = false;
-        _errorMessage = 'Não foi possível carregar o catálogo de veículos. '
-            'O back-end está rodando em localhost:8080?';
+        _loadingVersions = false;
+        _errorMessage = 'Não foi possível carregar os anos desse modelo.';
       });
     }
   }
@@ -185,16 +192,26 @@ class _HomeScreenState extends State<HomeScreen> {
           onSelected: (s) => _destinoSelecionado = s,
         ),
         const SizedBox(height: 12),
-        _loadingModels
-            ? const Padding(
-                padding: EdgeInsets.symmetric(vertical: 8),
-                child: LinearProgressIndicator(),
-              )
-            : VehicleSearchField(
-                initialValue: _selectedVehicle,
-                fetchSuggestions: _apiClient.searchVehicleModels,
-                onSelected: _onVehicleSelected,
-              ),
+        VehicleSearchField(
+          initialValue: _selectedModelSummary,
+          fetchSuggestions: _apiClient.searchVehicleModels,
+          onSelected: _onModelSelected,
+        ),
+        if (_loadingVersions) ...[
+          const SizedBox(height: 8),
+          const LinearProgressIndicator(),
+        ],
+        if (_availableVersions.isNotEmpty) ...[
+          const SizedBox(height: 12),
+          DropdownButtonFormField<VehicleModel>(
+            initialValue: _selectedVehicle,
+            decoration: const InputDecoration(labelText: 'Ano'),
+            items: _availableVersions
+                .map((v) => DropdownMenuItem(value: v, child: Text(v.ano.toString())))
+                .toList(),
+            onChanged: _onVehicleSelected,
+          ),
+        ],
         const SizedBox(height: 12),
         TextField(
           controller: _precoController,
@@ -207,7 +224,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         const SizedBox(height: 16),
         FilledButton(
-          onPressed: _loadingEstimate ? null : _calcular,
+          onPressed: (_loadingEstimate || _selectedVehicle == null) ? null : _calcular,
           child: _loadingEstimate
               ? const SizedBox(
                   width: 20,
