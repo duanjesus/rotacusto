@@ -20,6 +20,7 @@ import com.rotacusto.dto.response.TollPlazaResponseDTO;
 import com.rotacusto.dto.response.TripCostBreakdownDTO;
 import com.rotacusto.entity.TollPlaza;
 import com.rotacusto.entity.VehicleModel;
+import com.rotacusto.entity.enums.TipoEnergia;
 
 @Service
 public class TripEstimationService {
@@ -49,8 +50,12 @@ public class TripEstimationService {
         TripCostBreakdown breakdown = TripCostCalculator.calculate(route.distanciaKm(), route.duracaoMin(), profile,
                 praçasCruzadas);
 
-        List<OsmFuelStation> postos = fuelStationService.findStationsNearRoute(route.geometria());
-        Optional<OsmFuelStation> postoSugerido = fuelStationService.suggestStop(postos, route.geometria());
+        // Postos de gasolina não fazem sentido pra elétrico (precisaria de pontos de
+        // recarga, um recurso diferente, fora de escopo por enquanto).
+        boolean eletrico = profile.tipoEnergia() == TipoEnergia.ELETRICO;
+        List<OsmFuelStation> postos = eletrico ? List.of() : fuelStationService.findStationsNearRoute(route.geometria());
+        Optional<OsmFuelStation> postoSugerido = eletrico ? Optional.empty()
+                : fuelStationService.suggestStop(postos, route.geometria());
 
         List<CoordinateDTO> geometria = route.geometria().stream()
                 .map(c -> new CoordinateDTO(c.lat(), c.lon()))
@@ -80,18 +85,38 @@ public class TripEstimationService {
     private VehicleProfile resolveProfile(TripEstimateRequestDTO request) {
         if (request.vehicleModelId() != null) {
             VehicleModel model = vehicleModelService.findById(request.vehicleModelId());
-            return VehicleProfile.fromModel(model, request.precoCombustivelPorLitro());
+            double preco = precoParaTipoEnergia(request, model.getTipoEnergia());
+            return VehicleProfile.fromModel(model, preco);
         }
 
         VehicleProfileRequestDTO manual = request.vehicleProfile();
         if (manual == null) {
             throw new IllegalArgumentException("Informe vehicleModelId (catálogo) ou vehicleProfile (manual).");
         }
+        double preco = precoParaTipoEnergia(request, manual.tipoEnergia());
         return new VehicleProfile(
                 manual.tipo(),
-                manual.consumoKmPorLitro(),
+                manual.tipoEnergia(),
+                manual.consumoPorUnidade(),
                 manual.numeroEixos(),
                 manual.custoDesgastePorKm(),
-                request.precoCombustivelPorLitro());
+                preco);
+    }
+
+    /**
+     * Preço é condicional ao tipo de energia do veículo resolvido — não dá pra
+     * expressar essa regra (exatamente um dos dois campos) com anotações simples.
+     */
+    private double precoParaTipoEnergia(TripEstimateRequestDTO request, TipoEnergia tipoEnergia) {
+        if (tipoEnergia == TipoEnergia.ELETRICO) {
+            if (request.precoPorKWh() == null) {
+                throw new IllegalArgumentException("Veículo elétrico: informe precoPorKWh.");
+            }
+            return request.precoPorKWh();
+        }
+        if (request.precoCombustivelPorLitro() == null) {
+            throw new IllegalArgumentException("Veículo a combustão: informe precoCombustivelPorLitro.");
+        }
+        return request.precoCombustivelPorLitro();
     }
 }

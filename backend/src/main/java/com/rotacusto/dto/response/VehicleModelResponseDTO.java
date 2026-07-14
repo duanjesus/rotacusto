@@ -1,5 +1,6 @@
 package com.rotacusto.dto.response;
 
+import com.rotacusto.entity.enums.TipoEnergia;
 import com.rotacusto.entity.enums.VehicleType;
 
 public class VehicleModelResponseDTO {
@@ -9,8 +10,10 @@ public class VehicleModelResponseDTO {
     private String modelo;
     private Integer ano;
     private VehicleType tipo;
+    private TipoEnergia tipoEnergia;
     private Double consumoCidadeKmL;
     private Double consumoEstradaKmL;
+    private Double consumoKmPorKWh;
     private Integer numeroEixos;
     private Double custoDesgastePorKm;
 
@@ -18,14 +21,17 @@ public class VehicleModelResponseDTO {
     }
 
     public VehicleModelResponseDTO(Long id, String marca, String modelo, Integer ano, VehicleType tipo,
-            Double consumoCidadeKmL, Double consumoEstradaKmL, Integer numeroEixos, Double custoDesgastePorKm) {
+            TipoEnergia tipoEnergia, Double consumoCidadeKmL, Double consumoEstradaKmL, Double consumoKmPorKWh,
+            Integer numeroEixos, Double custoDesgastePorKm) {
         this.id = id;
         this.marca = marca;
         this.modelo = modelo;
         this.ano = ano;
         this.tipo = tipo;
+        this.tipoEnergia = tipoEnergia;
         this.consumoCidadeKmL = consumoCidadeKmL;
         this.consumoEstradaKmL = consumoEstradaKmL;
+        this.consumoKmPorKWh = consumoKmPorKWh;
         this.numeroEixos = numeroEixos;
         this.custoDesgastePorKm = custoDesgastePorKm;
     }
@@ -50,12 +56,20 @@ public class VehicleModelResponseDTO {
         return tipo;
     }
 
+    public TipoEnergia getTipoEnergia() {
+        return tipoEnergia;
+    }
+
     public Double getConsumoCidadeKmL() {
         return consumoCidadeKmL;
     }
 
     public Double getConsumoEstradaKmL() {
         return consumoEstradaKmL;
+    }
+
+    public Double getConsumoKmPorKWh() {
+        return consumoKmPorKWh;
     }
 
     public Integer getNumeroEixos() {

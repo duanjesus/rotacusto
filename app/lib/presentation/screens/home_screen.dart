@@ -16,11 +16,14 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
+const _precoCombustaoPadrao = '6.09';
+const _precoEletricoPadrao = '0.90';
+
 class _HomeScreenState extends State<HomeScreen> {
   final ApiClient _apiClient = ApiClient();
   final _origemController = TextEditingController(text: 'Copacabana, Rio de Janeiro, RJ');
   final _destinoController = TextEditingController(text: 'Guarapari, ES');
-  final _precoController = TextEditingController(text: '6.09');
+  final _precoController = TextEditingController(text: _precoCombustaoPadrao);
 
   VehicleModel? _selectedVehicle;
   AddressSuggestion? _origemSelecionada;
@@ -63,11 +66,24 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  void _onVehicleSelected(VehicleModel? v) {
+    final tipoEnergiaMudou = v != null && _selectedVehicle != null && _selectedVehicle!.isEletrico != v.isEletrico;
+    setState(() {
+      _selectedVehicle = v;
+      if (tipoEnergiaMudou) {
+        _precoController.text = v.isEletrico ? _precoEletricoPadrao : _precoCombustaoPadrao;
+      }
+    });
+  }
+
   Future<void> _calcular() async {
     if (_selectedVehicle == null) return;
     final preco = double.tryParse(_precoController.text.replaceAll(',', '.'));
+    final isEletrico = _selectedVehicle!.isEletrico;
     if (preco == null || preco <= 0) {
-      setState(() => _errorMessage = 'Informe um preço de combustível válido.');
+      setState(() => _errorMessage = isEletrico
+          ? 'Informe um preço de energia (R\$/kWh) válido.'
+          : 'Informe um preço de combustível válido.');
       return;
     }
 
@@ -92,7 +108,8 @@ class _HomeScreenState extends State<HomeScreen> {
         origem: origem,
         destino: destino,
         vehicleModelId: _selectedVehicle!.id,
-        precoCombustivelPorLitro: preco,
+        precoCombustivelPorLitro: isEletrico ? null : preco,
+        precoPorKWh: isEletrico ? preco : null,
       );
       setState(() {
         _breakdown = result;
@@ -176,12 +193,16 @@ class _HomeScreenState extends State<HomeScreen> {
             : VehicleSearchField(
                 initialValue: _selectedVehicle,
                 fetchSuggestions: _apiClient.searchVehicleModels,
-                onSelected: (v) => setState(() => _selectedVehicle = v),
+                onSelected: _onVehicleSelected,
               ),
         const SizedBox(height: 12),
         TextField(
           controller: _precoController,
-          decoration: const InputDecoration(labelText: 'Preço do combustível (R\$/L)'),
+          decoration: InputDecoration(
+            labelText: (_selectedVehicle?.isEletrico ?? false)
+                ? 'Preço da energia (R\$/kWh)'
+                : 'Preço do combustível (R\$/L)',
+          ),
           keyboardType: const TextInputType.numberWithOptions(decimal: true),
         ),
         const SizedBox(height: 16),
@@ -221,7 +242,7 @@ class _HomeScreenState extends State<HomeScreen> {
               style: Theme.of(context).textTheme.titleMedium,
             ),
             const Divider(),
-            _buildRow('Combustível', currency(b.custoCombustivel)),
+            _buildRow((_selectedVehicle?.isEletrico ?? false) ? 'Energia' : 'Combustível', currency(b.custoCombustivel)),
             _buildRow('Desgaste do veículo', currency(b.custoDesgaste)),
             _buildRow('Pedágios (${b.pedagiosNaRota.length})', currency(b.custoPedagio)),
             _buildRow('Lanche', currency(b.custoLanche)),

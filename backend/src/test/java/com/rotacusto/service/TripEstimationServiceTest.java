@@ -20,6 +20,7 @@ import com.rotacusto.dto.request.TripEstimateRequestDTO;
 import com.rotacusto.dto.response.TripCostBreakdownDTO;
 import com.rotacusto.entity.TollPlaza;
 import com.rotacusto.entity.VehicleModel;
+import com.rotacusto.entity.enums.TipoEnergia;
 import com.rotacusto.entity.enums.VehicleType;
 
 @ExtendWith(MockitoExtension.class)
@@ -67,7 +68,7 @@ class TripEstimationServiceTest {
         when(vehicleModelService.findById(1L)).thenReturn(mobi);
 
         TripEstimateRequestDTO request = new TripEstimateRequestDTO(
-                "Copacabana, RJ", "Guarapari, ES", 1L, null, 6.0);
+                "Copacabana, RJ", "Guarapari, ES", 1L, null, 6.0, null);
 
         TripCostBreakdownDTO result = tripEstimationService.estimate(request);
 
@@ -88,9 +89,9 @@ class TripEstimationServiceTest {
         when(routingService.route(any(), any())).thenReturn(new RouteResult(100.0, 60.0, List.of(origem, destino)));
 
         var manualProfile = new com.rotacusto.dto.request.VehicleProfileRequestDTO(
-                VehicleType.MOTO, 20.0, 2, 0.15);
+                VehicleType.MOTO, TipoEnergia.COMBUSTAO, 20.0, 2, 0.15);
         TripEstimateRequestDTO request = new TripEstimateRequestDTO(
-                "A", "B", null, manualProfile, 6.0);
+                "A", "B", null, manualProfile, 6.0, null);
 
         TripCostBreakdownDTO result = tripEstimationService.estimate(request);
 
@@ -128,7 +129,7 @@ class TripEstimationServiceTest {
         when(tollService.findCrossedPlazas(route.geometria())).thenReturn(List.of(praca));
 
         TripEstimateRequestDTO request = new TripEstimateRequestDTO(
-                "Copacabana, RJ", "Guarapari, ES", 1L, null, 6.0);
+                "Copacabana, RJ", "Guarapari, ES", 1L, null, 6.0, null);
 
         TripCostBreakdownDTO result = tripEstimationService.estimate(request);
 
@@ -163,11 +164,63 @@ class TripEstimationServiceTest {
                 .thenReturn(java.util.Optional.of(posto1));
 
         TripEstimateRequestDTO request = new TripEstimateRequestDTO(
-                "Copacabana, RJ", "Guarapari, ES", 1L, null, 6.0);
+                "Copacabana, RJ", "Guarapari, ES", 1L, null, 6.0, null);
 
         TripCostBreakdownDTO result = tripEstimationService.estimate(request);
 
         assertEquals(2, result.postosNaRota().size());
         assertEquals("Posto Ipiranga", result.postoSugerido().nome());
+    }
+
+    @Test
+    void estimatesTripCostUsingPrecoPorKWhForElectricVehicle() {
+        Coordinates origem = new Coordinates(-22.9711, -43.1822);
+        Coordinates destino = new Coordinates(-20.6633, -40.4967);
+        when(geocodingService.resolve("Copacabana, RJ")).thenReturn(origem);
+        when(geocodingService.resolve("Guarapari, ES")).thenReturn(destino);
+
+        RouteResult route = new RouteResult(300.0, 240.0, List.of(origem, destino));
+        when(routingService.route(origem, destino)).thenReturn(route);
+
+        VehicleModel bolt = new VehicleModel();
+        bolt.setId(2L);
+        bolt.setTipo(VehicleType.CARRO);
+        bolt.setTipoEnergia(TipoEnergia.ELETRICO);
+        bolt.setConsumoKmPorKWh(6.0);
+        bolt.setNumeroEixos(2);
+        bolt.setCustoDesgastePorKm(0.40);
+        when(vehicleModelService.findById(2L)).thenReturn(bolt);
+
+        TripEstimateRequestDTO request = new TripEstimateRequestDTO(
+                "Copacabana, RJ", "Guarapari, ES", 2L, null, null, 0.90);
+
+        TripCostBreakdownDTO result = tripEstimationService.estimate(request);
+
+        // 300km / 6km/kWh * 0,90 = 45,00 | 300km * 0,40 = 120,00
+        assertEquals(45.0, result.custoCombustivel(), 0.001);
+        assertEquals(120.0, result.custoDesgaste(), 0.001);
+        // veículo elétrico não sugere posto de gasolina
+        assertEquals(0, result.postosNaRota().size());
+    }
+
+    @Test
+    void throwsWhenElectricVehicleResolvedButPrecoPorKWhMissing() {
+        when(geocodingService.resolve(anyString())).thenReturn(new Coordinates(-22.9, -43.1), new Coordinates(-20.6, -40.4));
+        when(routingService.route(any(), any()))
+                .thenReturn(new RouteResult(300.0, 240.0, List.of(new Coordinates(-22.9, -43.1), new Coordinates(-20.6, -40.4))));
+
+        VehicleModel bolt = new VehicleModel();
+        bolt.setId(2L);
+        bolt.setTipo(VehicleType.CARRO);
+        bolt.setTipoEnergia(TipoEnergia.ELETRICO);
+        bolt.setConsumoKmPorKWh(6.0);
+        bolt.setNumeroEixos(2);
+        bolt.setCustoDesgastePorKm(0.40);
+        when(vehicleModelService.findById(2L)).thenReturn(bolt);
+
+        TripEstimateRequestDTO request = new TripEstimateRequestDTO("A", "B", 2L, null, 6.0, null);
+
+        org.junit.jupiter.api.Assertions.assertThrows(IllegalArgumentException.class,
+                () -> tripEstimationService.estimate(request));
     }
 }

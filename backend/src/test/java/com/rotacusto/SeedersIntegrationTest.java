@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import com.rotacusto.entity.enums.TipoEnergia;
 import com.rotacusto.repository.TollPlazaRepository;
 import com.rotacusto.repository.VehicleModelRepository;
 
@@ -25,7 +26,7 @@ class SeedersIntegrationTest {
 
     @Test
     void vehicleModelCatalogIsSeededOnStartup() {
-        assertEquals(5342, vehicleModelRepository.count());
+        assertEquals(5808, vehicleModelRepository.count());
         long marcasDistintas = vehicleModelRepository.findAll().stream()
                 .map(v -> v.getMarca())
                 .distinct()
@@ -37,6 +38,15 @@ class SeedersIntegrationTest {
                 .distinct()
                 .count();
         assertTrue(anosDistintos >= 5, "catálogo deveria cobrir vários anos-modelo, não só o mais recente");
+
+        long eletricos = vehicleModelRepository.findAll().stream()
+                .filter(v -> v.getTipoEnergia() == TipoEnergia.ELETRICO)
+                .count();
+        assertTrue(eletricos > 0, "catálogo deveria ter pelo menos um veículo elétrico");
+        assertTrue(vehicleModelRepository.findAll().stream()
+                .filter(v -> v.getTipoEnergia() == TipoEnergia.ELETRICO)
+                .allMatch(v -> v.getConsumoKmPorKWh() != null),
+                "todo veículo elétrico deveria ter consumoKmPorKWh preenchido");
     }
 
     @Test

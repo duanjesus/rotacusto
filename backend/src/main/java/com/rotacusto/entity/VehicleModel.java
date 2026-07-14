@@ -1,5 +1,6 @@
 package com.rotacusto.entity;
 
+import com.rotacusto.entity.enums.TipoEnergia;
 import com.rotacusto.entity.enums.VehicleType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -31,11 +32,23 @@ public class VehicleModel {
     @Column(nullable = false)
     private VehicleType tipo;
 
-    @Column(name = "consumo_cidade_km_l", nullable = false)
+    /**
+     * Sem valor no JSON de seed (todo o catálogo pré-elétricos), assume
+     * COMBUSTAO — deserialização Jackson só sobrescreve quando a chave existe.
+     */
+    @Enumerated(EnumType.STRING)
+    @Column(name = "tipo_energia", nullable = false)
+    private TipoEnergia tipoEnergia = TipoEnergia.COMBUSTAO;
+
+    @Column(name = "consumo_cidade_km_l")
     private Double consumoCidadeKmL;
 
-    @Column(name = "consumo_estrada_km_l", nullable = false)
+    @Column(name = "consumo_estrada_km_l")
     private Double consumoEstradaKmL;
+
+    /** Só preenchido quando tipoEnergia = ELETRICO. */
+    @Column(name = "consumo_km_por_kwh")
+    private Double consumoKmPorKWh;
 
     @Column(name = "numero_eixos", nullable = false)
     private Integer numeroEixos;
@@ -100,6 +113,22 @@ public class VehicleModel {
 
     public void setConsumoEstradaKmL(Double consumoEstradaKmL) {
         this.consumoEstradaKmL = consumoEstradaKmL;
+    }
+
+    public TipoEnergia getTipoEnergia() {
+        return tipoEnergia;
+    }
+
+    public void setTipoEnergia(TipoEnergia tipoEnergia) {
+        this.tipoEnergia = tipoEnergia;
+    }
+
+    public Double getConsumoKmPorKWh() {
+        return consumoKmPorKWh;
+    }
+
+    public void setConsumoKmPorKWh(Double consumoKmPorKWh) {
+        this.consumoKmPorKWh = consumoKmPorKWh;
     }
 
     public Integer getNumeroEixos() {

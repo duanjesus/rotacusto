@@ -13,14 +13,25 @@ import com.rotacusto.repository.VehicleModelRepository;
 /**
  * Carrega o catálogo de veículos a partir de data/vehicle-models.json.
  *
- * Consumo (consumoCidadeKmL/consumoEstradaKmL) vem das Tabelas PBE Veicular
- * oficiais do INMETRO (gov.br/inmetro) — **anos 2016 a 2026, catálogo
- * completo** (~5.340 modelos/versões no total). Cada ano tem um "ano" próprio
- * no catálogo, então o mesmo modelo pode aparecer várias vezes com o consumo
- * daquele ano específico. Veículos 100% elétricos/plug-in foram deixados de
- * fora — o motor de custo é por preço de combustível (R$/litro), não por kWh.
+ * Consumo vem das Tabelas PBE Veicular oficiais do INMETRO (gov.br/inmetro) —
+ * **anos 2016 a 2026, catálogo completo** (~5.800 modelos/versões no total).
+ * Cada ano tem um "ano" próprio no catálogo, então o mesmo modelo pode
+ * aparecer várias vezes com o consumo daquele ano específico.
  *
- * Anos 2021-2025 (fechados nesta rodada): a extração desses PDFs específicos
+ * {@code tipoEnergia} discrimina COMBUSTAO (usa consumoCidadeKmL/
+ * consumoEstradaKmL, em L/km) de ELETRICO (usa consumoKmPorKWh) — os campos
+ * do "outro" tipo ficam nulos. Entradas 100% elétricas foram extraídas dos
+ * mesmos PDFs 2021-2026 filtrando por Propulsão="Elétrico" (excluindo
+ * híbridos plug-in, que ainda têm motor a combustão e ficam de fora por
+ * ora). Como a tabela não expõe km/kWh diretamente, o valor vem do "Consumo
+ * Energético (MJ/km)" — métrica única, universal a qualquer motorização, que
+ * a tabela publica pra todo veículo — convertido via 1 kWh = 3,6 MJ:
+ * consumoKmPorKWh = 3,6 / consumoEnergeticoMJporKm. Verificado contra a
+ * legenda de estatísticas de 2022 ("Elétricos 60 Modelos"): a extração bateu
+ * exatamente 60 entradas elétricas nesse ano.
+ *
+ * Anos 2021-2025 (fechados numa rodada anterior, mesma técnica pra
+ * combustão/híbrido): a extração desses PDFs específicos
  * (via tabula-java) tem colunas com posições inconsistentes até entre páginas
  * do mesmo documento — um mapeamento fixo por ano capturava só uma fração das
  * linhas reais. Solução: detecção por VALOR em vez de posição fixa — marca/

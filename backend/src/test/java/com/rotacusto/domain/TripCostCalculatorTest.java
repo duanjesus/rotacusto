@@ -7,6 +7,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 import com.rotacusto.entity.TollPlaza;
+import com.rotacusto.entity.enums.TipoEnergia;
 import com.rotacusto.entity.enums.VehicleType;
 
 class TripCostCalculatorTest {
@@ -14,7 +15,7 @@ class TripCostCalculatorTest {
     @Test
     void composesFuelAndWearIntoTotalWhenNoTollsCrossed() {
         // 500 km, 10 km/l, R$ 6,00/l -> combustível R$ 300,00; desgaste 500 * 0,35 = R$ 175,00
-        VehicleProfile profile = new VehicleProfile(VehicleType.CARRO, 10.0, 2, 0.35, 6.0);
+        VehicleProfile profile = new VehicleProfile(VehicleType.CARRO, TipoEnergia.COMBUSTAO, 10.0, 2, 0.35, 6.0);
 
         TripCostBreakdown breakdown = TripCostCalculator.calculate(500.0, 360.0, profile, List.of());
 
@@ -29,7 +30,7 @@ class TripCostCalculatorTest {
 
     @Test
     void includesTollCostWhenPlazasAreCrossed() {
-        VehicleProfile profile = new VehicleProfile(VehicleType.CARRO, 10.0, 2, 0.35, 6.0);
+        VehicleProfile profile = new VehicleProfile(VehicleType.CARRO, TipoEnergia.COMBUSTAO, 10.0, 2, 0.35, 6.0);
 
         TollPlaza praca1 = new TollPlaza();
         praca1.setTarifaPorEixo(5.0); // carro (2 eixos) -> R$ 10,00

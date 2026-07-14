@@ -8,6 +8,6 @@ public final class FuelCostCalculator {
     }
 
     public static double calculate(double distanciaKm, VehicleProfile profile) {
-        return distanciaKm / profile.consumoKmPorLitro() * profile.precoCombustivelPorLitro();
+        return distanciaKm / profile.consumoPorUnidade() * profile.precoPorUnidade();
     }
 }
