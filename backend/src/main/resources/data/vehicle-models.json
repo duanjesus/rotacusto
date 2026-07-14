@@ -1,20 +1,2792 @@
 [
-  { "marca": "Fiat", "modelo": "Mobi 1.0", "ano": 2024, "tipo": "CARRO", "consumoCidadeKmL": 8.0, "consumoEstradaKmL": 9.6, "numeroEixos": 2, "custoDesgastePorKm": 0.35 },
-  { "marca": "Volkswagen", "modelo": "Gol 1.0", "ano": 2023, "tipo": "CARRO", "consumoCidadeKmL": 8.5, "consumoEstradaKmL": 10.2, "numeroEixos": 2, "custoDesgastePorKm": 0.35 },
-  { "marca": "Chevrolet", "modelo": "Onix 1.0", "ano": 2024, "tipo": "CARRO", "consumoCidadeKmL": 9.0, "consumoEstradaKmL": 10.8, "numeroEixos": 2, "custoDesgastePorKm": 0.38 },
-  { "marca": "Chevrolet", "modelo": "Onix Plus 1.0 Turbo", "ano": 2024, "tipo": "CARRO", "consumoCidadeKmL": 10.5, "consumoEstradaKmL": 13.0, "numeroEixos": 2, "custoDesgastePorKm": 0.40 },
-  { "marca": "Hyundai", "modelo": "HB20 1.0", "ano": 2024, "tipo": "CARRO", "consumoCidadeKmL": 8.7, "consumoEstradaKmL": 10.5, "numeroEixos": 2, "custoDesgastePorKm": 0.38 },
-  { "marca": "Fiat", "modelo": "Argo 1.0", "ano": 2023, "tipo": "CARRO", "consumoCidadeKmL": 8.3, "consumoEstradaKmL": 10.0, "numeroEixos": 2, "custoDesgastePorKm": 0.37 },
-  { "marca": "Fiat", "modelo": "Cronos 1.3", "ano": 2023, "tipo": "CARRO", "consumoCidadeKmL": 8.0, "consumoEstradaKmL": 9.8, "numeroEixos": 2, "custoDesgastePorKm": 0.38 },
-  { "marca": "Volkswagen", "modelo": "Polo 1.0", "ano": 2023, "tipo": "CARRO", "consumoCidadeKmL": 8.6, "consumoEstradaKmL": 10.3, "numeroEixos": 2, "custoDesgastePorKm": 0.38 },
-  { "marca": "Renault", "modelo": "Kwid 1.0", "ano": 2023, "tipo": "CARRO", "consumoCidadeKmL": 8.8, "consumoEstradaKmL": 10.5, "numeroEixos": 2, "custoDesgastePorKm": 0.32 },
-  { "marca": "Hyundai", "modelo": "Creta 1.6", "ano": 2024, "tipo": "CARRO", "consumoCidadeKmL": 7.5, "consumoEstradaKmL": 9.2, "numeroEixos": 2, "custoDesgastePorKm": 0.48 },
-  { "marca": "Jeep", "modelo": "Renegade 1.8", "ano": 2023, "tipo": "CARRO", "consumoCidadeKmL": 7.2, "consumoEstradaKmL": 8.8, "numeroEixos": 2, "custoDesgastePorKm": 0.52 },
-  { "marca": "Chevrolet", "modelo": "Tracker 1.0 Turbo", "ano": 2024, "tipo": "CARRO", "consumoCidadeKmL": 9.5, "consumoEstradaKmL": 12.0, "numeroEixos": 2, "custoDesgastePorKm": 0.45 },
-  { "marca": "Volkswagen", "modelo": "T-Cross 1.0 Turbo", "ano": 2024, "tipo": "CARRO", "consumoCidadeKmL": 9.8, "consumoEstradaKmL": 12.5, "numeroEixos": 2, "custoDesgastePorKm": 0.45 },
-  { "marca": "Honda", "modelo": "HR-V 1.5", "ano": 2023, "tipo": "CARRO", "consumoCidadeKmL": 8.5, "consumoEstradaKmL": 10.8, "numeroEixos": 2, "custoDesgastePorKm": 0.46 },
-  { "marca": "Toyota", "modelo": "Corolla 2.0", "ano": 2023, "tipo": "CARRO", "consumoCidadeKmL": 8.0, "consumoEstradaKmL": 10.5, "numeroEixos": 2, "custoDesgastePorKm": 0.45 },
-  { "marca": "Honda", "modelo": "Civic 2.0", "ano": 2022, "tipo": "CARRO", "consumoCidadeKmL": 7.8, "consumoEstradaKmL": 10.0, "numeroEixos": 2, "custoDesgastePorKm": 0.48 },
-  { "marca": "Fiat", "modelo": "Toro 1.8", "ano": 2023, "tipo": "CARRO", "consumoCidadeKmL": 7.0, "consumoEstradaKmL": 9.0, "numeroEixos": 2, "custoDesgastePorKm": 0.55 },
-  { "marca": "Toyota", "modelo": "Hilux 2.8 Diesel", "ano": 2023, "tipo": "CARRO", "consumoCidadeKmL": 8.0, "consumoEstradaKmL": 10.0, "numeroEixos": 2, "custoDesgastePorKm": 0.60 }
+  {
+    "marca": "AUDI",
+    "modelo": "A3 Sedan",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 10.1,
+    "consumoEstradaKmL": 12.9,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.46
+  },
+  {
+    "marca": "AUDI",
+    "modelo": "A5",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 8.7,
+    "consumoEstradaKmL": 11.3,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.5
+  },
+  {
+    "marca": "AUDI",
+    "modelo": "A5 Sedan",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 8.3,
+    "consumoEstradaKmL": 10.9,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.5
+  },
+  {
+    "marca": "AUDI",
+    "modelo": "A5 Sedan",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 8.4,
+    "consumoEstradaKmL": 11,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.5
+  },
+  {
+    "marca": "AUDI",
+    "modelo": "Q3 Sportback",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 8,
+    "consumoEstradaKmL": 9.9,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.46
+  },
+  {
+    "marca": "AUDI",
+    "modelo": "Q3 Sportback",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 8.2,
+    "consumoEstradaKmL": 9.5,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.46
+  },
+  {
+    "marca": "AUDI",
+    "modelo": "Q3 SUV",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 8,
+    "consumoEstradaKmL": 9.8,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.46
+  },
+  {
+    "marca": "AUDI",
+    "modelo": "Q3 SUV",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 8.2,
+    "consumoEstradaKmL": 9.6,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.46
+  },
+  {
+    "marca": "AUDI",
+    "modelo": "Q5 Sportback",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 8.3,
+    "consumoEstradaKmL": 10.2,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.5
+  },
+  {
+    "marca": "AUDI",
+    "modelo": "Q5 SUV",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 8.3,
+    "consumoEstradaKmL": 10.2,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.5
+  },
+  {
+    "marca": "AUDI",
+    "modelo": "Q7",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 7,
+    "consumoEstradaKmL": 8.6,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.5
+  },
+  {
+    "marca": "AUDI",
+    "modelo": "Q8 Sportback",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 6.8,
+    "consumoEstradaKmL": 7.7,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.5
+  },
+  {
+    "marca": "AUDI",
+    "modelo": "RS 6 Avant",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 5.9,
+    "consumoEstradaKmL": 7.8,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.5
+  },
+  {
+    "marca": "AUDI",
+    "modelo": "RS3 Sedan",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 7.3,
+    "consumoEstradaKmL": 9.9,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.46
+  },
+  {
+    "marca": "AUDI",
+    "modelo": "RSQ8",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 5.3,
+    "consumoEstradaKmL": 7,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.5
+  },
+  {
+    "marca": "AUDI",
+    "modelo": "SQ5 Sportback",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 6.9,
+    "consumoEstradaKmL": 8.9,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.5
+  },
+  {
+    "marca": "AUDI",
+    "modelo": "SQ5 SUV",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 7.2,
+    "consumoEstradaKmL": 9.2,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.5
+  },
+  {
+    "marca": "BMW",
+    "modelo": "220",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 11.4,
+    "consumoEstradaKmL": 14.9,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.46
+  },
+  {
+    "marca": "BMW",
+    "modelo": "320i",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 10.5,
+    "consumoEstradaKmL": 13.1,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.5
+  },
+  {
+    "marca": "BMW",
+    "modelo": "320i",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 10.9,
+    "consumoEstradaKmL": 13.3,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.5
+  },
+  {
+    "marca": "BMW",
+    "modelo": "320i",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 10,
+    "consumoEstradaKmL": 12.3,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.5
+  },
+  {
+    "marca": "BMW",
+    "modelo": "420i",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 9.8,
+    "consumoEstradaKmL": 12.5,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.5
+  },
+  {
+    "marca": "BMW",
+    "modelo": "M2",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 7.2,
+    "consumoEstradaKmL": 9.3,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.48
+  },
+  {
+    "marca": "BMW",
+    "modelo": "M235",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 8.9,
+    "consumoEstradaKmL": 12.3,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.46
+  },
+  {
+    "marca": "BMW",
+    "modelo": "M3",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 7,
+    "consumoEstradaKmL": 9.3,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.48
+  },
+  {
+    "marca": "BMW",
+    "modelo": "M4",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 7.4,
+    "consumoEstradaKmL": 10,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.48
+  },
+  {
+    "marca": "BMW",
+    "modelo": "X1",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 10.3,
+    "consumoEstradaKmL": 13.5,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.5
+  },
+  {
+    "marca": "BMW",
+    "modelo": "X1",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 10.2,
+    "consumoEstradaKmL": 13.2,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.5
+  },
+  {
+    "marca": "BMW",
+    "modelo": "X2",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 8.9,
+    "consumoEstradaKmL": 11.6,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.46
+  },
+  {
+    "marca": "BMW",
+    "modelo": "X2",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 9.9,
+    "consumoEstradaKmL": 13.1,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.5
+  },
+  {
+    "marca": "BMW",
+    "modelo": "X3",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 9.6,
+    "consumoEstradaKmL": 10.9,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.55
+  },
+  {
+    "marca": "BMW",
+    "modelo": "X3",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 10.4,
+    "consumoEstradaKmL": 12.2,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.55
+  },
+  {
+    "marca": "BMW",
+    "modelo": "X6",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 9,
+    "consumoEstradaKmL": 10.1,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.55
+  },
+  {
+    "marca": "BMW",
+    "modelo": "X7",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 8,
+    "consumoEstradaKmL": 8.7,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.55
+  },
+  {
+    "marca": "CAOA CHANGAN",
+    "modelo": "Uni-T",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 10.5,
+    "consumoEstradaKmL": 12.4,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.5
+  },
+  {
+    "marca": "CAOA CHERY",
+    "modelo": "TIGGO 5X",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 11.4,
+    "consumoEstradaKmL": 11.8,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.42
+  },
+  {
+    "marca": "CAOA CHERY",
+    "modelo": "TIGGO 5X",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 10,
+    "consumoEstradaKmL": 11.7,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.42
+  },
+  {
+    "marca": "CAOA CHERY",
+    "modelo": "TIGGO 7",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 10.5,
+    "consumoEstradaKmL": 13.3,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.5
+  },
+  {
+    "marca": "CAOA CHERY",
+    "modelo": "TIGGO 7",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 11.1,
+    "consumoEstradaKmL": 11.6,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.5
+  },
+  {
+    "marca": "CAOA CHERY",
+    "modelo": "TIGGO 7",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 10.4,
+    "consumoEstradaKmL": 12.6,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.5
+  },
+  {
+    "marca": "CAOA CHERY",
+    "modelo": "TIGGO 8",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 10,
+    "consumoEstradaKmL": 12.5,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.5
+  },
+  {
+    "marca": "CHEVROLET",
+    "modelo": "EQUINOX",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 9,
+    "consumoEstradaKmL": 10.7,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.5
+  },
+  {
+    "marca": "CHEVROLET",
+    "modelo": "MONTANA",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 12.3,
+    "consumoEstradaKmL": 13.7,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.45
+  },
+  {
+    "marca": "CHEVROLET",
+    "modelo": "MONTANA",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 11,
+    "consumoEstradaKmL": 13.5,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.45
+  },
+  {
+    "marca": "CHEVROLET",
+    "modelo": "ONIX",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 13.5,
+    "consumoEstradaKmL": 16.3,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.42
+  },
+  {
+    "marca": "CHEVROLET",
+    "modelo": "S10",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 8.4,
+    "consumoEstradaKmL": 11.1,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.55
+  },
+  {
+    "marca": "CHEVROLET",
+    "modelo": "S10",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 10.2,
+    "consumoEstradaKmL": 11.4,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.55
+  },
+  {
+    "marca": "CHEVROLET",
+    "modelo": "S10",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 8.8,
+    "consumoEstradaKmL": 11.9,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.55
+  },
+  {
+    "marca": "CHEVROLET",
+    "modelo": "SILVERADO",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 6,
+    "consumoEstradaKmL": 7.2,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.55
+  },
+  {
+    "marca": "CHEVROLET",
+    "modelo": "SONIC",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 12.1,
+    "consumoEstradaKmL": 14.8,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.42
+  },
+  {
+    "marca": "CHEVROLET",
+    "modelo": "SPIN",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 10.1,
+    "consumoEstradaKmL": 13.1,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.42
+  },
+  {
+    "marca": "CHEVROLET",
+    "modelo": "TRACKER",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 11.5,
+    "consumoEstradaKmL": 13.8,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.42
+  },
+  {
+    "marca": "CHEVROLET",
+    "modelo": "TRACKER",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 11,
+    "consumoEstradaKmL": 13.7,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.42
+  },
+  {
+    "marca": "CHEVROLET",
+    "modelo": "TRAILBLAZER",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 9.4,
+    "consumoEstradaKmL": 11.6,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.58
+  },
+  {
+    "marca": "CITROEN",
+    "modelo": "AIRCROSS",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 11,
+    "consumoEstradaKmL": 12.6,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.42
+  },
+  {
+    "marca": "CITROEN",
+    "modelo": "AIRCROSS",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 11.2,
+    "consumoEstradaKmL": 13,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.42
+  },
+  {
+    "marca": "CITROEN",
+    "modelo": "BASALT",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 13.2,
+    "consumoEstradaKmL": 14.3,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.42
+  },
+  {
+    "marca": "CITROEN",
+    "modelo": "BASALT",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 12.1,
+    "consumoEstradaKmL": 13.7,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.42
+  },
+  {
+    "marca": "CITROEN",
+    "modelo": "C3",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 13.2,
+    "consumoEstradaKmL": 14.5,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.42
+  },
+  {
+    "marca": "CITROEN",
+    "modelo": "C3",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 13.4,
+    "consumoEstradaKmL": 14.6,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.42
+  },
+  {
+    "marca": "CITROEN",
+    "modelo": "C3",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 13,
+    "consumoEstradaKmL": 14.2,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.42
+  },
+  {
+    "marca": "CITROEN",
+    "modelo": "C3",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 11.5,
+    "consumoEstradaKmL": 12.9,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.42
+  },
+  {
+    "marca": "CITROEN",
+    "modelo": "JUMPER",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 10.4,
+    "consumoEstradaKmL": 10.5,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.42
+  },
+  {
+    "marca": "CITROEN",
+    "modelo": "JUMPER",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 10.8,
+    "consumoEstradaKmL": 10.4,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.42
+  },
+  {
+    "marca": "CITROEN",
+    "modelo": "JUMPER",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 11,
+    "consumoEstradaKmL": 10.6,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.42
+  },
+  {
+    "marca": "CITROEN",
+    "modelo": "JUMPY",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 12.4,
+    "consumoEstradaKmL": 13.7,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.42
+  },
+  {
+    "marca": "FERRARI",
+    "modelo": "12CILINDRI",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 4.8,
+    "consumoEstradaKmL": 6.7,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.48
+  },
+  {
+    "marca": "FERRARI",
+    "modelo": "12CILINDRI",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 4.6,
+    "consumoEstradaKmL": 6.4,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.48
+  },
+  {
+    "marca": "FERRARI",
+    "modelo": "PUROSANGUE",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 4.1,
+    "consumoEstradaKmL": 5.6,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.48
+  },
+  {
+    "marca": "FERRARI",
+    "modelo": "ROMA",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 6.7,
+    "consumoEstradaKmL": 8.7,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.48
+  },
+  {
+    "marca": "FIAT",
+    "modelo": "ARGO",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 12.9,
+    "consumoEstradaKmL": 14.7,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.42
+  },
+  {
+    "marca": "FIAT",
+    "modelo": "ARGO",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 12.8,
+    "consumoEstradaKmL": 14.3,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.42
+  },
+  {
+    "marca": "FIAT",
+    "modelo": "DUCATO",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 10.4,
+    "consumoEstradaKmL": 10.5,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.42
+  },
+  {
+    "marca": "FIAT",
+    "modelo": "DUCATO",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 10.8,
+    "consumoEstradaKmL": 10.4,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.42
+  },
+  {
+    "marca": "FIAT",
+    "modelo": "DUCATO",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 11,
+    "consumoEstradaKmL": 10.6,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.42
+  },
+  {
+    "marca": "FIAT",
+    "modelo": "FASTBACK",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 12.1,
+    "consumoEstradaKmL": 14.3,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.42
+  },
+  {
+    "marca": "FIAT",
+    "modelo": "FASTBACK",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 12.6,
+    "consumoEstradaKmL": 13.9,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.42
+  },
+  {
+    "marca": "FIAT",
+    "modelo": "FASTBACK",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 10.8,
+    "consumoEstradaKmL": 12.9,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.42
+  },
+  {
+    "marca": "FIAT",
+    "modelo": "FASTBACK",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 11.3,
+    "consumoEstradaKmL": 13.6,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.42
+  },
+  {
+    "marca": "FIAT",
+    "modelo": "FIORINO",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 12.4,
+    "consumoEstradaKmL": 13.6,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.42
+  },
+  {
+    "marca": "FIAT",
+    "modelo": "PULSE",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 12.6,
+    "consumoEstradaKmL": 14.5,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.42
+  },
+  {
+    "marca": "FIAT",
+    "modelo": "PULSE",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 13,
+    "consumoEstradaKmL": 14.7,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.42
+  },
+  {
+    "marca": "FIAT",
+    "modelo": "PULSE",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 13.4,
+    "consumoEstradaKmL": 14.4,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.42
+  },
+  {
+    "marca": "FIAT",
+    "modelo": "PULSE",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 12.3,
+    "consumoEstradaKmL": 14.4,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.42
+  },
+  {
+    "marca": "FIAT",
+    "modelo": "PULSE",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 10.5,
+    "consumoEstradaKmL": 12.2,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.42
+  },
+  {
+    "marca": "FIAT",
+    "modelo": "SCUDO",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 12.4,
+    "consumoEstradaKmL": 13.7,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.42
+  },
+  {
+    "marca": "FIAT",
+    "modelo": "STRADA",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 13,
+    "consumoEstradaKmL": 14.7,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.45
+  },
+  {
+    "marca": "FIAT",
+    "modelo": "STRADA",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 12.8,
+    "consumoEstradaKmL": 14.4,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.45
+  },
+  {
+    "marca": "FIAT",
+    "modelo": "STRADA",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 12.4,
+    "consumoEstradaKmL": 13.9,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.45
+  },
+  {
+    "marca": "FIAT",
+    "modelo": "STRADA",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 12.6,
+    "consumoEstradaKmL": 13.5,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.45
+  },
+  {
+    "marca": "FIAT",
+    "modelo": "STRADA",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 11.9,
+    "consumoEstradaKmL": 13.1,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.45
+  },
+  {
+    "marca": "FIAT",
+    "modelo": "TITANO",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 10.5,
+    "consumoEstradaKmL": 10.5,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.55
+  },
+  {
+    "marca": "FIAT",
+    "modelo": "TITANO",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 9.9,
+    "consumoEstradaKmL": 10.8,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.55
+  },
+  {
+    "marca": "FIAT",
+    "modelo": "TORO",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 9.8,
+    "consumoEstradaKmL": 11.2,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.55
+  },
+  {
+    "marca": "FIAT",
+    "modelo": "TORO",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 9.4,
+    "consumoEstradaKmL": 10.8,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.55
+  },
+  {
+    "marca": "FIAT",
+    "modelo": "TORO",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 10.5,
+    "consumoEstradaKmL": 13.6,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.55
+  },
+  {
+    "marca": "FIAT",
+    "modelo": "TORO",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 10.3,
+    "consumoEstradaKmL": 13.1,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.55
+  },
+  {
+    "marca": "FIAT",
+    "modelo": "TORO",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 10.5,
+    "consumoEstradaKmL": 10.7,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.55
+  },
+  {
+    "marca": "FORD",
+    "modelo": "BRONCO SPORT",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 8.4,
+    "consumoEstradaKmL": 10.7,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.58
+  },
+  {
+    "marca": "FORD",
+    "modelo": "Maverick",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 15.4,
+    "consumoEstradaKmL": 13.5,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.55
+  },
+  {
+    "marca": "FORD",
+    "modelo": "Maverick",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 8.5,
+    "consumoEstradaKmL": 11.4,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.55
+  },
+  {
+    "marca": "FORD",
+    "modelo": "Maverick",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 8.4,
+    "consumoEstradaKmL": 10.7,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.55
+  },
+  {
+    "marca": "FORD",
+    "modelo": "Mustang",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 6.5,
+    "consumoEstradaKmL": 9,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.48
+  },
+  {
+    "marca": "FORD",
+    "modelo": "Mustang Dark Horse",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 6.3,
+    "consumoEstradaKmL": 8.8,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.48
+  },
+  {
+    "marca": "FORD",
+    "modelo": "Nova F150",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 6,
+    "consumoEstradaKmL": 7.5,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.55
+  },
+  {
+    "marca": "FORD",
+    "modelo": "Nova F150",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 6.5,
+    "consumoEstradaKmL": 8.5,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.55
+  },
+  {
+    "marca": "FORD",
+    "modelo": "Nova Ranger 4x2",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 10.2,
+    "consumoEstradaKmL": 12.1,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.55
+  },
+  {
+    "marca": "FORD",
+    "modelo": "Nova Ranger 4x4",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 10.3,
+    "consumoEstradaKmL": 11.2,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.55
+  },
+  {
+    "marca": "FORD",
+    "modelo": "Nova Ranger 4x4",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 9.9,
+    "consumoEstradaKmL": 11.6,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.55
+  },
+  {
+    "marca": "FORD",
+    "modelo": "Nova Ranger 4x4",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 8.3,
+    "consumoEstradaKmL": 10.1,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.55
+  },
+  {
+    "marca": "FORD",
+    "modelo": "Nova Ranger 4x4",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 8.6,
+    "consumoEstradaKmL": 10.1,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.55
+  },
+  {
+    "marca": "FORD",
+    "modelo": "Nova Ranger 4x4",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 9.2,
+    "consumoEstradaKmL": 11.1,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.55
+  },
+  {
+    "marca": "FORD",
+    "modelo": "TERRITORY",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 8.8,
+    "consumoEstradaKmL": 11.2,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.5
+  },
+  {
+    "marca": "FORD",
+    "modelo": "Transit",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 9.8,
+    "consumoEstradaKmL": 9.7,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.42
+  },
+  {
+    "marca": "FOTON",
+    "modelo": "TUNLAND",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 8.7,
+    "consumoEstradaKmL": 9.9,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.55
+  },
+  {
+    "marca": "GAC",
+    "modelo": "GS3",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 10.2,
+    "consumoEstradaKmL": 11.6,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.5
+  },
+  {
+    "marca": "GAC",
+    "modelo": "GS4",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 14.1,
+    "consumoEstradaKmL": 11.8,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.5
+  },
+  {
+    "marca": "GWM",
+    "modelo": "HAVAL H6",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 14.7,
+    "consumoEstradaKmL": 11.4,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.5
+  },
+  {
+    "marca": "GWM",
+    "modelo": "HAVAL H9",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 9,
+    "consumoEstradaKmL": 10.3,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.58
+  },
+  {
+    "marca": "GWM",
+    "modelo": "POER P30",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 9.4,
+    "consumoEstradaKmL": 10.4,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.55
+  },
+  {
+    "marca": "HONDA",
+    "modelo": "ACCORD HYBRID",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 17.5,
+    "consumoEstradaKmL": 15.6,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.5
+  },
+  {
+    "marca": "HONDA",
+    "modelo": "CITY",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 12.8,
+    "consumoEstradaKmL": 15.5,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.4
+  },
+  {
+    "marca": "HONDA",
+    "modelo": "CITY HATCH",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 13.2,
+    "consumoEstradaKmL": 15,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.4
+  },
+  {
+    "marca": "HONDA",
+    "modelo": "CIVIC HYBRID",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 18.4,
+    "consumoEstradaKmL": 15.9,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.46
+  },
+  {
+    "marca": "HONDA",
+    "modelo": "CR-V",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 14.1,
+    "consumoEstradaKmL": 11.8,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.5
+  },
+  {
+    "marca": "HONDA",
+    "modelo": "HR-V",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 12.5,
+    "consumoEstradaKmL": 13.9,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.4
+  },
+  {
+    "marca": "HONDA",
+    "modelo": "HR-V",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 11.3,
+    "consumoEstradaKmL": 13,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.4
+  },
+  {
+    "marca": "HONDA",
+    "modelo": "HR-V (mod. 26)",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 11.5,
+    "consumoEstradaKmL": 12.9,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.4
+  },
+  {
+    "marca": "HONDA",
+    "modelo": "WR-V",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 12,
+    "consumoEstradaKmL": 12.8,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.42
+  },
+  {
+    "marca": "HONDA",
+    "modelo": "ZR-V",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 10.4,
+    "consumoEstradaKmL": 12.3,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.46
+  },
+  {
+    "marca": "Hyundai",
+    "modelo": "CRETA",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 12,
+    "consumoEstradaKmL": 12.7,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.42
+  },
+  {
+    "marca": "Hyundai",
+    "modelo": "CRETA",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 11.8,
+    "consumoEstradaKmL": 13.4,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.42
+  },
+  {
+    "marca": "Hyundai",
+    "modelo": "CRETA",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 11.7,
+    "consumoEstradaKmL": 13.8,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.42
+  },
+  {
+    "marca": "Hyundai",
+    "modelo": "HB20S",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 13.4,
+    "consumoEstradaKmL": 15.4,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.4
+  },
+  {
+    "marca": "Hyundai",
+    "modelo": "HB20S",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 13,
+    "consumoEstradaKmL": 15.2,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.4
+  },
+  {
+    "marca": "Hyundai",
+    "modelo": "KONA",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 18.4,
+    "consumoEstradaKmL": 16,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.4
+  },
+  {
+    "marca": "JAC",
+    "modelo": "HUNTER",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 9,
+    "consumoEstradaKmL": 10.2,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.55
+  },
+  {
+    "marca": "JEEP",
+    "modelo": "COMMANDER",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 10,
+    "consumoEstradaKmL": 11.5,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.5
+  },
+  {
+    "marca": "JEEP",
+    "modelo": "COMMANDER",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 11,
+    "consumoEstradaKmL": 11.2,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.5
+  },
+  {
+    "marca": "JEEP",
+    "modelo": "COMMANDER",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 8,
+    "consumoEstradaKmL": 10.3,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.58
+  },
+  {
+    "marca": "JEEP",
+    "modelo": "COMMANDER",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 10.3,
+    "consumoEstradaKmL": 13.4,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.58
+  },
+  {
+    "marca": "JEEP",
+    "modelo": "COMMANDER",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 8.2,
+    "consumoEstradaKmL": 10.6,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.58
+  },
+  {
+    "marca": "JEEP",
+    "modelo": "COMPASS",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 10.1,
+    "consumoEstradaKmL": 12.1,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.5
+  },
+  {
+    "marca": "JEEP",
+    "modelo": "COMPASS",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 8.5,
+    "consumoEstradaKmL": 10.8,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.58
+  },
+  {
+    "marca": "JEEP",
+    "modelo": "COMPASS",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 8.5,
+    "consumoEstradaKmL": 11,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.58
+  },
+  {
+    "marca": "JEEP",
+    "modelo": "GLADIATOR",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 6.3,
+    "consumoEstradaKmL": 7.1,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.55
+  },
+  {
+    "marca": "JEEP",
+    "modelo": "RENEGADE",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 11.9,
+    "consumoEstradaKmL": 11.8,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.42
+  },
+  {
+    "marca": "JEEP",
+    "modelo": "RENEGADE",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 11.1,
+    "consumoEstradaKmL": 12.4,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.42
+  },
+  {
+    "marca": "JEEP",
+    "modelo": "RENEGADE",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 10.9,
+    "consumoEstradaKmL": 12,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.42
+  },
+  {
+    "marca": "JEEP",
+    "modelo": "RENEGADE",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 9.2,
+    "consumoEstradaKmL": 10.1,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.48
+  },
+  {
+    "marca": "JEEP",
+    "modelo": "RENEGADE",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 9.1,
+    "consumoEstradaKmL": 9.7,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.48
+  },
+  {
+    "marca": "JEEP",
+    "modelo": "WRANGLER",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 7.2,
+    "consumoEstradaKmL": 7.5,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.58
+  },
+  {
+    "marca": "KIA",
+    "modelo": "BONGO K2500 4X4 SC",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 8.6,
+    "consumoEstradaKmL": 8.1,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.42
+  },
+  {
+    "marca": "KIA",
+    "modelo": "CARNIVAL",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 11.9,
+    "consumoEstradaKmL": 10.2,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.42
+  },
+  {
+    "marca": "KIA",
+    "modelo": "NIRO",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 18.3,
+    "consumoEstradaKmL": 15.9,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.4
+  },
+  {
+    "marca": "KIA",
+    "modelo": "SPORTAGE",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 12.5,
+    "consumoEstradaKmL": 13.2,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.5
+  },
+  {
+    "marca": "LAND ROVER",
+    "modelo": "DEFENDER 110 D350",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 9.1,
+    "consumoEstradaKmL": 10.6,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.58
+  },
+  {
+    "marca": "LAND ROVER",
+    "modelo": "DEFENDER 130 D350",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 9.2,
+    "consumoEstradaKmL": 10.9,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.58
+  },
+  {
+    "marca": "LAND ROVER",
+    "modelo": "DEFENDER 90 D350",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 9.1,
+    "consumoEstradaKmL": 10.6,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.58
+  },
+  {
+    "marca": "LAND ROVER",
+    "modelo": "DISCOVERY",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 9.5,
+    "consumoEstradaKmL": 11.8,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.58
+  },
+  {
+    "marca": "LAND ROVER",
+    "modelo": "DISCOVERY SPORT",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 7.2,
+    "consumoEstradaKmL": 9.6,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.58
+  },
+  {
+    "marca": "LAND ROVER",
+    "modelo": "EVOQUE",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 7.4,
+    "consumoEstradaKmL": 9.4,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.58
+  },
+  {
+    "marca": "LEXUS",
+    "modelo": "NX350H",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 15.7,
+    "consumoEstradaKmL": 13.8,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.5
+  },
+  {
+    "marca": "LEXUS",
+    "modelo": "RX500H",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 10.8,
+    "consumoEstradaKmL": 11,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.5
+  },
+  {
+    "marca": "LEXUS",
+    "modelo": "UX 300H",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 17.3,
+    "consumoEstradaKmL": 14.9,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.46
+  },
+  {
+    "marca": "MCLAREN",
+    "modelo": "750S",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 5.9,
+    "consumoEstradaKmL": 7.4,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.48
+  },
+  {
+    "marca": "Mercedes-Benz",
+    "modelo": "315CDI STREET",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 9.6,
+    "consumoEstradaKmL": 10.4,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.42
+  },
+  {
+    "marca": "Mercedes-Benz",
+    "modelo": "AMG A45S 4M",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 8.3,
+    "consumoEstradaKmL": 10.7,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.46
+  },
+  {
+    "marca": "Mercedes-Benz",
+    "modelo": "AMG CLA35 4M",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 8.1,
+    "consumoEstradaKmL": 11.7,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.5
+  },
+  {
+    "marca": "Mercedes-Benz",
+    "modelo": "AMG CLA45S 4M",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 8.1,
+    "consumoEstradaKmL": 10.7,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.5
+  },
+  {
+    "marca": "Mercedes-Benz",
+    "modelo": "AMG G63",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 5.3,
+    "consumoEstradaKmL": 6,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.58
+  },
+  {
+    "marca": "Mercedes-Benz",
+    "modelo": "AMG G63 4M",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 5.4,
+    "consumoEstradaKmL": 6.2,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.58
+  },
+  {
+    "marca": "Mercedes-Benz",
+    "modelo": "AMG GLA35 4M",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 8.8,
+    "consumoEstradaKmL": 10.8,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.46
+  },
+  {
+    "marca": "Mercedes-Benz",
+    "modelo": "AMG GLB35 4M",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 8.4,
+    "consumoEstradaKmL": 9.8,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.5
+  },
+  {
+    "marca": "Mercedes-Benz",
+    "modelo": "AMG GLC43",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 7.3,
+    "consumoEstradaKmL": 9.1,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.5
+  },
+  {
+    "marca": "Mercedes-Benz",
+    "modelo": "AMG GLC43",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 6.8,
+    "consumoEstradaKmL": 8.7,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.5
+  },
+  {
+    "marca": "Mercedes-Benz",
+    "modelo": "AMG GLE53 4M",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 7.3,
+    "consumoEstradaKmL": 8.9,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.5
+  },
+  {
+    "marca": "Mercedes-Benz",
+    "modelo": "AMG GLE63 S CO",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 5.9,
+    "consumoEstradaKmL": 7.3,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.5
+  },
+  {
+    "marca": "Mercedes-Benz",
+    "modelo": "C200",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 11.4,
+    "consumoEstradaKmL": 14.1,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.5
+  },
+  {
+    "marca": "Mercedes-Benz",
+    "modelo": "C300",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 10.8,
+    "consumoEstradaKmL": 13.4,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.5
+  },
+  {
+    "marca": "Mercedes-Benz",
+    "modelo": "CLA200",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 12,
+    "consumoEstradaKmL": 14,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.5
+  },
+  {
+    "marca": "Mercedes-Benz",
+    "modelo": "E300",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 9.9,
+    "consumoEstradaKmL": 12.7,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.5
+  },
+  {
+    "marca": "Mercedes-Benz",
+    "modelo": "GLA200",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 11.4,
+    "consumoEstradaKmL": 12.4,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.46
+  },
+  {
+    "marca": "Mercedes-Benz",
+    "modelo": "GLB220 4M",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 10.4,
+    "consumoEstradaKmL": 13,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.5
+  },
+  {
+    "marca": "Mercedes-Benz",
+    "modelo": "GLC300 4M",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 9.5,
+    "consumoEstradaKmL": 11.8,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.55
+  },
+  {
+    "marca": "Mercedes-Benz",
+    "modelo": "GLE450D",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 10.6,
+    "consumoEstradaKmL": 13,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.55
+  },
+  {
+    "marca": "Mercedes-Benz",
+    "modelo": "GLS450 4M",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 7.5,
+    "consumoEstradaKmL": 9,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.5
+  },
+  {
+    "marca": "MINI",
+    "modelo": "Cooper",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 11.5,
+    "consumoEstradaKmL": 14.5,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.4
+  },
+  {
+    "marca": "MINI",
+    "modelo": "JCW",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 9.5,
+    "consumoEstradaKmL": 11.6,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.46
+  },
+  {
+    "marca": "Mitsubishi",
+    "modelo": "Eclipse Cross",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 10.3,
+    "consumoEstradaKmL": 11.3,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.5
+  },
+  {
+    "marca": "Mitsubishi",
+    "modelo": "Eclipse Cross",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 10.2,
+    "consumoEstradaKmL": 11.5,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.55
+  },
+  {
+    "marca": "Mitsubishi",
+    "modelo": "Triton",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 10.2,
+    "consumoEstradaKmL": 12.3,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.55
+  },
+  {
+    "marca": "Mitsubishi",
+    "modelo": "Triton",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 10.8,
+    "consumoEstradaKmL": 12.2,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.55
+  },
+  {
+    "marca": "Mitsubishi",
+    "modelo": "Triton",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 9.5,
+    "consumoEstradaKmL": 11.7,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.55
+  },
+  {
+    "marca": "Nissan",
+    "modelo": "Kait",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 11.3,
+    "consumoEstradaKmL": 13.7,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.42
+  },
+  {
+    "marca": "Nissan",
+    "modelo": "Kait",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 11,
+    "consumoEstradaKmL": 12.5,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.42
+  },
+  {
+    "marca": "Nissan",
+    "modelo": "Kicks",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 11.7,
+    "consumoEstradaKmL": 14.3,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.42
+  },
+  {
+    "marca": "Nissan",
+    "modelo": "Sentra",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 11,
+    "consumoEstradaKmL": 14,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.46
+  },
+  {
+    "marca": "Nissan",
+    "modelo": "Versa",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 11.5,
+    "consumoEstradaKmL": 15,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.4
+  },
+  {
+    "marca": "OMODA",
+    "modelo": "5",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 15.1,
+    "consumoEstradaKmL": 13.2,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.46
+  },
+  {
+    "marca": "PEUGEOT",
+    "modelo": "2008",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 12,
+    "consumoEstradaKmL": 14.1,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.42
+  },
+  {
+    "marca": "PEUGEOT",
+    "modelo": "2008",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 13,
+    "consumoEstradaKmL": 13.7,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.42
+  },
+  {
+    "marca": "PEUGEOT",
+    "modelo": "BOXER",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 10.4,
+    "consumoEstradaKmL": 10.5,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.42
+  },
+  {
+    "marca": "PEUGEOT",
+    "modelo": "BOXER",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 10.8,
+    "consumoEstradaKmL": 10.4,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.42
+  },
+  {
+    "marca": "PEUGEOT",
+    "modelo": "BOXER",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 11,
+    "consumoEstradaKmL": 10.6,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.42
+  },
+  {
+    "marca": "PEUGEOT",
+    "modelo": "EXPERT",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 12.4,
+    "consumoEstradaKmL": 13.7,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.42
+  },
+  {
+    "marca": "PEUGEOT",
+    "modelo": "PARTRAPID",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 12.4,
+    "consumoEstradaKmL": 13.6,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.42
+  },
+  {
+    "marca": "PORSCHE",
+    "modelo": "911",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 7,
+    "consumoEstradaKmL": 9.6,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.48
+  },
+  {
+    "marca": "PORSCHE",
+    "modelo": "911",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 6.9,
+    "consumoEstradaKmL": 9.5,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.48
+  },
+  {
+    "marca": "PORSCHE",
+    "modelo": "911",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 5.2,
+    "consumoEstradaKmL": 6.9,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.48
+  },
+  {
+    "marca": "PORSCHE",
+    "modelo": "911",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 5.6,
+    "consumoEstradaKmL": 6.8,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.48
+  },
+  {
+    "marca": "PORSCHE",
+    "modelo": "911",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 6.9,
+    "consumoEstradaKmL": 9.4,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.48
+  },
+  {
+    "marca": "PORSCHE",
+    "modelo": "911",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 7.2,
+    "consumoEstradaKmL": 9.2,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.48
+  },
+  {
+    "marca": "PORSCHE",
+    "modelo": "BOXSTER",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 7.1,
+    "consumoEstradaKmL": 8.9,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.48
+  },
+  {
+    "marca": "PORSCHE",
+    "modelo": "CAYENNE",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 5.8,
+    "consumoEstradaKmL": 7.9,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.55
+  },
+  {
+    "marca": "PORSCHE",
+    "modelo": "CAYENNE",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 6.9,
+    "consumoEstradaKmL": 8.5,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.55
+  },
+  {
+    "marca": "PORSCHE",
+    "modelo": "CAYENNE",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 5.9,
+    "consumoEstradaKmL": 8.2,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.55
+  },
+  {
+    "marca": "PORSCHE",
+    "modelo": "CAYMAN",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 7.1,
+    "consumoEstradaKmL": 8.9,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.48
+  },
+  {
+    "marca": "PORSCHE",
+    "modelo": "MACAN",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 7,
+    "consumoEstradaKmL": 8.4,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.5
+  },
+  {
+    "marca": "PORSCHE",
+    "modelo": "MACAN",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 7.3,
+    "consumoEstradaKmL": 8.5,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.5
+  },
+  {
+    "marca": "RAM",
+    "modelo": "1500",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 6,
+    "consumoEstradaKmL": 7,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.55
+  },
+  {
+    "marca": "RAM",
+    "modelo": "DAKOTA",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 9.7,
+    "consumoEstradaKmL": 10.8,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.55
+  },
+  {
+    "marca": "RAM",
+    "modelo": "RAMPAGE",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 10.6,
+    "consumoEstradaKmL": 13.3,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.55
+  },
+  {
+    "marca": "RAM",
+    "modelo": "RAMPAGE",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 8.2,
+    "consumoEstradaKmL": 10,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.55
+  },
+  {
+    "marca": "RAM",
+    "modelo": "RAMPAGE",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 8.2,
+    "consumoEstradaKmL": 9.8,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.55
+  },
+  {
+    "marca": "RAM",
+    "modelo": "RAMPAGE",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 7.7,
+    "consumoEstradaKmL": 9.7,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.55
+  },
+  {
+    "marca": "RAM",
+    "modelo": "RAMPAGE",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 7.7,
+    "consumoEstradaKmL": 9.9,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.55
+  },
+  {
+    "marca": "Renault",
+    "modelo": "BOREAL",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 11.2,
+    "consumoEstradaKmL": 13.6,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.5
+  },
+  {
+    "marca": "Renault",
+    "modelo": "DUSTER",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 10.8,
+    "consumoEstradaKmL": 11.4,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.5
+  },
+  {
+    "marca": "Renault",
+    "modelo": "DUSTER",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 11.2,
+    "consumoEstradaKmL": 12.3,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.5
+  },
+  {
+    "marca": "Renault",
+    "modelo": "DUSTER",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 10.9,
+    "consumoEstradaKmL": 12.3,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.5
+  },
+  {
+    "marca": "Renault",
+    "modelo": "KANGOO",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 11,
+    "consumoEstradaKmL": 11.7,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.42
+  },
+  {
+    "marca": "Renault",
+    "modelo": "KARDIAN",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 12.8,
+    "consumoEstradaKmL": 13.9,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.42
+  },
+  {
+    "marca": "Renault",
+    "modelo": "KARDIAN",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 12.2,
+    "consumoEstradaKmL": 13.8,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.42
+  },
+  {
+    "marca": "Renault",
+    "modelo": "KARDIAN",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 12.7,
+    "consumoEstradaKmL": 14.7,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.42
+  },
+  {
+    "marca": "Renault",
+    "modelo": "KOLEOS",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 13.1,
+    "consumoEstradaKmL": 12.1,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.5
+  },
+  {
+    "marca": "Renault",
+    "modelo": "KWID",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 14.4,
+    "consumoEstradaKmL": 15.4,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.42
+  },
+  {
+    "marca": "Renault",
+    "modelo": "MASTER BUS",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 9.4,
+    "consumoEstradaKmL": 9.3,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.42
+  },
+  {
+    "marca": "Renault",
+    "modelo": "MASTER CHASSIS CABINE",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 10.2,
+    "consumoEstradaKmL": 9.7,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.42
+  },
+  {
+    "marca": "Renault",
+    "modelo": "MASTER FUGÃO PRÓ",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 10.1,
+    "consumoEstradaKmL": 9.6,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.42
+  },
+  {
+    "marca": "Renault",
+    "modelo": "MASTER FURGÃO",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 10.1,
+    "consumoEstradaKmL": 10.3,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.42
+  },
+  {
+    "marca": "Renault",
+    "modelo": "OROCH",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 11.3,
+    "consumoEstradaKmL": 11.7,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.45
+  },
+  {
+    "marca": "TOYOTA",
+    "modelo": "COROLLA",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 17.5,
+    "consumoEstradaKmL": 15.2,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.46
+  },
+  {
+    "marca": "TOYOTA",
+    "modelo": "COROLLA",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 11.6,
+    "consumoEstradaKmL": 14.6,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.46
+  },
+  {
+    "marca": "TOYOTA",
+    "modelo": "COROLLA CROSS",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 16.6,
+    "consumoEstradaKmL": 14,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.46
+  },
+  {
+    "marca": "TOYOTA",
+    "modelo": "COROLLA CROSS",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 11.5,
+    "consumoEstradaKmL": 13.1,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.46
+  },
+  {
+    "marca": "TOYOTA",
+    "modelo": "COROLLA HB",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 8.6,
+    "consumoEstradaKmL": 10.9,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.46
+  },
+  {
+    "marca": "TOYOTA",
+    "modelo": "GR YARIS",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 7.8,
+    "consumoEstradaKmL": 9.7,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.4
+  },
+  {
+    "marca": "TOYOTA",
+    "modelo": "GR YARIS",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 8.6,
+    "consumoEstradaKmL": 10.1,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.4
+  },
+  {
+    "marca": "TOYOTA",
+    "modelo": "HIACE",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 8.5,
+    "consumoEstradaKmL": 9.8,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.42
+  },
+  {
+    "marca": "TOYOTA",
+    "modelo": "HIACE",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 8.8,
+    "consumoEstradaKmL": 10.2,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.42
+  },
+  {
+    "marca": "TOYOTA",
+    "modelo": "HILUX DIESEL 4X4 AT",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 9.3,
+    "consumoEstradaKmL": 10,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.55
+  },
+  {
+    "marca": "TOYOTA",
+    "modelo": "HILUX DIESEL 4X4 MT",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 9.3,
+    "consumoEstradaKmL": 10.6,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.55
+  },
+  {
+    "marca": "TOYOTA",
+    "modelo": "HILUX DIESEL 4X4 MT",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 9.7,
+    "consumoEstradaKmL": 11.2,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.55
+  },
+  {
+    "marca": "TOYOTA",
+    "modelo": "RAV4",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 15.3,
+    "consumoEstradaKmL": 14.1,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.5
+  },
+  {
+    "marca": "TOYOTA",
+    "modelo": "RAV4",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 16.1,
+    "consumoEstradaKmL": 13.5,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.5
+  },
+  {
+    "marca": "TOYOTA",
+    "modelo": "SW4 DIESEL 4X4",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 9.3,
+    "consumoEstradaKmL": 10.5,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.58
+  },
+  {
+    "marca": "TOYOTA",
+    "modelo": "YARIS CROSS",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 17.9,
+    "consumoEstradaKmL": 15.3,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.42
+  },
+  {
+    "marca": "TOYOTA",
+    "modelo": "YARIS CROSS FLEX",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 12.6,
+    "consumoEstradaKmL": 14.3,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.42
+  },
+  {
+    "marca": "VW",
+    "modelo": "AMAROK",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 8.1,
+    "consumoEstradaKmL": 9.4,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.55
+  },
+  {
+    "marca": "VW",
+    "modelo": "GOLF",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 9.8,
+    "consumoEstradaKmL": 12.8,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.4
+  },
+  {
+    "marca": "VW",
+    "modelo": "JETTA",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 10.3,
+    "consumoEstradaKmL": 13.4,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.5
+  },
+  {
+    "marca": "VW",
+    "modelo": "NIVUS",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 12.4,
+    "consumoEstradaKmL": 14.8,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.42
+  },
+  {
+    "marca": "VW",
+    "modelo": "NIVUS",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 11.6,
+    "consumoEstradaKmL": 14.2,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.42
+  },
+  {
+    "marca": "VW",
+    "modelo": "POLO",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 13.1,
+    "consumoEstradaKmL": 16.1,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.4
+  },
+  {
+    "marca": "VW",
+    "modelo": "POLO",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 12.5,
+    "consumoEstradaKmL": 15.2,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.4
+  },
+  {
+    "marca": "VW",
+    "modelo": "POLO",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 13.5,
+    "consumoEstradaKmL": 15.7,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.4
+  },
+  {
+    "marca": "VW",
+    "modelo": "SAVEIRO",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 11.2,
+    "consumoEstradaKmL": 12.9,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.45
+  },
+  {
+    "marca": "VW",
+    "modelo": "SAVEIRO",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 11.3,
+    "consumoEstradaKmL": 12.4,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.45
+  },
+  {
+    "marca": "VW",
+    "modelo": "T CROSS",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 11.8,
+    "consumoEstradaKmL": 14.2,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.42
+  },
+  {
+    "marca": "VW",
+    "modelo": "T CROSS",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 12.1,
+    "consumoEstradaKmL": 14.5,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.42
+  },
+  {
+    "marca": "VW",
+    "modelo": "TAOS",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 11.1,
+    "consumoEstradaKmL": 13.3,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.5
+  },
+  {
+    "marca": "VW",
+    "modelo": "TERA",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 13.4,
+    "consumoEstradaKmL": 15,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.4
+  },
+  {
+    "marca": "VW",
+    "modelo": "TERA",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 12.2,
+    "consumoEstradaKmL": 14.5,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.42
+  },
+  {
+    "marca": "VW",
+    "modelo": "TERA",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 12.9,
+    "consumoEstradaKmL": 15,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.42
+  },
+  {
+    "marca": "VW",
+    "modelo": "VIRTUS",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 12.1,
+    "consumoEstradaKmL": 14.7,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.4
+  },
+  {
+    "marca": "VW",
+    "modelo": "VIRTUS",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 12.2,
+    "consumoEstradaKmL": 14.9,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.4
+  },
+  {
+    "marca": "VW",
+    "modelo": "VIRTUS",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 13.2,
+    "consumoEstradaKmL": 15.8,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.4
+  },
+  {
+    "marca": "VW",
+    "modelo": "VIRTUS",
+    "ano": 2026,
+    "tipo": "CARRO",
+    "consumoCidadeKmL": 11.7,
+    "consumoEstradaKmL": 14,
+    "numeroEixos": 2,
+    "custoDesgastePorKm": 0.4
+  }
 ]

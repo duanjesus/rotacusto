@@ -25,7 +25,12 @@ class SeedersIntegrationTest {
 
     @Test
     void vehicleModelCatalogIsSeededOnStartup() {
-        assertEquals(18, vehicleModelRepository.count());
+        assertEquals(279, vehicleModelRepository.count());
+        long marcasDistintas = vehicleModelRepository.findAll().stream()
+                .map(v -> v.getMarca())
+                .distinct()
+                .count();
+        assertTrue(marcasDistintas >= 25, "catálogo deveria cobrir pelo menos 25 marcas distintas");
     }
 
     @Test

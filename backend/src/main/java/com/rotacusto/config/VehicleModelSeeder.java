@@ -11,9 +11,18 @@ import com.rotacusto.entity.VehicleModel;
 import com.rotacusto.repository.VehicleModelRepository;
 
 /**
- * Carrega o catálogo inicial de veículos a partir de data/vehicle-models.json.
- * Consumo (km/l) e desgaste por km são estimativas de mercado para o MVP — a
- * refinar depois com dados oficiais do PBE Veicular/INMETRO por modelo/ano.
+ * Carrega o catálogo de veículos a partir de data/vehicle-models.json.
+ *
+ * Consumo (consumoCidadeKmL/consumoEstradaKmL) vem da Tabela PBE Veicular
+ * 2026 oficial do INMETRO (280+ modelos leves à combustão/híbridos vendidos
+ * no Brasil, extraída do PDF oficial em gov.br/inmetro). Veículos 100%
+ * elétricos/plug-in foram deixados de fora — o modelo de custo atual é por
+ * preço de combustível (R$/litro), não por kWh.
+ *
+ * Desgaste (custoDesgastePorKm) NÃO tem fonte oficial no Brasil — continua
+ * sendo uma estimativa por categoria/segmento do próprio INMETRO (Sub
+ * Compacto, Compacto, Médio, SUV, Picape etc.), documentada como placeholder
+ * a refinar.
  */
 @Component
 public class VehicleModelSeeder implements CommandLineRunner {
