@@ -139,6 +139,81 @@ class TollServiceTest {
     }
 
     @Test
+    void oneWayTollChargingOnlyTowardReferenceIsIncludedWhenHeadingThatWay() {
+        TollService tollService = newTollService(5.0, 0.5);
+
+        TollPlaza pedagio = umaPracaDeSentidoUnico(true);
+        when(repository.findAll()).thenReturn(List.of(pedagio));
+        when(overpassClient.findTollBoothsInBoundingBox(anyDouble(), anyDouble(), anyDouble(), anyDouble()))
+                .thenThrow(new RuntimeException("Overpass indisponível"));
+
+        // Referência fica a leste (lon 10) do pedágio (lon 0); rota indo de oeste pra leste = rumo à referência.
+        List<Coordinates> rotaIndoParaLeste = List.of(new Coordinates(0.0, -1.0), new Coordinates(0.0, 0.0), new Coordinates(0.0, 1.0));
+
+        assertEquals(1, tollService.findCrossedPlazas(rotaIndoParaLeste).size());
+    }
+
+    @Test
+    void oneWayTollChargingOnlyTowardReferenceIsExcludedWhenHeadingAway() {
+        TollService tollService = newTollService(5.0, 0.5);
+
+        TollPlaza pedagio = umaPracaDeSentidoUnico(true);
+        when(repository.findAll()).thenReturn(List.of(pedagio));
+        when(overpassClient.findTollBoothsInBoundingBox(anyDouble(), anyDouble(), anyDouble(), anyDouble()))
+                .thenThrow(new RuntimeException("Overpass indisponível"));
+
+        // Rota indo de leste pra oeste = se afastando da referência (que fica a leste).
+        List<Coordinates> rotaIndoParaOeste = List.of(new Coordinates(0.0, 1.0), new Coordinates(0.0, 0.0), new Coordinates(0.0, -1.0));
+
+        assertTrue(tollService.findCrossedPlazas(rotaIndoParaOeste).isEmpty());
+    }
+
+    @Test
+    void oneWayTollChargingOnlyWhenLeavingIsIncludedWhenHeadingAway() {
+        TollService tollService = newTollService(5.0, 0.5);
+
+        TollPlaza pedagio = umaPracaDeSentidoUnico(false);
+        when(repository.findAll()).thenReturn(List.of(pedagio));
+        when(overpassClient.findTollBoothsInBoundingBox(anyDouble(), anyDouble(), anyDouble(), anyDouble()))
+                .thenThrow(new RuntimeException("Overpass indisponível"));
+
+        List<Coordinates> rotaIndoParaOeste = List.of(new Coordinates(0.0, 1.0), new Coordinates(0.0, 0.0), new Coordinates(0.0, -1.0));
+
+        assertEquals(1, tollService.findCrossedPlazas(rotaIndoParaOeste).size());
+    }
+
+    @Test
+    void tollWithoutDirectionConstraintAlwaysCounts() {
+        TollService tollService = newTollService(5.0, 0.5);
+
+        TollPlaza pedagio = new TollPlaza();
+        pedagio.setNome("Pedágio comum");
+        pedagio.setLat(0.0);
+        pedagio.setLng(0.0);
+        pedagio.setTarifaPorEixo(5.0);
+        // refLat/refLng/cobraApenasIndo ficam nulos -> sem restrição de sentido
+        when(repository.findAll()).thenReturn(List.of(pedagio));
+        when(overpassClient.findTollBoothsInBoundingBox(anyDouble(), anyDouble(), anyDouble(), anyDouble()))
+                .thenThrow(new RuntimeException("Overpass indisponível"));
+
+        List<Coordinates> qualquerRota = List.of(new Coordinates(0.0, 1.0), new Coordinates(0.0, 0.0), new Coordinates(0.0, -1.0));
+
+        assertEquals(1, tollService.findCrossedPlazas(qualquerRota).size());
+    }
+
+    private static TollPlaza umaPracaDeSentidoUnico(boolean cobraApenasIndo) {
+        TollPlaza pedagio = new TollPlaza();
+        pedagio.setNome("Pedágio sentido único");
+        pedagio.setLat(0.0);
+        pedagio.setLng(0.0);
+        pedagio.setTarifaPorEixo(5.0);
+        pedagio.setRefLat(0.0);
+        pedagio.setRefLng(10.0); // referência a leste
+        pedagio.setCobraApenasIndo(cobraApenasIndo);
+        return pedagio;
+    }
+
+    @Test
     void returnsEmptyListWhenNothingIsFound() {
         TollService tollService = newTollService(0.1, 0.1);
 

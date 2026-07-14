@@ -35,8 +35,9 @@ class SeedersIntegrationTest {
 
     @Test
     void tollPlazaSeedDataIsLoadedOnStartup() {
-        assertEquals(4, tollPlazaRepository.count());
+        assertEquals(6, tollPlazaRepository.count());
         assertTrue(tollPlazaRepository.findAll().stream()
-                .allMatch(p -> p.getRodovia().equals("BR-101")));
+                .anyMatch(p -> p.getCobraApenasIndo() != null),
+                "deveria ter pelo menos uma praça de sentido único cadastrada");
     }
 }

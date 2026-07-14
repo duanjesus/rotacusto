@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import com.rotacusto.client.OverpassClient;
 import com.rotacusto.domain.Coordinates;
 import com.rotacusto.domain.OsmTollBooth;
+import com.rotacusto.domain.geo.Bearing;
 import com.rotacusto.domain.geo.BoundingBoxCalculator;
 import com.rotacusto.domain.geo.HaversineDistance;
 import com.rotacusto.entity.TollPlaza;
@@ -22,10 +23,21 @@ import com.rotacusto.repository.TollPlazaRepository;
  * Overpass API) é a fonte de verdade sobre QUAIS pedágios existem — cobertura
  * nacional, localização real e precisa. O dataset curado (poucas praças,
  * coordenadas aproximadas de município — ver TollPlazaSeeder) nunca gera uma
- * entrada própria; ele só ENRIQUECE a tarifa/nome de um pedágio já achado
- * pelo OSM quando as coordenadas batem, evitando contar a mesma praça física
- * duas vezes. Sem um match curado, usa-se uma tarifa média nacional.
+ * entrada própria; ele só ENRIQUECE a tarifa/nome/direção de um pedágio já
+ * achado pelo OSM quando as coordenadas batem, evitando contar a mesma praça
+ * física duas vezes. Sem um match curado, usa-se uma tarifa média nacional.
  * Se o Overpass falhar, cai para detecção só pelo dataset curado.
+ *
+ * O raio de detecção pelo OSM (osm-detection-radius-km) é apertado de
+ * propósito: muitas praças no Brasil cobram só um sentido — a cabine física
+ * só existe numa das pistas de uma rodovia dividida. Um raio largo demais
+ * "atravessa" o canteiro central e conta também o pedágio da pista oposta.
+ *
+ * Praças de sentido único de verdade (a mesma cabine física, mas só cobra
+ * indo ou só cobra voltando em relação a um ponto de referência) não dá pra
+ * distinguir só por proximidade — por isso o dataset curado pode marcar
+ * refLat/refLng/cobraApenasIndo, e comparamos o rumo (bearing) da viagem
+ * naquele trecho contra o rumo até a referência.
  */
 @Service
 public class TollService {
@@ -69,6 +81,7 @@ public class TollService {
             log.warn("Falha ao consultar pedágios via OpenStreetMap (Overpass); caindo para o dataset curado", e);
             return curated.stream()
                     .filter(p -> isCrossedBy(p.getLat(), p.getLng(), geometriaRota, curatedDetectionRadiusKm))
+                    .filter(p -> passesDirectionConstraint(p, geometriaRota))
                     .toList();
         }
 
@@ -78,6 +91,7 @@ public class TollService {
 
         return clusterNearbyBooths(nearRoute).stream()
                 .map(osm -> enrichWithCuratedTariff(osm, curated))
+                .filter(p -> passesDirectionConstraint(p, geometriaRota))
                 .toList();
     }
 
@@ -99,7 +113,48 @@ public class TollService {
         p.setLng(osm.lon());
         p.setTarifaPorEixo(curatedPlaza.getTarifaPorEixo());
         p.setTarifaMoto(curatedPlaza.getTarifaMoto());
+        p.setRefLat(curatedPlaza.getRefLat());
+        p.setRefLng(curatedPlaza.getRefLng());
+        p.setCobraApenasIndo(curatedPlaza.getCobraApenasIndo());
         return p;
+    }
+
+    /**
+     * Praças sem restrição de sentido (refLat/refLng nulos) sempre passam.
+     * Com restrição: compara o rumo da viagem no trecho mais próximo da
+     * praça contra o rumo da praça até o ponto de referência. Diferença
+     * menor que 90° = indo em direção à referência; maior = se afastando.
+     */
+    private boolean passesDirectionConstraint(TollPlaza plaza, List<Coordinates> geometriaRota) {
+        if (plaza.getRefLat() == null || plaza.getRefLng() == null || plaza.getCobraApenasIndo() == null) {
+            return true;
+        }
+        if (geometriaRota.size() < 2) {
+            return true;
+        }
+
+        Coordinates plazaPoint = new Coordinates(plaza.getLat(), plaza.getLng());
+        int nearestIndex = 0;
+        double nearestDistance = Double.MAX_VALUE;
+        for (int i = 0; i < geometriaRota.size(); i++) {
+            double d = HaversineDistance.km(geometriaRota.get(i), plazaPoint);
+            if (d < nearestDistance) {
+                nearestDistance = d;
+                nearestIndex = i;
+            }
+        }
+
+        Coordinates before = geometriaRota.get(Math.max(0, nearestIndex - 1));
+        Coordinates after = geometriaRota.get(Math.min(geometriaRota.size() - 1, nearestIndex + 1));
+        if (before.equals(after)) {
+            return true; // não dá pra determinar o rumo (início/fim da rota)
+        }
+
+        double rumoViagem = Bearing.degrees(before, after);
+        double rumoAteReferencia = Bearing.degrees(plazaPoint, new Coordinates(plaza.getRefLat(), plaza.getRefLng()));
+        boolean indoEmDirecaoAReferencia = Bearing.angularDifference(rumoViagem, rumoAteReferencia) < 90.0;
+
+        return plaza.getCobraApenasIndo() == indoEmDirecaoAReferencia;
     }
 
     /** Colapsa nós do OSM muito próximos entre si (mesma praça, faixas diferentes) num só representante. */

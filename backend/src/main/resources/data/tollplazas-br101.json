@@ -2,5 +2,7 @@
   { "nome": "Pedágio BR-101 - Rio Bonito/RJ", "rodovia": "BR-101", "concessionaria": "Arteris Fluminense", "lat": -22.72, "lng": -42.62, "tarifaPorEixo": 5.20, "tarifaMoto": 3.90 },
   { "nome": "Pedágio BR-101 - Casimiro de Abreu/RJ", "rodovia": "BR-101", "concessionaria": "Arteris Fluminense", "lat": -22.47, "lng": -41.86, "tarifaPorEixo": 5.20, "tarifaMoto": 3.90 },
   { "nome": "Pedágio BR-101 - Campos dos Goytacazes/RJ", "rodovia": "BR-101", "concessionaria": "Arteris Fluminense", "lat": -21.75, "lng": -41.33, "tarifaPorEixo": 5.50, "tarifaMoto": 4.10 },
-  { "nome": "Pedágio BR-101 - Marataízes/ES", "rodovia": "BR-101", "concessionaria": "Rodosol", "lat": -21.04, "lng": -41.05, "tarifaPorEixo": 6.90, "tarifaMoto": 4.50 }
+  { "nome": "Pedágio BR-101 - Marataízes/ES", "rodovia": "BR-101", "concessionaria": "Rodosol", "lat": -21.04, "lng": -41.05, "tarifaPorEixo": 6.90, "tarifaMoto": 4.50 },
+  { "nome": "Pedágio Itaboraí (sentido único - só na volta)", "rodovia": "RJ-104", "concessionaria": "Não identificada", "lat": -22.7754719, "lng": -42.9453788, "tarifaPorEixo": 5.20, "tarifaMoto": 3.90, "refLat": -22.744, "refLng": -42.859, "cobraApenasIndo": false },
+  { "nome": "Pedágio da Ponte (sentido único - só indo p/ Itaboraí)", "rodovia": "RJ-104", "concessionaria": "Não identificada", "lat": -22.8780341, "lng": -43.1158327, "tarifaPorEixo": 5.20, "tarifaMoto": 3.90, "refLat": -22.744, "refLng": -42.859, "cobraApenasIndo": true }
 ]

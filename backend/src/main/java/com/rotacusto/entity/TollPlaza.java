@@ -38,6 +38,22 @@ public class TollPlaza {
     @Column(name = "tarifa_moto")
     private Double tarifaMoto;
 
+    /**
+     * Praças de sentido único (comuns no Brasil — a cabine física só existe
+     * numa das pistas). Quando refLat/refLng estão preenchidos, a praça só é
+     * cobrada se a rota estiver indo em direção a esse ponto de referência
+     * (cobraApenasIndo=true) ou se afastando dele (cobraApenasIndo=false).
+     * Nulo = cobra nos dois sentidos (padrão da maioria das praças).
+     */
+    @Column(name = "ref_lat")
+    private Double refLat;
+
+    @Column(name = "ref_lng")
+    private Double refLng;
+
+    @Column(name = "cobra_apenas_indo")
+    private Boolean cobraApenasIndo;
+
     public TollPlaza() {
     }
 
@@ -103,5 +119,29 @@ public class TollPlaza {
 
     public void setTarifaMoto(Double tarifaMoto) {
         this.tarifaMoto = tarifaMoto;
+    }
+
+    public Double getRefLat() {
+        return refLat;
+    }
+
+    public void setRefLat(Double refLat) {
+        this.refLat = refLat;
+    }
+
+    public Double getRefLng() {
+        return refLng;
+    }
+
+    public void setRefLng(Double refLng) {
+        this.refLng = refLng;
+    }
+
+    public Boolean getCobraApenasIndo() {
+        return cobraApenasIndo;
+    }
+
+    public void setCobraApenasIndo(Boolean cobraApenasIndo) {
+        this.cobraApenasIndo = cobraApenasIndo;
     }
 }

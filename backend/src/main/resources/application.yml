@@ -42,9 +42,13 @@ rotacusto:
   # coordenadas aproximadas de município — ver TollPlazaSeeder) com busca ao
   # vivo no OpenStreetMap via Overpass (cobertura nacional, coordenadas
   # precisas, mas sem tarifa real — por isso a tarifa-padrão abaixo).
+  # osm-detection-radius-km é apertado de propósito: muitas praças no Brasil
+  # cobram só um sentido (a cabine física só existe numa das pistas de uma
+  # rodovia dividida). Um raio largo "atravessa" o canteiro central e conta o
+  # pedágio da pista oposta também — ver TollService.
   tolls:
     curated-detection-radius-km: 5.0
-    osm-detection-radius-km: 0.5
+    osm-detection-radius-km: 0.1
     default-tarifa-por-eixo: 5.50
     default-tarifa-moto: 4.00
   # Postos de combustível reais na rota (OpenStreetMap). O preço usado no
