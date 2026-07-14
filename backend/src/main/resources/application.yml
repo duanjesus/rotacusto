@@ -1,0 +1,39 @@
+spring:
+  application:
+    name: rotacusto-backend
+  datasource:
+    url: jdbc:h2:mem:rotacusto;DB_CLOSE_DELAY=-1
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    open-in-view: false
+  h2:
+    console:
+      enabled: true
+
+server:
+  port: 8080
+
+# Configurações do RotaCusto
+rotacusto:
+  # Nominatim (geocoding OSM). Endpoint público exige User-Agent identificável e ~1 req/s.
+  geocoding:
+    base-url: https://nominatim.openstreetmap.org
+    user-agent: "RotaCusto/0.1 (contato: duanjesus30@gmail.com)"
+  # OpenRouteService (roteamento). A chave gratuita fica SÓ no back-end.
+  # Defina via variável de ambiente ORS_API_KEY (não versionar a chave).
+  routing:
+    base-url: https://api.openrouteservice.org
+    api-key: ${ORS_API_KEY:}
+  # Parâmetros default do cálculo de parada para lanche (usados na Fase 4).
+  food-stop:
+    interval-hours: 3.0
+    average-cost: 25.0
+  # Detecção de pedágios na rota. Raio generoso pois o dataset-semente usa
+  # coordenadas aproximadas de município, não o ponto exato da praça (ver
+  # TollPlazaSeeder). Reduzir ao substituir por dados oficiais precisos.
+  tolls:
+    detection-radius-km: 5.0

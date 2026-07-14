@@ -1,0 +1,20 @@
+[
+  { "marca": "Fiat", "modelo": "Mobi 1.0", "ano": 2024, "tipo": "CARRO", "consumoCidadeKmL": 8.0, "consumoEstradaKmL": 9.6, "numeroEixos": 2, "custoDesgastePorKm": 0.35 },
+  { "marca": "Volkswagen", "modelo": "Gol 1.0", "ano": 2023, "tipo": "CARRO", "consumoCidadeKmL": 8.5, "consumoEstradaKmL": 10.2, "numeroEixos": 2, "custoDesgastePorKm": 0.35 },
+  { "marca": "Chevrolet", "modelo": "Onix 1.0", "ano": 2024, "tipo": "CARRO", "consumoCidadeKmL": 9.0, "consumoEstradaKmL": 10.8, "numeroEixos": 2, "custoDesgastePorKm": 0.38 },
+  { "marca": "Chevrolet", "modelo": "Onix Plus 1.0 Turbo", "ano": 2024, "tipo": "CARRO", "consumoCidadeKmL": 10.5, "consumoEstradaKmL": 13.0, "numeroEixos": 2, "custoDesgastePorKm": 0.40 },
+  { "marca": "Hyundai", "modelo": "HB20 1.0", "ano": 2024, "tipo": "CARRO", "consumoCidadeKmL": 8.7, "consumoEstradaKmL": 10.5, "numeroEixos": 2, "custoDesgastePorKm": 0.38 },
+  { "marca": "Fiat", "modelo": "Argo 1.0", "ano": 2023, "tipo": "CARRO", "consumoCidadeKmL": 8.3, "consumoEstradaKmL": 10.0, "numeroEixos": 2, "custoDesgastePorKm": 0.37 },
+  { "marca": "Fiat", "modelo": "Cronos 1.3", "ano": 2023, "tipo": "CARRO", "consumoCidadeKmL": 8.0, "consumoEstradaKmL": 9.8, "numeroEixos": 2, "custoDesgastePorKm": 0.38 },
+  { "marca": "Volkswagen", "modelo": "Polo 1.0", "ano": 2023, "tipo": "CARRO", "consumoCidadeKmL": 8.6, "consumoEstradaKmL": 10.3, "numeroEixos": 2, "custoDesgastePorKm": 0.38 },
+  { "marca": "Renault", "modelo": "Kwid 1.0", "ano": 2023, "tipo": "CARRO", "consumoCidadeKmL": 8.8, "consumoEstradaKmL": 10.5, "numeroEixos": 2, "custoDesgastePorKm": 0.32 },
+  { "marca": "Hyundai", "modelo": "Creta 1.6", "ano": 2024, "tipo": "CARRO", "consumoCidadeKmL": 7.5, "consumoEstradaKmL": 9.2, "numeroEixos": 2, "custoDesgastePorKm": 0.48 },
+  { "marca": "Jeep", "modelo": "Renegade 1.8", "ano": 2023, "tipo": "CARRO", "consumoCidadeKmL": 7.2, "consumoEstradaKmL": 8.8, "numeroEixos": 2, "custoDesgastePorKm": 0.52 },
+  { "marca": "Chevrolet", "modelo": "Tracker 1.0 Turbo", "ano": 2024, "tipo": "CARRO", "consumoCidadeKmL": 9.5, "consumoEstradaKmL": 12.0, "numeroEixos": 2, "custoDesgastePorKm": 0.45 },
+  { "marca": "Volkswagen", "modelo": "T-Cross 1.0 Turbo", "ano": 2024, "tipo": "CARRO", "consumoCidadeKmL": 9.8, "consumoEstradaKmL": 12.5, "numeroEixos": 2, "custoDesgastePorKm": 0.45 },
+  { "marca": "Honda", "modelo": "HR-V 1.5", "ano": 2023, "tipo": "CARRO", "consumoCidadeKmL": 8.5, "consumoEstradaKmL": 10.8, "numeroEixos": 2, "custoDesgastePorKm": 0.46 },
+  { "marca": "Toyota", "modelo": "Corolla 2.0", "ano": 2023, "tipo": "CARRO", "consumoCidadeKmL": 8.0, "consumoEstradaKmL": 10.5, "numeroEixos": 2, "custoDesgastePorKm": 0.45 },
+  { "marca": "Honda", "modelo": "Civic 2.0", "ano": 2022, "tipo": "CARRO", "consumoCidadeKmL": 7.8, "consumoEstradaKmL": 10.0, "numeroEixos": 2, "custoDesgastePorKm": 0.48 },
+  { "marca": "Fiat", "modelo": "Toro 1.8", "ano": 2023, "tipo": "CARRO", "consumoCidadeKmL": 7.0, "consumoEstradaKmL": 9.0, "numeroEixos": 2, "custoDesgastePorKm": 0.55 },
+  { "marca": "Toyota", "modelo": "Hilux 2.8 Diesel", "ano": 2023, "tipo": "CARRO", "consumoCidadeKmL": 8.0, "consumoEstradaKmL": 10.0, "numeroEixos": 2, "custoDesgastePorKm": 0.60 }
+]

@@ -1,0 +1,10 @@
+# Backend (Java/Maven)
+backend/target/
+*.class
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.log
