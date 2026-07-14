@@ -7,6 +7,7 @@ import '../../domain/models/trip_cost_breakdown.dart';
 import '../../domain/models/vehicle_model.dart';
 import '../widgets/address_field.dart';
 import '../widgets/trip_map.dart';
+import '../widgets/vehicle_search_field.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -21,7 +22,6 @@ class _HomeScreenState extends State<HomeScreen> {
   final _destinoController = TextEditingController(text: 'Guarapari, ES');
   final _precoController = TextEditingController(text: '6.09');
 
-  List<VehicleModel> _vehicleModels = [];
   VehicleModel? _selectedVehicle;
   AddressSuggestion? _origemSelecionada;
   AddressSuggestion? _destinoSelecionado;
@@ -46,9 +46,11 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _loadVehicleModels() async {
     try {
+      // Só usado pra pré-selecionar um veículo padrão ao abrir a tela; a
+      // partir daí, VehicleSearchField busca sob demanda (o catálogo tem
+      // centenas de modelos, carregar tudo de uma vez não escala).
       final models = await _apiClient.fetchVehicleModels();
       setState(() {
-        _vehicleModels = models;
         _selectedVehicle = models.isNotEmpty ? models.first : null;
         _loadingModels = false;
       });
@@ -171,17 +173,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 padding: EdgeInsets.symmetric(vertical: 8),
                 child: LinearProgressIndicator(),
               )
-            : DropdownButtonFormField<VehicleModel>(
+            : VehicleSearchField(
                 initialValue: _selectedVehicle,
-                decoration: const InputDecoration(labelText: 'Veículo'),
-                isExpanded: true,
-                items: _vehicleModels
-                    .map((v) => DropdownMenuItem(
-                          value: v,
-                          child: Text(v.displayName, overflow: TextOverflow.ellipsis),
-                        ))
-                    .toList(),
-                onChanged: (v) => setState(() => _selectedVehicle = v),
+                fetchSuggestions: _apiClient.searchVehicleModels,
+                onSelected: (v) => setState(() => _selectedVehicle = v),
               ),
         const SizedBox(height: 12),
         TextField(

@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.rotacusto.dto.response.VehicleModelResponseDTO;
+import com.rotacusto.entity.VehicleModel;
 import com.rotacusto.entity.enums.VehicleType;
 import com.rotacusto.mapper.VehicleModelMapper;
 import com.rotacusto.service.VehicleModelService;
@@ -28,8 +29,10 @@ public class VehicleModelController {
     @GetMapping
     public List<VehicleModelResponseDTO> list(
             @RequestParam(required = false) String marca,
-            @RequestParam(required = false) VehicleType tipo) {
-        return service.list(marca, tipo).stream()
+            @RequestParam(required = false) VehicleType tipo,
+            @RequestParam(required = false) String q) {
+        List<VehicleModel> resultado = (q != null) ? service.search(q) : service.list(marca, tipo);
+        return resultado.stream()
                 .map(mapper::toResponseDTO)
                 .toList();
     }

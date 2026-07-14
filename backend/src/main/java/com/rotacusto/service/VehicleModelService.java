@@ -13,10 +13,26 @@ import com.rotacusto.repository.VehicleModelRepository;
 @Service
 public class VehicleModelService {
 
+    private static final int SEARCH_LIMIT = 20;
+    private static final int MIN_QUERY_LENGTH = 2;
+
     private final VehicleModelRepository repository;
 
     public VehicleModelService(VehicleModelRepository repository) {
         this.repository = repository;
+    }
+
+    /**
+     * Busca por texto livre (autocomplete): acha em marca OU modelo,
+     * limitada pra caber num dropdown de sugestões.
+     */
+    public List<VehicleModel> search(String q) {
+        if (!StringUtils.hasText(q) || q.trim().length() < MIN_QUERY_LENGTH) {
+            return List.of();
+        }
+        return repository.findByMarcaContainingIgnoreCaseOrModeloContainingIgnoreCase(q, q).stream()
+                .limit(SEARCH_LIMIT)
+                .toList();
     }
 
     public List<VehicleModel> list(String marca, VehicleType tipo) {

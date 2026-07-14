@@ -23,6 +23,13 @@ class ApiClient {
         .toList();
   }
 
+  Future<List<VehicleModel>> searchVehicleModels(String query) async {
+    final response = await _dio.get('/vehicle-models', queryParameters: {'q': query});
+    return (response.data as List<dynamic>)
+        .map((json) => VehicleModel.fromJson(json as Map<String, dynamic>))
+        .toList();
+  }
+
   Future<List<AddressSuggestion>> suggestAddress(String query) async {
     final response = await _dio.get('/geocoding/suggest', queryParameters: {'q': query});
     return (response.data as List<dynamic>)
