@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 
+import '../domain/models/address_suggestion.dart';
 import '../domain/models/trip_cost_breakdown.dart';
 import '../domain/models/vehicle_model.dart';
 
@@ -19,6 +20,13 @@ class ApiClient {
     });
     return (response.data as List<dynamic>)
         .map((json) => VehicleModel.fromJson(json as Map<String, dynamic>))
+        .toList();
+  }
+
+  Future<List<AddressSuggestion>> suggestAddress(String query) async {
+    final response = await _dio.get('/geocoding/suggest', queryParameters: {'q': query});
+    return (response.data as List<dynamic>)
+        .map((json) => AddressSuggestion.fromJson(json as Map<String, dynamic>))
         .toList();
   }
 

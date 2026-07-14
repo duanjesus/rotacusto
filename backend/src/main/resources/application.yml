@@ -19,10 +19,12 @@ server:
 
 # Configurações do RotaCusto
 rotacusto:
-  # Nominatim (geocoding OSM). Endpoint público exige User-Agent identificável e ~1 req/s.
+  # Nominatim (geocoding do endereço final) + Photon (autocomplete, aceita
+  # busca por prefixo — o Nominatim não aceita). Ambos sobre dados OSM.
   geocoding:
     base-url: https://nominatim.openstreetmap.org
     user-agent: "RotaCusto/0.1 (contato: duanjesus30@gmail.com)"
+    photon-base-url: https://photon.komoot.io
   # OpenRouteService (roteamento). A chave gratuita fica SÓ no back-end.
   # Defina via variável de ambiente ORS_API_KEY (não versionar a chave).
   routing:
@@ -32,8 +34,21 @@ rotacusto:
   food-stop:
     interval-hours: 3.0
     average-cost: 25.0
-  # Detecção de pedágios na rota. Raio generoso pois o dataset-semente usa
-  # coordenadas aproximadas de município, não o ponto exato da praça (ver
-  # TollPlazaSeeder). Reduzir ao substituir por dados oficiais precisos.
+  # Overpass API (OpenStreetMap ao vivo) — usado tanto para pedágios quanto
+  # para postos de combustível.
+  overpass:
+    base-url: https://overpass-api.de/api/interpreter
+  # Detecção de pedágios na rota. Combina o dataset curado (poucas praças,
+  # coordenadas aproximadas de município — ver TollPlazaSeeder) com busca ao
+  # vivo no OpenStreetMap via Overpass (cobertura nacional, coordenadas
+  # precisas, mas sem tarifa real — por isso a tarifa-padrão abaixo).
   tolls:
-    detection-radius-km: 5.0
+    curated-detection-radius-km: 5.0
+    osm-detection-radius-km: 0.5
+    default-tarifa-por-eixo: 5.50
+    default-tarifa-moto: 4.00
+  # Postos de combustível reais na rota (OpenStreetMap). O preço usado no
+  # cálculo continua sendo a média que o usuário informa — não existe fonte
+  # gratuita de preço por posto em tempo real no Brasil.
+  fuel-stations:
+    detection-radius-km: 0.3

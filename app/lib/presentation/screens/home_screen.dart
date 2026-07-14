@@ -2,8 +2,10 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
 import '../../data/api_client.dart';
+import '../../domain/models/address_suggestion.dart';
 import '../../domain/models/trip_cost_breakdown.dart';
 import '../../domain/models/vehicle_model.dart';
+import '../widgets/address_field.dart';
 import '../widgets/trip_map.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -21,6 +23,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   List<VehicleModel> _vehicleModels = [];
   VehicleModel? _selectedVehicle;
+  AddressSuggestion? _origemSelecionada;
+  AddressSuggestion? _destinoSelecionado;
   bool _loadingModels = true;
   bool _loadingEstimate = false;
   TripCostBreakdown? _breakdown;
@@ -72,9 +76,19 @@ class _HomeScreenState extends State<HomeScreen> {
     });
 
     try {
+      // Se o usuário escolheu uma sugestão do dropdown, manda a coordenada
+      // exata direto (o back-end já aceita "lat,lon"), evitando um novo
+      // geocode (mais rápido e sem risco de resolver para outro lugar).
+      final origem = _origemSelecionada != null
+          ? '${_origemSelecionada!.lat},${_origemSelecionada!.lon}'
+          : _origemController.text;
+      final destino = _destinoSelecionado != null
+          ? '${_destinoSelecionado!.lat},${_destinoSelecionado!.lon}'
+          : _destinoController.text;
+
       final result = await _apiClient.estimateTrip(
-        origem: _origemController.text,
-        destino: _destinoController.text,
+        origem: origem,
+        destino: destino,
         vehicleModelId: _selectedVehicle!.id,
         precoCombustivelPorLitro: preco,
       );
@@ -138,9 +152,19 @@ class _HomeScreenState extends State<HomeScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        TextField(controller: _origemController, decoration: const InputDecoration(labelText: 'Origem')),
+        AddressField(
+          controller: _origemController,
+          label: 'Origem',
+          fetchSuggestions: _apiClient.suggestAddress,
+          onSelected: (s) => _origemSelecionada = s,
+        ),
         const SizedBox(height: 12),
-        TextField(controller: _destinoController, decoration: const InputDecoration(labelText: 'Destino')),
+        AddressField(
+          controller: _destinoController,
+          label: 'Destino',
+          fetchSuggestions: _apiClient.suggestAddress,
+          onSelected: (s) => _destinoSelecionado = s,
+        ),
         const SizedBox(height: 12),
         _loadingModels
             ? const Padding(
@@ -208,6 +232,21 @@ class _HomeScreenState extends State<HomeScreen> {
             _buildRow('Lanche', currency(b.custoLanche)),
             const Divider(),
             _buildRow('Total', currency(b.total), bold: true),
+            if (b.postoSugerido != null) ...[
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  const Icon(Icons.local_gas_station, color: Colors.green, size: 18),
+                  const SizedBox(width: 6),
+                  Expanded(
+                    child: Text(
+                      'Sugestão de parada: ${b.postoSugerido!.nome}',
+                      style: const TextStyle(fontSize: 13),
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ],
         ),
       ),

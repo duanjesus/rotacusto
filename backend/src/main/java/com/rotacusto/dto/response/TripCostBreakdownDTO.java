@@ -11,5 +11,7 @@ public record TripCostBreakdownDTO(
         double custoLanche,
         double total,
         List<CoordinateDTO> geometriaRota,
-        List<TollPlazaResponseDTO> pedagiosNaRota) {
+        List<TollPlazaResponseDTO> pedagiosNaRota,
+        List<FuelStationResponseDTO> postosNaRota,
+        FuelStationResponseDTO postoSugerido) {
 }

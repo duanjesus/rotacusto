@@ -9,6 +9,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.rotacusto.domain.AddressSuggestion;
 import com.rotacusto.domain.Coordinates;
 import com.rotacusto.exception.AddressNotFoundException;
 
@@ -30,22 +31,35 @@ public class NominatimClient {
                 .build();
     }
 
-    public Coordinates geocode(String address) {
+    public List<AddressSuggestion> search(String query, int limit) {
         List<JsonNode> results = restClient.get()
                 .uri(uriBuilder -> uriBuilder.path("/search")
-                        .queryParam("q", address)
+                        .queryParam("q", query)
                         .queryParam("format", "json")
-                        .queryParam("limit", 1)
+                        .queryParam("limit", limit)
+                        .queryParam("countrycodes", "br")
                         .build())
                 .retrieve()
                 .body(new ParameterizedTypeReference<List<JsonNode>>() {
                 });
 
-        if (results == null || results.isEmpty()) {
+        if (results == null) {
+            return List.of();
+        }
+        return results.stream()
+                .map(n -> new AddressSuggestion(
+                        n.path("display_name").asText(),
+                        n.path("lat").asDouble(),
+                        n.path("lon").asDouble()))
+                .toList();
+    }
+
+    public Coordinates geocode(String address) {
+        List<AddressSuggestion> results = search(address, 1);
+        if (results.isEmpty()) {
             throw new AddressNotFoundException("Endereço não encontrado: " + address);
         }
-
-        JsonNode first = results.get(0);
-        return new Coordinates(first.path("lat").asDouble(), first.path("lon").asDouble());
+        AddressSuggestion first = results.get(0);
+        return new Coordinates(first.lat(), first.lon());
     }
 }

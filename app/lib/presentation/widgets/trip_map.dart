@@ -32,19 +32,31 @@ class TripMap extends StatelessWidget {
             ]),
           if (breakdown != null)
             MarkerLayer(
-              markers: breakdown!.pedagiosNaRota
-                  .map(
-                    (p) => Marker(
-                      point: LatLng(p.lat, p.lng),
-                      width: 36,
-                      height: 36,
-                      child: Tooltip(
-                        message: '${p.nome}\nR\$ ${p.valorCobrado.toStringAsFixed(2)}',
-                        child: const Icon(Icons.toll, color: Colors.red, size: 28),
-                      ),
+              markers: [
+                ...breakdown!.pedagiosNaRota.map(
+                  (p) => Marker(
+                    point: LatLng(p.lat, p.lng),
+                    width: 36,
+                    height: 36,
+                    child: Tooltip(
+                      message: '${p.nome}\nR\$ ${p.valorCobrado.toStringAsFixed(2)}',
+                      child: const Icon(Icons.toll, color: Colors.red, size: 28),
                     ),
-                  )
-                  .toList(),
+                  ),
+                ),
+                // Só o posto sugerido aparece no mapa (os demais postos da
+                // rota poluiriam demais — podem passar de 100 em áreas urbanas).
+                if (breakdown!.postoSugerido != null)
+                  Marker(
+                    point: LatLng(breakdown!.postoSugerido!.lat, breakdown!.postoSugerido!.lon),
+                    width: 36,
+                    height: 36,
+                    child: Tooltip(
+                      message: 'Parada sugerida\n${breakdown!.postoSugerido!.nome}',
+                      child: const Icon(Icons.local_gas_station, color: Colors.green, size: 28),
+                    ),
+                  ),
+              ],
             ),
         ],
       ),
