@@ -79,8 +79,8 @@ class ApiClient {
       'origem': origem,
       'destino': destino,
       'vehicleModelId': vehicleModelId,
-      if (precoPorLitro != null) 'precoPorLitro': precoPorLitro,
-      if (precoPorKWh != null) 'precoPorKWh': precoPorKWh,
+      'precoPorLitro': ?precoPorLitro,
+      'precoPorKWh': ?precoPorKWh,
     });
     return TripCostBreakdown.fromJson(response.data as Map<String, dynamic>);
   }
