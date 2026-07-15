@@ -18,6 +18,7 @@ import com.rotacusto.dto.request.TripEstimateRequestDTO;
 import com.rotacusto.dto.request.VehicleProfileRequestDTO;
 import com.rotacusto.dto.response.CoordinateDTO;
 import com.rotacusto.dto.response.FuelStationResponseDTO;
+import com.rotacusto.dto.response.RouteStepDTO;
 import com.rotacusto.dto.response.TollPlazaResponseDTO;
 import com.rotacusto.dto.response.TripCostBreakdownDTO;
 import com.rotacusto.entity.TollPlaza;
@@ -85,6 +86,9 @@ public class TripEstimationService {
         List<FuelStationResponseDTO> postosDTO = postos.stream()
                 .map(p -> new FuelStationResponseDTO(p.nome(), p.lat(), p.lon()))
                 .toList();
+        List<RouteStepDTO> passos = route.passos().stream()
+                .map(s -> new RouteStepDTO(s.instrucao(), s.distanciaM(), s.duracaoS(), s.wayPointInicio(), s.wayPointFim()))
+                .toList();
 
         return new TripCostBreakdownDTO(
                 breakdown.distanciaKm(),
@@ -97,7 +101,8 @@ public class TripEstimationService {
                 geometria,
                 pedagios,
                 postosDTO,
-                postoSugerido.map(p -> new FuelStationResponseDTO(p.nome(), p.lat(), p.lon())).orElse(null));
+                postoSugerido.map(p -> new FuelStationResponseDTO(p.nome(), p.lat(), p.lon())).orElse(null),
+                passos);
     }
 
     private VehicleProfile resolveProfile(TripEstimateRequestDTO request) {

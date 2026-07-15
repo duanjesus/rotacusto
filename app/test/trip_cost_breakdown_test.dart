@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:latlong2/latlong.dart';
 
 import 'package:rotacusto_app/domain/models/fuel_station.dart';
+import 'package:rotacusto_app/domain/models/route_step.dart';
 import 'package:rotacusto_app/domain/models/toll_plaza.dart';
 import 'package:rotacusto_app/domain/models/trip_cost_breakdown.dart';
 
@@ -17,6 +18,7 @@ TripCostBreakdown _breakdown({
   List<TollPlaza> pedagiosNaRota = const [],
   List<FuelStation> postosNaRota = const [],
   FuelStation? postoSugerido,
+  List<RouteStep> passosRota = const [],
 }) {
   return TripCostBreakdown(
     distanciaKm: distanciaKm,
@@ -30,6 +32,7 @@ TripCostBreakdown _breakdown({
     pedagiosNaRota: pedagiosNaRota,
     postosNaRota: postosNaRota,
     postoSugerido: postoSugerido,
+    passosRota: passosRota,
   );
 }
 
@@ -110,5 +113,33 @@ void main() {
     final combinado = TripCostBreakdown.combine(ida, volta);
 
     expect(combinado.postoSugerido, postoVolta);
+  });
+
+  test('combine offsets the return leg\'s way-point indices past the outbound geometry', () {
+    // A geometria da volta é concatenada DEPOIS da geometria da ida — os
+    // way_points de cada passo da volta apontavam pra índices relativos à
+    // geometria dela sozinha; sem o deslocamento, eles apontariam pro trecho
+    // errado da rota combinada (ex.: pro meio da ida em vez do início da volta).
+    final ida = _breakdown(
+      geometriaRota: [const LatLng(0, 0), const LatLng(1, 1), const LatLng(2, 2)],
+      passosRota: [
+        RouteStep(instrucao: 'Siga em frente', distanciaM: 100, duracaoS: 10, wayPointInicio: 0, wayPointFim: 2),
+      ],
+    );
+    final volta = _breakdown(
+      geometriaRota: [const LatLng(2, 2), const LatLng(3, 3)],
+      passosRota: [
+        RouteStep(instrucao: 'Vire à esquerda', distanciaM: 50, duracaoS: 5, wayPointInicio: 0, wayPointFim: 1),
+      ],
+    );
+
+    final combinado = TripCostBreakdown.combine(ida, volta);
+
+    expect(combinado.passosRota.length, 2);
+    expect(combinado.passosRota[0].wayPointInicio, 0);
+    expect(combinado.passosRota[0].wayPointFim, 2);
+    expect(combinado.passosRota[1].instrucao, 'Vire à esquerda');
+    expect(combinado.passosRota[1].wayPointInicio, 3, reason: 'deslocado pelos 3 pontos da geometria da ida');
+    expect(combinado.passosRota[1].wayPointFim, 4);
   });
 }

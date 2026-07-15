@@ -6,13 +6,19 @@ import '../../domain/models/trip_cost_breakdown.dart';
 
 class TripMap extends StatelessWidget {
   final TripCostBreakdown? breakdown;
+  /// Dono é de quem precisa mover a câmera de fora (ex.: seguir o GPS ao
+  /// vivo na tela de navegação) — sem isso, `TripMap` continua stateless.
+  final MapController? mapController;
+  /// Posição ao vivo do usuário (Fase 6, navegação) — null fora da tela de
+  /// navegação, sem nenhum efeito no uso normal (resultado da viagem).
+  final LatLng? posicaoAtual;
 
-  const TripMap({super.key, this.breakdown});
+  const TripMap({super.key, this.breakdown, this.mapController, this.posicaoAtual});
 
   @override
   Widget build(BuildContext context) {
     final route = breakdown?.geometriaRota ?? const <LatLng>[];
-    final center = route.isNotEmpty ? route[route.length ~/ 2] : const LatLng(-22.9068, -43.1729);
+    final center = posicaoAtual ?? (route.isNotEmpty ? route[route.length ~/ 2] : const LatLng(-22.9068, -43.1729));
     final isDark = Theme.of(context).brightness == Brightness.dark;
     // Tiles CartoDB (estilo mais limpo, com variante clara/escura) em vez do
     // OSM padrão, mais carregado visualmente — requer atribuição própria
@@ -24,6 +30,7 @@ class TripMap extends StatelessWidget {
     return Container(
       color: Theme.of(context).colorScheme.surfaceContainerLow,
       child: FlutterMap(
+        mapController: mapController,
         options: MapOptions(
           initialCenter: center,
           initialZoom: route.isNotEmpty ? 7 : 10,
@@ -66,6 +73,22 @@ class TripMap extends StatelessWidget {
                   ),
               ],
             ),
+          if (posicaoAtual != null)
+            MarkerLayer(markers: [
+              Marker(
+                point: posicaoAtual!,
+                width: 24,
+                height: 24,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.primary,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.white, width: 3),
+                    boxShadow: const [BoxShadow(color: Colors.black38, blurRadius: 4)],
+                  ),
+                ),
+              ),
+            ]),
           RichAttributionWidget(
             attributions: [
               TextSourceAttribution('OpenStreetMap contributors'),

@@ -34,6 +34,13 @@
     <!-- API do back-end é HTTP/HTTPS puro (dio) — sem isso, todo request de
          rede falha silenciosamente com SocketException no Android. -->
     <uses-permission android:name="android.permission.INTERNET"/>
+    <!-- Navegação turn-by-turn (Fase 6) — posição ao vivo pra seguir a rota.
+         COARSE é pedida junto porque alguns fabricantes/versões negam FINE mas
+         concedem COARSE; o app funciona com precisão reduzida nesse caso.
+         Sem ACCESS_BACKGROUND_LOCATION de propósito — fora de escopo, a
+         navegação só funciona com o app aberto e a tela ligada. -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <!-- Required to query activities that can process text, see:
          https://developer.android.com/training/package-visibility and
          https://developer.android.com/reference/android/content/Intent#ACTION_PROCESS_TEXT.

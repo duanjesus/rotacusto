@@ -65,7 +65,7 @@ class TripEstimationServiceTest {
         when(geocodingService.resolve("Guarapari, ES")).thenReturn(destino);
 
         RouteResult route = new RouteResult(500.0, 360.0,
-                List.of(origem, new Coordinates(-21.5, -41.5), destino));
+                List.of(origem, new Coordinates(-21.5, -41.5), destino), List.of());
         when(routingService.route(origem, destino)).thenReturn(route);
 
         VehicleModel mobi = new VehicleModel();
@@ -99,7 +99,7 @@ class TripEstimationServiceTest {
         Coordinates origem = new Coordinates(-22.9, -43.1);
         Coordinates destino = new Coordinates(-20.6, -40.4);
         when(geocodingService.resolve(anyString())).thenReturn(origem, destino);
-        when(routingService.route(any(), any())).thenReturn(new RouteResult(100.0, 60.0, List.of(origem, destino)));
+        when(routingService.route(any(), any())).thenReturn(new RouteResult(100.0, 60.0, List.of(origem, destino), List.of()));
 
         var manualProfile = new com.rotacusto.dto.request.VehicleProfileRequestDTO(
                 VehicleType.MOTO, TipoCombustivel.GASOLINA, 20.0, 2, 0.15);
@@ -121,7 +121,7 @@ class TripEstimationServiceTest {
         when(geocodingService.resolve("Copacabana, RJ")).thenReturn(origem);
         when(geocodingService.resolve("Guarapari, ES")).thenReturn(destino);
 
-        RouteResult route = new RouteResult(500.0, 360.0, List.of(origem, destino));
+        RouteResult route = new RouteResult(500.0, 360.0, List.of(origem, destino), List.of());
         when(routingService.route(origem, destino)).thenReturn(route);
 
         VehicleModel mobi = new VehicleModel();
@@ -159,7 +159,7 @@ class TripEstimationServiceTest {
         when(geocodingService.resolve("Copacabana, RJ")).thenReturn(origem);
         when(geocodingService.resolve("Guarapari, ES")).thenReturn(destino);
 
-        RouteResult route = new RouteResult(500.0, 360.0, List.of(origem, destino));
+        RouteResult route = new RouteResult(500.0, 360.0, List.of(origem, destino), List.of());
         when(routingService.route(origem, destino)).thenReturn(route);
 
         VehicleModel mobi = new VehicleModel();
@@ -192,7 +192,7 @@ class TripEstimationServiceTest {
         when(geocodingService.resolve("Copacabana, RJ")).thenReturn(origem);
         when(geocodingService.resolve("Guarapari, ES")).thenReturn(destino);
 
-        RouteResult route = new RouteResult(300.0, 240.0, List.of(origem, destino));
+        RouteResult route = new RouteResult(300.0, 240.0, List.of(origem, destino), List.of());
         when(routingService.route(origem, destino)).thenReturn(route);
 
         VehicleModel bolt = new VehicleModel();
@@ -220,7 +220,8 @@ class TripEstimationServiceTest {
     void throwsWhenElectricVehicleResolvedButPrecoPorKWhMissing() {
         when(geocodingService.resolve(anyString())).thenReturn(new Coordinates(-22.9, -43.1), new Coordinates(-20.6, -40.4));
         when(routingService.route(any(), any()))
-                .thenReturn(new RouteResult(300.0, 240.0, List.of(new Coordinates(-22.9, -43.1), new Coordinates(-20.6, -40.4))));
+                .thenReturn(new RouteResult(300.0, 240.0,
+                        List.of(new Coordinates(-22.9, -43.1), new Coordinates(-20.6, -40.4)), List.of()));
 
         VehicleModel bolt = new VehicleModel();
         bolt.setId(2L);
@@ -249,7 +250,7 @@ class TripEstimationServiceTest {
         tripEstimationService = new TripEstimationService(
                 geocodingService, routingService, vehicleModelService, tollService, fuelStationService,
                 3.0, 25.0);
-        RouteResult route = new RouteResult(700.0, 480.0, List.of(origem, destino));
+        RouteResult route = new RouteResult(700.0, 480.0, List.of(origem, destino), List.of());
         when(routingService.route(origem, destino)).thenReturn(route);
 
         VehicleModel mobi = new VehicleModel();

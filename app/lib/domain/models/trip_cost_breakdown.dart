@@ -1,6 +1,7 @@
 import 'package:latlong2/latlong.dart';
 
 import 'fuel_station.dart';
+import 'route_step.dart';
 import 'toll_plaza.dart';
 
 class TripCostBreakdown {
@@ -15,6 +16,7 @@ class TripCostBreakdown {
   final List<TollPlaza> pedagiosNaRota;
   final List<FuelStation> postosNaRota;
   final FuelStation? postoSugerido;
+  final List<RouteStep> passosRota;
 
   TripCostBreakdown({
     required this.distanciaKm,
@@ -28,6 +30,7 @@ class TripCostBreakdown {
     required this.pedagiosNaRota,
     required this.postosNaRota,
     required this.postoSugerido,
+    required this.passosRota,
   });
 
   /// Combina ida + volta calculadas separadamente (não é só multiplicar por
@@ -47,6 +50,13 @@ class TripCostBreakdown {
       pedagiosNaRota: [...ida.pedagiosNaRota, ...volta.pedagiosNaRota],
       postosNaRota: [...ida.postosNaRota, ...volta.postosNaRota],
       postoSugerido: ida.postoSugerido ?? volta.postoSugerido,
+      // way_points da volta apontam pra índices dentro DA GEOMETRIA DELA —
+      // precisam do deslocamento pelo tamanho da geometria da ida pra
+      // continuarem válidos contra geometriaRota já concatenada acima.
+      passosRota: [
+        ...ida.passosRota,
+        ...volta.passosRota.map((p) => p.offsetWayPoints(ida.geometriaRota.length)),
+      ],
     );
   }
 
@@ -71,6 +81,9 @@ class TripCostBreakdown {
       postoSugerido: json['postoSugerido'] != null
           ? FuelStation.fromJson(json['postoSugerido'] as Map<String, dynamic>)
           : null,
+      passosRota: (json['passosRota'] as List<dynamic>? ?? [])
+          .map((p) => RouteStep.fromJson(p as Map<String, dynamic>))
+          .toList(),
     );
   }
 }

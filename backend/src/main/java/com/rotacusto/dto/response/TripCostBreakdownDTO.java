@@ -13,5 +13,6 @@ public record TripCostBreakdownDTO(
         List<CoordinateDTO> geometriaRota,
         List<TollPlazaResponseDTO> pedagiosNaRota,
         List<FuelStationResponseDTO> postosNaRota,
-        FuelStationResponseDTO postoSugerido) {
+        FuelStationResponseDTO postoSugerido,
+        List<RouteStepDTO> passosRota) {
 }

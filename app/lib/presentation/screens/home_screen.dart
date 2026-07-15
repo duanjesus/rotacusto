@@ -13,6 +13,7 @@ import '../widgets/cost_breakdown_bar.dart';
 import '../widgets/section_card.dart';
 import '../widgets/trip_map.dart';
 import '../widgets/vehicle_search_field.dart';
+import 'navigation_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -552,6 +553,16 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
               ],
+            ),
+          ],
+          if (b.passosRota.isNotEmpty) ...[
+            const SizedBox(height: 12),
+            OutlinedButton.icon(
+              onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => NavigationScreen(breakdown: b)),
+              ),
+              icon: const Icon(Icons.navigation_rounded),
+              label: const Text('Navegar'),
             ),
           ],
         ],
