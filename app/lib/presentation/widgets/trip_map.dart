@@ -13,9 +13,16 @@ class TripMap extends StatelessWidget {
   Widget build(BuildContext context) {
     final route = breakdown?.geometriaRota ?? const <LatLng>[];
     final center = route.isNotEmpty ? route[route.length ~/ 2] : const LatLng(-22.9068, -43.1729);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    // Tiles CartoDB (estilo mais limpo, com variante clara/escura) em vez do
+    // OSM padrão, mais carregado visualmente — requer atribuição própria
+    // (RichAttributionWidget abaixo), além da do OSM (fonte dos dados).
+    final tileUrl = isDark
+        ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+        : 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
 
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(8),
+    return Container(
+      color: Theme.of(context).colorScheme.surfaceContainerLow,
       child: FlutterMap(
         options: MapOptions(
           initialCenter: center,
@@ -23,12 +30,13 @@ class TripMap extends StatelessWidget {
         ),
         children: [
           TileLayer(
-            urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+            urlTemplate: tileUrl,
             userAgentPackageName: 'com.rotacusto.app',
+            subdomains: const ['a', 'b', 'c', 'd'],
           ),
           if (route.isNotEmpty)
             PolylineLayer(polylines: [
-              Polyline(points: route, strokeWidth: 4, color: Colors.blueAccent),
+              Polyline(points: route, strokeWidth: 4, color: Theme.of(context).colorScheme.primary),
             ]),
           if (breakdown != null)
             MarkerLayer(
@@ -58,6 +66,12 @@ class TripMap extends StatelessWidget {
                   ),
               ],
             ),
+          RichAttributionWidget(
+            attributions: [
+              TextSourceAttribution('OpenStreetMap contributors'),
+              TextSourceAttribution('CARTO'),
+            ],
+          ),
         ],
       ),
     );

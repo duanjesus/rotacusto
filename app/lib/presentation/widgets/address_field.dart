@@ -94,26 +94,30 @@ class _AddressFieldState extends State<AddressField> {
           onChanged: _onChanged,
         ),
         if (_suggestions.isNotEmpty)
-          Container(
-            margin: const EdgeInsets.only(top: 2),
-            constraints: const BoxConstraints(maxHeight: 220),
-            decoration: BoxDecoration(
-              border: Border.all(color: Theme.of(context).dividerColor),
-              borderRadius: BorderRadius.circular(4),
-            ),
-            child: ListView.builder(
-              padding: EdgeInsets.zero,
-              shrinkWrap: true,
-              itemCount: _suggestions.length,
-              itemBuilder: (context, index) {
-                final suggestion = _suggestions[index];
-                return ListTile(
-                  dense: true,
-                  leading: const Icon(Icons.location_on_outlined, size: 18),
-                  title: Text(suggestion.displayName, style: const TextStyle(fontSize: 13)),
-                  onTap: () => _select(suggestion),
-                );
-              },
+          Padding(
+            padding: const EdgeInsets.only(top: 6),
+            child: Material(
+              elevation: 3,
+              borderRadius: BorderRadius.circular(14),
+              clipBehavior: Clip.antiAlias,
+              color: Theme.of(context).colorScheme.surfaceContainerHigh,
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxHeight: 220),
+                child: ListView.builder(
+                  padding: EdgeInsets.zero,
+                  shrinkWrap: true,
+                  itemCount: _suggestions.length,
+                  itemBuilder: (context, index) {
+                    final suggestion = _suggestions[index];
+                    return ListTile(
+                      dense: true,
+                      leading: const Icon(Icons.location_on_outlined, size: 18),
+                      title: Text(suggestion.displayName, style: const TextStyle(fontSize: 13)),
+                      onTap: () => _select(suggestion),
+                    );
+                  },
+                ),
+              ),
             ),
           ),
       ],
