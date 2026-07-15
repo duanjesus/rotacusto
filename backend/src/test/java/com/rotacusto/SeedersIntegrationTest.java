@@ -136,5 +136,18 @@ class SeedersIntegrationTest {
         assertTrue(tollPlazaRepository.findAll().stream()
                 .anyMatch(p -> p.getCobraApenasIndo() != null),
                 "deveria ter pelo menos uma praça de sentido único cadastrada");
+
+        // Itaboraí (Rota 116) e Ponte Rio-Niterói (Ecovias Ponte) tinham
+        // tarifa estimada — corrigidas com valor real confirmado. Moto é
+        // ISENTA na Rota 116 (tarifaMoto=0,0, não confundir com "sem dado").
+        var todasPracas = tollPlazaRepository.findAll();
+        assertTrue(todasPracas.stream().anyMatch(p -> p.getConcessionaria().equals("Rota 116")),
+                "deveria ter a praça real da Rota 116 (Itaboraí)");
+        assertTrue(todasPracas.stream()
+                .filter(p -> p.getConcessionaria().equals("Rota 116"))
+                .allMatch(p -> p.getTarifaMoto() != null && p.getTarifaMoto() == 0.0),
+                "moto deveria ser isenta na praça da Rota 116");
+        assertTrue(todasPracas.stream().anyMatch(p -> p.getConcessionaria().contains("Ecovias Ponte")),
+                "deveria ter a praça real da Ponte Rio-Niterói");
     }
 }
