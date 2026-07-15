@@ -265,13 +265,23 @@ class _HomeScreenState extends State<HomeScreen> {
                 fetchSuggestions: _apiClient.suggestAddress,
                 onSelected: (s) => _destinoSelecionado = s,
               ),
-              CheckboxListTile(
-                value: _idaEVolta,
-                onChanged: (v) => setState(() => _idaEVolta = v ?? false),
-                title: const Text('Ida e volta'),
-                contentPadding: EdgeInsets.zero,
-                controlAffinity: ListTileControlAffinity.leading,
-                dense: true,
+              const SizedBox(height: 4),
+              InkWell(
+                borderRadius: BorderRadius.circular(10),
+                onTap: () => setState(() => _idaEVolta = !_idaEVolta),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  child: Row(
+                    children: [
+                      Checkbox(
+                        value: _idaEVolta,
+                        onChanged: (v) => setState(() => _idaEVolta = v ?? false),
+                      ),
+                      const SizedBox(width: 4),
+                      const Text('Ida e volta'),
+                    ],
+                  ),
+                ),
               ),
             ],
           ),
