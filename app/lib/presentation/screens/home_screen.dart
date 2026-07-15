@@ -7,6 +7,7 @@ import '../../domain/models/tipo_combustivel.dart';
 import '../../domain/models/trip_cost_breakdown.dart';
 import '../../domain/models/vehicle_model.dart';
 import '../../domain/models/vehicle_model_summary.dart';
+import '../../domain/models/vehicle_type.dart';
 import '../widgets/address_field.dart';
 import '../widgets/cost_breakdown_bar.dart';
 import '../widgets/section_card.dart';
@@ -35,6 +36,9 @@ class _HomeScreenState extends State<HomeScreen> {
   final _destinoController = TextEditingController(text: 'Guarapari, ES');
   final _precoController = TextEditingController(text: _precoPadraoPorCombustivel[TipoCombustivel.gasolina]);
 
+  // Só carro e moto têm dado de verdade no catálogo por enquanto
+  // (caminhão/van/ônibus ficam pra uma próxima rodada da Fase 3).
+  VehicleType _selectedTipo = VehicleType.carro;
   VehicleModelSummary? _selectedModelSummary;
   List<VehicleModel> _availableVersions = [];
   bool _loadingVersions = false;
@@ -65,6 +69,16 @@ class _HomeScreenState extends State<HomeScreen> {
     _destinoController.dispose();
     _precoController.dispose();
     super.dispose();
+  }
+
+  void _onTipoSelected(VehicleType tipo) {
+    setState(() {
+      _selectedTipo = tipo;
+      _selectedModelSummary = null;
+      _availableVersions = [];
+      _selectedAno = null;
+      _selectedVehicle = null;
+    });
   }
 
   Future<void> _onModelSelected(VehicleModelSummary? summary) async {
@@ -291,9 +305,21 @@ class _HomeScreenState extends State<HomeScreen> {
           title: 'Veículo',
           child: Column(
             children: [
+              SegmentedButton<VehicleType>(
+                segments: const [
+                  ButtonSegment(value: VehicleType.carro, label: Text('Carro'), icon: Icon(Icons.directions_car_rounded)),
+                  ButtonSegment(value: VehicleType.moto, label: Text('Moto'), icon: Icon(Icons.two_wheeler_rounded)),
+                ],
+                selected: {_selectedTipo},
+                onSelectionChanged: (novo) => _onTipoSelected(novo.first),
+              ),
+              const SizedBox(height: 12),
               VehicleSearchField(
+                // Força recriar o campo (e limpar o texto digitado) ao trocar
+                // de tipo — initialValue só vale na criação do widget.
+                key: ValueKey(_selectedTipo),
                 initialValue: _selectedModelSummary,
-                fetchSuggestions: _apiClient.searchVehicleModels,
+                fetchSuggestions: (q) => _apiClient.searchVehicleModels(q, tipo: _selectedTipo),
                 onSelected: _onModelSelected,
               ),
               if (_loadingVersions) ...[
@@ -331,6 +357,15 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                     ),
                   ],
+                ),
+              ],
+              if (_selectedVehicle?.cilindradaCC != null) ...[
+                const SizedBox(height: 8),
+                Text(
+                  '${_selectedVehicle!.cilindradaCC} cc · consumo estimado pela cilindrada (sem tabela oficial pra moto)',
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
                 ),
               ],
               const SizedBox(height: 12),

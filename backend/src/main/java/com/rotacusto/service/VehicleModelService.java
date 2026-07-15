@@ -37,7 +37,7 @@ public class VehicleModelService {
      * ano/versão do mesmo modelo — aqui devolve só pares marca+modelo
      * distintos (o passo 2, {@link #findVersions}, lista os anos).
      */
-    public List<VehicleModelSummaryDTO> searchModels(String q) {
+    public List<VehicleModelSummaryDTO> searchModels(String q, VehicleType tipo) {
         if (!StringUtils.hasText(q) || q.trim().length() < MIN_QUERY_LENGTH) {
             return List.of();
         }
@@ -50,6 +50,9 @@ public class VehicleModelService {
         for (VehicleModel v : repository.findAll()) {
             if (distintos.size() >= SEARCH_LIMIT) {
                 break;
+            }
+            if (tipo != null && v.getTipo() != tipo) {
+                continue;
             }
             if (!matchesAllTerms(v, termos)) {
                 continue;

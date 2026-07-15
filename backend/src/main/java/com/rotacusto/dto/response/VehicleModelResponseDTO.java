@@ -16,13 +16,14 @@ public class VehicleModelResponseDTO {
     private Double consumoKmPorKWh;
     private Integer numeroEixos;
     private Double custoDesgastePorKm;
+    private Integer cilindradaCC;
 
     public VehicleModelResponseDTO() {
     }
 
     public VehicleModelResponseDTO(Long id, String marca, String modelo, Integer ano, VehicleType tipo,
             TipoCombustivel tipoCombustivel, Double consumoCidadeKmL, Double consumoEstradaKmL, Double consumoKmPorKWh,
-            Integer numeroEixos, Double custoDesgastePorKm) {
+            Integer numeroEixos, Double custoDesgastePorKm, Integer cilindradaCC) {
         this.id = id;
         this.marca = marca;
         this.modelo = modelo;
@@ -34,6 +35,7 @@ public class VehicleModelResponseDTO {
         this.consumoKmPorKWh = consumoKmPorKWh;
         this.numeroEixos = numeroEixos;
         this.custoDesgastePorKm = custoDesgastePorKm;
+        this.cilindradaCC = cilindradaCC;
     }
 
     public Long getId() {
@@ -78,5 +80,9 @@ public class VehicleModelResponseDTO {
 
     public Double getCustoDesgastePorKm() {
         return custoDesgastePorKm;
+    }
+
+    public Integer getCilindradaCC() {
+        return cilindradaCC;
     }
 }

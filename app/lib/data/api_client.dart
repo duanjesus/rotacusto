@@ -4,6 +4,7 @@ import '../domain/models/address_suggestion.dart';
 import '../domain/models/trip_cost_breakdown.dart';
 import '../domain/models/vehicle_model.dart';
 import '../domain/models/vehicle_model_summary.dart';
+import '../domain/models/vehicle_type.dart';
 
 /// Client HTTP para o back-end do RotaCusto.
 /// Em desktop/mobile nativo, `localhost` aponta para a própria máquina.
@@ -23,8 +24,13 @@ class ApiClient {
         ));
 
   /// Passo 1 da escolha de veículo: marca+modelo distintos (sem ano ainda).
-  Future<List<VehicleModelSummary>> searchVehicleModels(String query) async {
-    final response = await _dio.get('/vehicle-models/search', queryParameters: {'q': query});
+  /// [tipo] filtra por tipo de veículo (carro/moto/...) — sem isso, buscar
+  /// "honda" misturaria carro (Civic) com moto (CG 160) no mesmo resultado.
+  Future<List<VehicleModelSummary>> searchVehicleModels(String query, {VehicleType? tipo}) async {
+    final response = await _dio.get('/vehicle-models/search', queryParameters: {
+      'q': query,
+      if (tipo != null) 'tipo': tipo.apiValue,
+    });
     return (response.data as List<dynamic>)
         .map((json) => VehicleModelSummary.fromJson(json as Map<String, dynamic>))
         .toList();

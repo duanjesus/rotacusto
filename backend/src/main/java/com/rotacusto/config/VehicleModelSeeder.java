@@ -13,9 +13,23 @@ import com.rotacusto.repository.VehicleModelRepository;
 /**
  * Carrega o catálogo de veículos a partir de data/vehicle-models.json.
  *
- * Consumo vem das Tabelas PBE Veicular oficiais do INMETRO (gov.br/inmetro) —
- * **anos 2016 a 2026, catálogo completo** (7.726 linhas). Cada ano tem um
- * "ano" próprio no catálogo, então o mesmo modelo pode aparecer várias vezes.
+ * Consumo de CARRO vem das Tabelas PBE Veicular oficiais do INMETRO
+ * (gov.br/inmetro) — **anos 2016 a 2026, catálogo completo**. Cada ano tem
+ * um "ano" próprio no catálogo, então o mesmo modelo pode aparecer várias
+ * vezes. Total do catálogo (carro + moto): 7.802 linhas.
+ *
+ * MOTO (Fase 3, 76 modelos): o PBE do INMETRO **não cobre motocicleta** —
+ * não existe tabela oficial de consumo por modelo de moto no Brasil. A
+ * cilindrada ({@code cilindradaCC}) é dado público real (ficha técnica do
+ * fabricante), curada de múltiplas fontes de mercado (rankings de vendas,
+ * especificações de cada marca). O consumo é uma ESTIMATIVA derivada da
+ * cilindrada por interpolação linear entre faixas de km/l comumente
+ * conhecidas pra motos populares no Brasil (ex.: ~36km/l pra uma 160cc,
+ * ~28km/l pra uma 250cc) — não é medição real por modelo. Combustível
+ * sempre GASOLINA (simplificação: várias motos populares são flex de
+ * verdade, mas separar isso por modelo exigiria pesquisa adicional não
+ * feita ainda). Ano fixo em 2025 pra todas — cilindrada não muda
+ * ano-a-ano o bastante pra justificar entradas duplicadas por ano.
  *
  * {@code tipoCombustivel} (GASOLINA/ETANOL/DIESEL/ELETRICO) é parte da
  * IDENTIDADE do registro, não um detalhe: um carro flex vira DUAS linhas

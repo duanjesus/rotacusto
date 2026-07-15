@@ -20,6 +20,7 @@ public class VehicleModelMapper {
                 model.getConsumoEstradaKmL(),
                 model.getConsumoKmPorKWh(),
                 model.getNumeroEixos(),
-                model.getCustoDesgastePorKm());
+                model.getCustoDesgastePorKm(),
+                model.getCilindradaCC());
     }
 }

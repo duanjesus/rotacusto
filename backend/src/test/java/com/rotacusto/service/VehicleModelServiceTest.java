@@ -17,6 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import com.rotacusto.dto.response.VehicleModelSummaryDTO;
 import com.rotacusto.entity.VehicleModel;
 import com.rotacusto.entity.enums.TipoCombustivel;
+import com.rotacusto.entity.enums.VehicleType;
 import com.rotacusto.repository.VehicleModelRepository;
 
 @ExtendWith(MockitoExtension.class)
@@ -34,11 +35,16 @@ class VehicleModelServiceTest {
     }
 
     private static VehicleModel vehicle(String marca, String modelo, Integer ano, TipoCombustivel combustivel) {
+        return vehicle(marca, modelo, ano, combustivel, VehicleType.CARRO);
+    }
+
+    private static VehicleModel vehicle(String marca, String modelo, Integer ano, TipoCombustivel combustivel, VehicleType tipo) {
         VehicleModel v = new VehicleModel();
         v.setMarca(marca);
         v.setModelo(modelo);
         v.setAno(ano);
         v.setTipoCombustivel(combustivel);
+        v.setTipo(tipo);
         return v;
     }
 
@@ -46,8 +52,8 @@ class VehicleModelServiceTest {
     void returnsEmptyListForQueriesShorterThanTwoChars() {
         VehicleModelService service = new VehicleModelService(repository);
 
-        assertTrue(service.searchModels("C").isEmpty());
-        assertTrue(service.searchModels("").isEmpty());
+        assertTrue(service.searchModels("C", null).isEmpty());
+        assertTrue(service.searchModels("", null).isEmpty());
         verify(repository, never()).findAll();
     }
 
@@ -58,7 +64,7 @@ class VehicleModelServiceTest {
                 vehicle("TOYOTA", "COROLLA"),
                 vehicle("HONDA", "CIVIC")));
 
-        List<VehicleModelSummaryDTO> result = service.searchModels("Corolla");
+        List<VehicleModelSummaryDTO> result = service.searchModels("Corolla", null);
 
         assertEquals(1, result.size());
         assertEquals("COROLLA", result.get(0).modelo());
@@ -74,7 +80,7 @@ class VehicleModelServiceTest {
                 vehicle("HONDA", "CIVIC"),
                 vehicle("TOYOTA", "COROLLA")));
 
-        List<VehicleModelSummaryDTO> result = service.searchModels("honda hr-v");
+        List<VehicleModelSummaryDTO> result = service.searchModels("honda hr-v", null);
 
         assertEquals(1, result.size());
         assertEquals("HR-V", result.get(0).modelo());
@@ -85,7 +91,7 @@ class VehicleModelServiceTest {
         VehicleModelService service = new VehicleModelService(repository);
         when(repository.findAll()).thenReturn(List.of(vehicle("HONDA", "HR-V")));
 
-        List<VehicleModelSummaryDTO> result = service.searchModels("hr-v honda");
+        List<VehicleModelSummaryDTO> result = service.searchModels("hr-v honda", null);
 
         assertEquals(1, result.size());
     }
@@ -98,7 +104,7 @@ class VehicleModelServiceTest {
                 vehicle("HONDA", "HR-V", 2022),
                 vehicle("HONDA", "HR-V", 2021)));
 
-        List<VehicleModelSummaryDTO> result = service.searchModels("hr-v");
+        List<VehicleModelSummaryDTO> result = service.searchModels("hr-v", null);
 
         assertEquals(1, result.size(), "os 3 anos do mesmo modelo devem virar 1 resultado só no passo 1");
     }
@@ -111,7 +117,7 @@ class VehicleModelServiceTest {
                 .toList();
         when(repository.findAll()).thenReturn(manyMatches);
 
-        List<VehicleModelSummaryDTO> result = service.searchModels("ma");
+        List<VehicleModelSummaryDTO> result = service.searchModels("ma", null);
 
         assertEquals(20, result.size());
     }
@@ -158,5 +164,20 @@ class VehicleModelServiceTest {
         assertEquals(2, result.size(), "flex tem 2 versões reais no mesmo ano — gasolina e etanol não são duplicatas");
         assertEquals(TipoCombustivel.GASOLINA, result.get(0).getTipoCombustivel(), "gasolina vem antes de etanol na ordem fixa");
         assertEquals(TipoCombustivel.ETANOL, result.get(1).getTipoCombustivel());
+    }
+
+    @Test
+    void searchFiltersByVehicleTypeWhenProvided() {
+        // Regressão: sem esse filtro, buscar "honda" misturaria carro (Civic)
+        // com moto (CG 160) no mesmo passo 1 de escolha de veículo.
+        VehicleModelService service = new VehicleModelService(repository);
+        when(repository.findAll()).thenReturn(List.of(
+                vehicle("HONDA", "Civic", null, TipoCombustivel.GASOLINA, VehicleType.CARRO),
+                vehicle("HONDA", "CG 160", null, TipoCombustivel.GASOLINA, VehicleType.MOTO)));
+
+        List<VehicleModelSummaryDTO> result = service.searchModels("honda", VehicleType.MOTO);
+
+        assertEquals(1, result.size());
+        assertEquals("CG 160", result.get(0).modelo());
     }
 }

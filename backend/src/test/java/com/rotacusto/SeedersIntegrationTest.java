@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import com.rotacusto.entity.enums.TipoCombustivel;
+import com.rotacusto.entity.enums.VehicleType;
 import com.rotacusto.repository.TollPlazaRepository;
 import com.rotacusto.repository.VehicleModelRepository;
 
@@ -26,7 +27,7 @@ class SeedersIntegrationTest {
 
     @Test
     void vehicleModelCatalogIsSeededOnStartup() {
-        assertEquals(7726, vehicleModelRepository.count());
+        assertEquals(7802, vehicleModelRepository.count());
         long marcasDistintas = vehicleModelRepository.findAll().stream()
                 .map(v -> v.getMarca())
                 .distinct()
@@ -52,6 +53,13 @@ class SeedersIntegrationTest {
                 .filter(v -> v.getTipoCombustivel() != TipoCombustivel.ELETRICO)
                 .allMatch(v -> v.getConsumoCidadeKmL() != null && v.getConsumoEstradaKmL() != null),
                 "todo veículo a combustão deveria ter consumo em km/L preenchido");
+
+        long motos = todos.stream().filter(v -> v.getTipo() == VehicleType.MOTO).count();
+        assertTrue(motos > 0, "catálogo deveria ter pelo menos uma moto (Fase 3)");
+        assertTrue(todos.stream()
+                .filter(v -> v.getTipo() == VehicleType.MOTO)
+                .allMatch(v -> v.getCilindradaCC() != null && v.getCilindradaCC() > 0),
+                "toda moto deveria ter cilindrada preenchida");
     }
 
     @Test

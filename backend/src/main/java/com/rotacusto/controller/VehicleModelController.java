@@ -37,8 +37,8 @@ public class VehicleModelController {
 
     /** Passo 1 da escolha de veículo: marca+modelo distintos que batem com a busca. */
     @GetMapping("/search")
-    public List<VehicleModelSummaryDTO> search(@RequestParam String q) {
-        return service.searchModels(q);
+    public List<VehicleModelSummaryDTO> search(@RequestParam String q, @RequestParam(required = false) VehicleType tipo) {
+        return service.searchModels(q, tipo);
     }
 
     /** Passo 2: anos/versões disponíveis do marca+modelo escolhido no passo 1. */

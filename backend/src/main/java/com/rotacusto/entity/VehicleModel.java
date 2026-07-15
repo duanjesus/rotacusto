@@ -58,6 +58,16 @@ public class VehicleModel {
     @Column(name = "custo_desgaste_por_km", nullable = false)
     private Double custoDesgastePorKm;
 
+    /**
+     * Só preenchido pra MOTO. Não existe tabela oficial de consumo por
+     * modelo de moto no Brasil (o PBE do INMETRO só cobre carro/utilitário
+     * leve) — a cilindrada real do modelo (dado público, verificável) é
+     * usada pra estimar consumoCidadeKmL/EstradaKmL na hora de montar o
+     * catálogo, em vez de inventar um consumo direto sem base nenhuma.
+     */
+    @Column(name = "cilindrada_cc")
+    private Integer cilindradaCC;
+
     public VehicleModel() {
     }
 
@@ -147,5 +157,13 @@ public class VehicleModel {
 
     public void setCustoDesgastePorKm(Double custoDesgastePorKm) {
         this.custoDesgastePorKm = custoDesgastePorKm;
+    }
+
+    public Integer getCilindradaCC() {
+        return cilindradaCC;
+    }
+
+    public void setCilindradaCC(Integer cilindradaCC) {
+        this.cilindradaCC = cilindradaCC;
     }
 }
