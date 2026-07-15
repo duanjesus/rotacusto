@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../../data/api_client.dart';
 import '../../domain/models/address_suggestion.dart';
+import '../../domain/models/tipo_combustivel.dart';
 import '../../domain/models/trip_cost_breakdown.dart';
 import '../../domain/models/vehicle_model.dart';
 import '../../domain/models/vehicle_model_summary.dart';
@@ -19,14 +20,20 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-const _precoCombustaoPadrao = '6.09';
-const _precoEletricoPadrao = '0.90';
+// Médias aproximadas de mercado — só o valor inicial sugerido; o usuário
+// sempre pode digitar o preço real de onde vai abastecer/carregar.
+const _precoPadraoPorCombustivel = {
+  TipoCombustivel.gasolina: '6.09',
+  TipoCombustivel.etanol: '4.09',
+  TipoCombustivel.diesel: '6.29',
+  TipoCombustivel.eletrico: '0.90',
+};
 
 class _HomeScreenState extends State<HomeScreen> {
   final ApiClient _apiClient = ApiClient();
   final _origemController = TextEditingController(text: 'Copacabana, Rio de Janeiro, RJ');
   final _destinoController = TextEditingController(text: 'Guarapari, ES');
-  final _precoController = TextEditingController(text: _precoCombustaoPadrao);
+  final _precoController = TextEditingController(text: _precoPadraoPorCombustivel[TipoCombustivel.gasolina]);
 
   VehicleModelSummary? _selectedModelSummary;
   List<VehicleModel> _availableVersions = [];
@@ -76,11 +83,12 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _onVehicleSelected(VehicleModel? v) {
-    final tipoEnergiaMudou = v != null && _selectedVehicle != null && _selectedVehicle!.isEletrico != v.isEletrico;
+    final combustivelMudou =
+        v != null && _selectedVehicle != null && _selectedVehicle!.tipoCombustivel != v.tipoCombustivel;
     setState(() {
       _selectedVehicle = v;
-      if (tipoEnergiaMudou) {
-        _precoController.text = v.isEletrico ? _precoEletricoPadrao : _precoCombustaoPadrao;
+      if (combustivelMudou) {
+        _precoController.text = _precoPadraoPorCombustivel[v.tipoCombustivel]!;
       }
     });
   }
@@ -117,7 +125,7 @@ class _HomeScreenState extends State<HomeScreen> {
         origem: origem,
         destino: destino,
         vehicleModelId: _selectedVehicle!.id,
-        precoCombustivelPorLitro: isEletrico ? null : preco,
+        precoPorLitro: isEletrico ? null : preco,
         precoPorKWh: isEletrico ? preco : null,
       );
       setState(() {
@@ -243,9 +251,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 const SizedBox(height: 12),
                 DropdownButtonFormField<VehicleModel>(
                   initialValue: _selectedVehicle,
-                  decoration: const InputDecoration(labelText: 'Ano'),
+                  decoration: const InputDecoration(labelText: 'Ano / combustível'),
                   items: _availableVersions
-                      .map((v) => DropdownMenuItem(value: v, child: Text(v.ano.toString())))
+                      .map((v) => DropdownMenuItem(value: v, child: Text(v.versaoLabel)))
                       .toList(),
                   onChanged: _onVehicleSelected,
                 ),
@@ -256,7 +264,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 decoration: InputDecoration(
                   labelText: (_selectedVehicle?.isEletrico ?? false)
                       ? 'Preço da energia (R\$/kWh)'
-                      : 'Preço do combustível (R\$/L)',
+                      : 'Preço do ${(_selectedVehicle?.tipoCombustivel ?? TipoCombustivel.gasolina).label.toLowerCase()} (R\$/L)',
                   prefixIcon: Icon((_selectedVehicle?.isEletrico ?? false) ? Icons.bolt_rounded : Icons.local_gas_station_rounded),
                 ),
                 keyboardType: const TextInputType.numberWithOptions(decimal: true),
@@ -331,7 +339,7 @@ class _HomeScreenState extends State<HomeScreen> {
           CostBreakdownBar(
             segments: [
               CostSegment(
-                label: (_selectedVehicle?.isEletrico ?? false) ? 'Energia' : 'Combustível',
+                label: (_selectedVehicle?.tipoCombustivel ?? TipoCombustivel.gasolina).label,
                 value: b.custoCombustivel,
                 light: const Color(0xFF2a78d6),
                 dark: const Color(0xFF3987e5),

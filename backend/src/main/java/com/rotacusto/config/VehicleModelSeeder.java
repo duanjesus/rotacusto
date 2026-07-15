@@ -14,35 +14,40 @@ import com.rotacusto.repository.VehicleModelRepository;
  * Carrega o catálogo de veículos a partir de data/vehicle-models.json.
  *
  * Consumo vem das Tabelas PBE Veicular oficiais do INMETRO (gov.br/inmetro) —
- * **anos 2016 a 2026, catálogo completo** (~5.800 modelos/versões no total).
- * Cada ano tem um "ano" próprio no catálogo, então o mesmo modelo pode
- * aparecer várias vezes com o consumo daquele ano específico.
+ * **anos 2016 a 2026, catálogo completo** (7.726 linhas). Cada ano tem um
+ * "ano" próprio no catálogo, então o mesmo modelo pode aparecer várias vezes.
  *
- * {@code tipoEnergia} discrimina COMBUSTAO (usa consumoCidadeKmL/
- * consumoEstradaKmL, em L/km) de ELETRICO (usa consumoKmPorKWh) — os campos
- * do "outro" tipo ficam nulos. Entradas 100% elétricas foram extraídas dos
- * mesmos PDFs 2021-2026 filtrando por Propulsão="Elétrico" (excluindo
- * híbridos plug-in, que ainda têm motor a combustão e ficam de fora por
- * ora). Como a tabela não expõe km/kWh diretamente, o valor vem do "Consumo
- * Energético (MJ/km)" — métrica única, universal a qualquer motorização, que
- * a tabela publica pra todo veículo — convertido via 1 kWh = 3,6 MJ:
- * consumoKmPorKWh = 3,6 / consumoEnergeticoMJporKm. Verificado contra a
- * legenda de estatísticas de 2022 ("Elétricos 60 Modelos"): a extração bateu
- * exatamente 60 entradas elétricas nesse ano.
+ * {@code tipoCombustivel} (GASOLINA/ETANOL/DIESEL/ELETRICO) é parte da
+ * IDENTIDADE do registro, não um detalhe: um carro flex vira DUAS linhas
+ * (mesmo marca/modelo/ano, uma GASOLINA e uma ETANOL, cada uma com seu
+ * consumo real) em vez de uma linha só usando a gasolina como proxy — pedido
+ * explícito do usuário pra poder escolher o combustível de verdade na hora
+ * de calcular. GASOLINA/ETANOL/DIESEL usam consumoCidadeKmL/EstradaKmL (fica
+ * nulo pra ELETRICO); ELETRICO usa consumoKmPorKWh (fica nulo pros outros).
+ * GNV **não existe** no catálogo — a tabela do INMETRO só certifica
+ * configuração de fábrica (legenda oficial: "Etanol(E)Gasolina(G)Flex(F)
+ * Diesel(D)"), e GNV no Brasil é sempre conversão pós-fábrica, fora do
+ * escopo do programa de etiquetagem.
  *
- * Anos 2021-2025 (fechados numa rodada anterior, mesma técnica pra
- * combustão/híbrido): a extração desses PDFs específicos
- * (via tabula-java) tem colunas com posições inconsistentes até entre páginas
- * do mesmo documento — um mapeamento fixo por ano capturava só uma fração das
- * linhas reais. Solução: detecção por VALOR em vez de posição fixa — marca/
- * modelo/versão/categoria/combustível vêm de cabeçalho re-detectado por
- * página, mas o par consumo cidade/estrada é achado varrendo a linha inteira
- * por números decimais no intervalo plausível de km/l (4-45), pegando sempre
- * os dois últimos válidos (gasolina/diesel, não etanol — mesma convenção dos
- * anos anteriores). Ano 2021 é um caso à parte: só a página 1 do PDF tem
- * cabeçalho de texto (é só legenda, sem dado); as páginas 2-20 (dado real)
- * não repetem o cabeçalho, então usam um mapeamento de posição fixo
- * verificado à mão contra várias linhas reais (HB20, Kicks, 911, Boxster).
+ * Extração via tabula-java, com detecção por VALOR em vez de posição fixa
+ * (varia demais entre páginas do mesmo PDF e até entre anos): marca/modelo/
+ * versão/categoria vêm de cabeçalho re-detectado por página; propulsão e
+ * combustível são achados varrendo a linha inteira por palavra/letra
+ * conhecida; o(s) par(es) de consumo cidade/estrada são achados varrendo por
+ * decimais no intervalo plausível de km/l (4-45) — quando a linha tem 2
+ * pares (flex), o primeiro é sempre etanol e o segundo gasolina/diesel,
+ * confirmado empiricamente contra várias linhas reais (Onix, Mobi). Anos
+ * 2017-2019 não têm coluna de Propulsão na tabela (só passou a existir depois,
+ * quando híbridos passaram a ser comuns) — tratados como combustão direto.
+ * Anos 2016/2020 têm cabeçalho e dado desalinhados (mesmo problema visto
+ * antes em 2021/2022) — mapeamento de posição fixo verificado à mão. 2021 é
+ * o caso mais extremo: só a página 1 do PDF tem cabeçalho de texto (é só
+ * legenda, sem dado); as páginas de dado real não repetem cabeçalho nenhum.
+ *
+ * Nomes de modelo com variações decorativas do mesmo carro físico (ex.:
+ * "HR-V" vs "HR-V (mod. 26)" vs hífen alternativo) são normalizados antes de
+ * gravar — ver {@code normalizeModelo} no script de merge — pra não poluir
+ * o catálogo com entradas redundantes que deveriam ser uma só.
  *
  * Desgaste (custoDesgastePorKm) NÃO tem fonte oficial no Brasil — continua
  * sendo uma estimativa por categoria/segmento do próprio INMETRO (Sub

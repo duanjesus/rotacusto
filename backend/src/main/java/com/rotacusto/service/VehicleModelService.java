@@ -1,5 +1,6 @@
 package com.rotacusto.service;
 
+import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -9,6 +10,7 @@ import org.springframework.util.StringUtils;
 
 import com.rotacusto.dto.response.VehicleModelSummaryDTO;
 import com.rotacusto.entity.VehicleModel;
+import com.rotacusto.entity.enums.TipoCombustivel;
 import com.rotacusto.entity.enums.VehicleType;
 import com.rotacusto.exception.ResourceNotFoundException;
 import com.rotacusto.repository.VehicleModelRepository;
@@ -58,19 +60,29 @@ public class VehicleModelService {
         return List.copyOf(distintos.values());
     }
 
+    private static final List<TipoCombustivel> ORDEM_COMBUSTIVEL = List.of(
+            TipoCombustivel.GASOLINA, TipoCombustivel.ETANOL, TipoCombustivel.DIESEL, TipoCombustivel.ELETRICO);
+
     /**
-     * Passo 2 — lista as versões/anos disponíveis de um marca+modelo já
-     * escolhido no passo 1, mais recente primeiro. Quando o mesmo ano tem
-     * mais de uma versão/trim com consumo diferente (o catálogo não guarda o
-     * texto da versão), fica só a primeira encontrada — evitaria duas
-     * entradas de "2023" indistinguíveis no dropdown de ano.
+     * Passo 2 — lista as versões (ano + combustível) disponíveis de um
+     * marca+modelo já escolhido no passo 1, mais recente primeiro. Um
+     * veículo flex tem DUAS linhas nesse ano (gasolina e etanol) — ambas
+     * aparecem, já que representam consumo/custo diferentes de verdade.
+     * Quando o mesmo ano+combustível tem mais de um trim com consumo
+     * diferente (o catálogo não guarda o texto da versão), fica só o
+     * primeiro encontrado — evitaria duas entradas indistinguíveis no
+     * dropdown.
      */
     public List<VehicleModel> findVersions(String marca, String modelo) {
-        Map<Integer, VehicleModel> porAno = new LinkedHashMap<>();
+        Map<String, VehicleModel> porAnoCombustivel = new LinkedHashMap<>();
         for (VehicleModel v : repository.findByMarcaIgnoreCaseAndModeloIgnoreCaseOrderByAnoDesc(marca, modelo)) {
-            porAno.putIfAbsent(v.getAno(), v);
+            String chave = v.getAno() + "|" + v.getTipoCombustivel();
+            porAnoCombustivel.putIfAbsent(chave, v);
         }
-        return List.copyOf(porAno.values());
+        return porAnoCombustivel.values().stream()
+                .sorted(Comparator.comparing(VehicleModel::getAno, Comparator.reverseOrder())
+                        .thenComparing(v -> ORDEM_COMBUSTIVEL.indexOf(v.getTipoCombustivel())))
+                .toList();
     }
 
     private boolean matchesAllTerms(VehicleModel v, String[] termos) {

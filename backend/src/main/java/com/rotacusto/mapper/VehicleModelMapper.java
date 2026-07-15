@@ -15,7 +15,7 @@ public class VehicleModelMapper {
                 model.getModelo(),
                 model.getAno(),
                 model.getTipo(),
-                model.getTipoEnergia(),
+                model.getTipoCombustivel(),
                 model.getConsumoCidadeKmL(),
                 model.getConsumoEstradaKmL(),
                 model.getConsumoKmPorKWh(),

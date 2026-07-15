@@ -20,7 +20,7 @@ import com.rotacusto.dto.request.TripEstimateRequestDTO;
 import com.rotacusto.dto.response.TripCostBreakdownDTO;
 import com.rotacusto.entity.TollPlaza;
 import com.rotacusto.entity.VehicleModel;
-import com.rotacusto.entity.enums.TipoEnergia;
+import com.rotacusto.entity.enums.TipoCombustivel;
 import com.rotacusto.entity.enums.VehicleType;
 
 @ExtendWith(MockitoExtension.class)
@@ -89,7 +89,7 @@ class TripEstimationServiceTest {
         when(routingService.route(any(), any())).thenReturn(new RouteResult(100.0, 60.0, List.of(origem, destino)));
 
         var manualProfile = new com.rotacusto.dto.request.VehicleProfileRequestDTO(
-                VehicleType.MOTO, TipoEnergia.COMBUSTAO, 20.0, 2, 0.15);
+                VehicleType.MOTO, TipoCombustivel.GASOLINA, 20.0, 2, 0.15);
         TripEstimateRequestDTO request = new TripEstimateRequestDTO(
                 "A", "B", null, manualProfile, 6.0, null);
 
@@ -185,7 +185,7 @@ class TripEstimationServiceTest {
         VehicleModel bolt = new VehicleModel();
         bolt.setId(2L);
         bolt.setTipo(VehicleType.CARRO);
-        bolt.setTipoEnergia(TipoEnergia.ELETRICO);
+        bolt.setTipoCombustivel(TipoCombustivel.ELETRICO);
         bolt.setConsumoKmPorKWh(6.0);
         bolt.setNumeroEixos(2);
         bolt.setCustoDesgastePorKm(0.40);
@@ -212,7 +212,7 @@ class TripEstimationServiceTest {
         VehicleModel bolt = new VehicleModel();
         bolt.setId(2L);
         bolt.setTipo(VehicleType.CARRO);
-        bolt.setTipoEnergia(TipoEnergia.ELETRICO);
+        bolt.setTipoCombustivel(TipoCombustivel.ELETRICO);
         bolt.setConsumoKmPorKWh(6.0);
         bolt.setNumeroEixos(2);
         bolt.setCustoDesgastePorKm(0.40);

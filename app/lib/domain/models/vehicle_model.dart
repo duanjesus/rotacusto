@@ -1,4 +1,4 @@
-import 'tipo_energia.dart';
+import 'tipo_combustivel.dart';
 import 'vehicle_type.dart';
 
 class VehicleModel {
@@ -7,14 +7,19 @@ class VehicleModel {
   final String modelo;
   final int ano;
   final VehicleType tipo;
-  final TipoEnergia tipoEnergia;
+  final TipoCombustivel tipoCombustivel;
   final double? consumoCidadeKmL;
   final double? consumoEstradaKmL;
   final double? consumoKmPorKWh;
   final int numeroEixos;
   final double custoDesgastePorKm;
 
-  bool get isEletrico => tipoEnergia == TipoEnergia.eletrico;
+  bool get isEletrico => tipoCombustivel == TipoCombustivel.eletrico;
+
+  /// Rótulo do passo 2 (escolha de ano/versão): "2023 · Gasolina" — um
+  /// modelo flex tem 2 linhas no mesmo ano (gasolina e etanol), então o
+  /// combustível precisa aparecer no rótulo pra distinguir.
+  String get versaoLabel => '$ano · ${tipoCombustivel.label}';
 
   VehicleModel({
     required this.id,
@@ -22,7 +27,7 @@ class VehicleModel {
     required this.modelo,
     required this.ano,
     required this.tipo,
-    this.tipoEnergia = TipoEnergia.combustao,
+    this.tipoCombustivel = TipoCombustivel.gasolina,
     this.consumoCidadeKmL,
     this.consumoEstradaKmL,
     this.consumoKmPorKWh,
@@ -39,7 +44,7 @@ class VehicleModel {
       modelo: json['modelo'] as String,
       ano: json['ano'] as int,
       tipo: VehicleType.fromApiValue(json['tipo'] as String),
-      tipoEnergia: TipoEnergia.fromApiValue(json['tipoEnergia'] as String?),
+      tipoCombustivel: TipoCombustivel.fromApiValue(json['tipoCombustivel'] as String?),
       consumoCidadeKmL: (json['consumoCidadeKmL'] as num?)?.toDouble(),
       consumoEstradaKmL: (json['consumoEstradaKmL'] as num?)?.toDouble(),
       consumoKmPorKWh: (json['consumoKmPorKWh'] as num?)?.toDouble(),

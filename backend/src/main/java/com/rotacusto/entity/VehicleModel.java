@@ -1,6 +1,6 @@
 package com.rotacusto.entity;
 
-import com.rotacusto.entity.enums.TipoEnergia;
+import com.rotacusto.entity.enums.TipoCombustivel;
 import com.rotacusto.entity.enums.VehicleType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -33,20 +33,22 @@ public class VehicleModel {
     private VehicleType tipo;
 
     /**
-     * Sem valor no JSON de seed (todo o catálogo pré-elétricos), assume
-     * COMBUSTAO — deserialização Jackson só sobrescreve quando a chave existe.
+     * Um veículo flex vira DUAS linhas de catálogo (mesmo marca/modelo/ano,
+     * GASOLINA e ETANOL cada uma com seu consumo) — combustível é parte da
+     * identidade do registro, não um detalhe do veículo.
      */
     @Enumerated(EnumType.STRING)
-    @Column(name = "tipo_energia", nullable = false)
-    private TipoEnergia tipoEnergia = TipoEnergia.COMBUSTAO;
+    @Column(name = "tipo_combustivel", nullable = false)
+    private TipoCombustivel tipoCombustivel;
 
+    /** Nulo quando tipoCombustivel = ELETRICO. */
     @Column(name = "consumo_cidade_km_l")
     private Double consumoCidadeKmL;
 
     @Column(name = "consumo_estrada_km_l")
     private Double consumoEstradaKmL;
 
-    /** Só preenchido quando tipoEnergia = ELETRICO. */
+    /** Só preenchido quando tipoCombustivel = ELETRICO. */
     @Column(name = "consumo_km_por_kwh")
     private Double consumoKmPorKWh;
 
@@ -115,12 +117,12 @@ public class VehicleModel {
         this.consumoEstradaKmL = consumoEstradaKmL;
     }
 
-    public TipoEnergia getTipoEnergia() {
-        return tipoEnergia;
+    public TipoCombustivel getTipoCombustivel() {
+        return tipoCombustivel;
     }
 
-    public void setTipoEnergia(TipoEnergia tipoEnergia) {
-        this.tipoEnergia = tipoEnergia;
+    public void setTipoCombustivel(TipoCombustivel tipoCombustivel) {
+        this.tipoCombustivel = tipoCombustivel;
     }
 
     public Double getConsumoKmPorKWh() {

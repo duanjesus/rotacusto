@@ -21,7 +21,7 @@ import com.rotacusto.dto.response.TollPlazaResponseDTO;
 import com.rotacusto.dto.response.TripCostBreakdownDTO;
 import com.rotacusto.entity.TollPlaza;
 import com.rotacusto.entity.VehicleModel;
-import com.rotacusto.entity.enums.TipoEnergia;
+import com.rotacusto.entity.enums.TipoCombustivel;
 
 @Service
 public class TripEstimationService {
@@ -53,7 +53,7 @@ public class TripEstimationService {
         // tem timeout+fallback próprio, mas em série os dois piores casos somam).
         // Postos de gasolina não fazem sentido pra elétrico (precisaria de pontos
         // de recarga, um recurso diferente, fora de escopo por enquanto).
-        boolean eletrico = profile.tipoEnergia() == TipoEnergia.ELETRICO;
+        boolean eletrico = profile.tipoCombustivel() == TipoCombustivel.ELETRICO;
         CompletableFuture<List<TollPlaza>> praçasFuture = CompletableFuture
                 .supplyAsync(() -> tollService.findCrossedPlazas(route.geometria()));
         CompletableFuture<List<OsmFuelStation>> postosFuture = eletrico
@@ -96,7 +96,7 @@ public class TripEstimationService {
     private VehicleProfile resolveProfile(TripEstimateRequestDTO request) {
         if (request.vehicleModelId() != null) {
             VehicleModel model = vehicleModelService.findById(request.vehicleModelId());
-            double preco = precoParaTipoEnergia(request, model.getTipoEnergia());
+            double preco = precoParaTipoCombustivel(request, model.getTipoCombustivel());
             return VehicleProfile.fromModel(model, preco);
         }
 
@@ -104,10 +104,10 @@ public class TripEstimationService {
         if (manual == null) {
             throw new IllegalArgumentException("Informe vehicleModelId (catálogo) ou vehicleProfile (manual).");
         }
-        double preco = precoParaTipoEnergia(request, manual.tipoEnergia());
+        double preco = precoParaTipoCombustivel(request, manual.tipoCombustivel());
         return new VehicleProfile(
                 manual.tipo(),
-                manual.tipoEnergia(),
+                manual.tipoCombustivel(),
                 manual.consumoPorUnidade(),
                 manual.numeroEixos(),
                 manual.custoDesgastePorKm(),
@@ -115,19 +115,21 @@ public class TripEstimationService {
     }
 
     /**
-     * Preço é condicional ao tipo de energia do veículo resolvido — não dá pra
+     * Preço é condicional ao combustível do veículo resolvido — não dá pra
      * expressar essa regra (exatamente um dos dois campos) com anotações simples.
+     * Gasolina/etanol/diesel usam todos o mesmo campo genérico precoPorLitro (o
+     * veículo escolhido já fixa qual dos três é).
      */
-    private double precoParaTipoEnergia(TripEstimateRequestDTO request, TipoEnergia tipoEnergia) {
-        if (tipoEnergia == TipoEnergia.ELETRICO) {
+    private double precoParaTipoCombustivel(TripEstimateRequestDTO request, TipoCombustivel tipoCombustivel) {
+        if (tipoCombustivel == TipoCombustivel.ELETRICO) {
             if (request.precoPorKWh() == null) {
                 throw new IllegalArgumentException("Veículo elétrico: informe precoPorKWh.");
             }
             return request.precoPorKWh();
         }
-        if (request.precoCombustivelPorLitro() == null) {
-            throw new IllegalArgumentException("Veículo a combustão: informe precoCombustivelPorLitro.");
+        if (request.precoPorLitro() == null) {
+            throw new IllegalArgumentException("Informe precoPorLitro para " + tipoCombustivel + ".");
         }
-        return request.precoCombustivelPorLitro();
+        return request.precoPorLitro();
     }
 }

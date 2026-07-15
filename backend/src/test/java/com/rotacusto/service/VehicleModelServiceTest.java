@@ -16,6 +16,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.rotacusto.dto.response.VehicleModelSummaryDTO;
 import com.rotacusto.entity.VehicleModel;
+import com.rotacusto.entity.enums.TipoCombustivel;
 import com.rotacusto.repository.VehicleModelRepository;
 
 @ExtendWith(MockitoExtension.class)
@@ -25,14 +26,19 @@ class VehicleModelServiceTest {
     private VehicleModelRepository repository;
 
     private static VehicleModel vehicle(String marca, String modelo) {
-        return vehicle(marca, modelo, null);
+        return vehicle(marca, modelo, null, TipoCombustivel.GASOLINA);
     }
 
     private static VehicleModel vehicle(String marca, String modelo, Integer ano) {
+        return vehicle(marca, modelo, ano, TipoCombustivel.GASOLINA);
+    }
+
+    private static VehicleModel vehicle(String marca, String modelo, Integer ano, TipoCombustivel combustivel) {
         VehicleModel v = new VehicleModel();
         v.setMarca(marca);
         v.setModelo(modelo);
         v.setAno(ano);
+        v.setTipoCombustivel(combustivel);
         return v;
     }
 
@@ -137,5 +143,20 @@ class VehicleModelServiceTest {
         List<VehicleModel> result = service.findVersions("HONDA", "HR-V");
 
         assertEquals(2, result.size(), "não deveria haver dois '2023' indistinguíveis no dropdown");
+    }
+
+    @Test
+    void findVersionsKeepsBothFuelsOfAFlexVehicleInTheSameYear() {
+        VehicleModelService service = new VehicleModelService(repository);
+        when(repository.findByMarcaIgnoreCaseAndModeloIgnoreCaseOrderByAnoDesc("FIAT", "MOBI"))
+                .thenReturn(List.of(
+                        vehicle("FIAT", "MOBI", 2023, TipoCombustivel.ETANOL),
+                        vehicle("FIAT", "MOBI", 2023, TipoCombustivel.GASOLINA)));
+
+        List<VehicleModel> result = service.findVersions("FIAT", "MOBI");
+
+        assertEquals(2, result.size(), "flex tem 2 versões reais no mesmo ano — gasolina e etanol não são duplicatas");
+        assertEquals(TipoCombustivel.GASOLINA, result.get(0).getTipoCombustivel(), "gasolina vem antes de etanol na ordem fixa");
+        assertEquals(TipoCombustivel.ETANOL, result.get(1).getTipoCombustivel());
     }
 }
