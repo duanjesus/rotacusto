@@ -20,6 +20,7 @@ void main() {
         return [];
       },
       onSelected: (_) {},
+      tipoLabel: 'Carro',
     )));
 
     await tester.enterText(find.byType(TextField), 'C');
@@ -37,6 +38,7 @@ void main() {
         _vehicle('Toyota', 'Corolla Cross'),
       ],
       onSelected: (v) => selected = v,
+      tipoLabel: 'Carro',
     )));
 
     await tester.enterText(find.byType(TextField), 'Corolla');
@@ -59,8 +61,19 @@ void main() {
       initialValue: _vehicle('Honda', 'Civic'),
       fetchSuggestions: (q) async => [],
       onSelected: (_) {},
+      tipoLabel: 'Carro',
     )));
 
     expect(find.text('Honda Civic'), findsOneWidget);
+  });
+
+  testWidgets('shows the missing-vehicle report link', (tester) async {
+    await tester.pumpWidget(wrap(VehicleSearchField(
+      fetchSuggestions: (q) async => [],
+      onSelected: (_) {},
+      tipoLabel: 'Caminhão',
+    )));
+
+    expect(find.text('Não achou seu veículo? Relate aqui'), findsOneWidget);
   });
 }

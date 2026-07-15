@@ -31,6 +31,21 @@ import com.rotacusto.repository.VehicleModelRepository;
  * feita ainda). Ano fixo em 2025 pra todas — cilindrada não muda
  * ano-a-ano o bastante pra justificar entradas duplicadas por ano.
  *
+ * VAN/CAMINHÃO leve/ÔNIBUS micro (Fase 3, parte 1): não são dado novo —
+ * são entradas que já existiam no catálogo como CARRO (o PBE do INMETRO
+ * certifica alguns veículos comerciais leves junto dos carros de passeio)
+ * reclassificadas por nome de modelo conhecido: furgões puros (Ducato,
+ * Jumper, Boxer, Fiorino, Sprinter, Transit, Kangoo, Partner/Rapid, Expert,
+ * Master Furgão/PRO) viraram VAN; picapes/chassi de carga (Kia Bongo K2500,
+ * Master Chassis Cabine) viraram CAMINHAO; o micro-ônibus Master Bus virou
+ * ONIBUS. Mantêm o consumo/desgaste REAIS originais — não são estimativa.
+ * Ficaram de fora por ambiguidade (nome também usado pra versão de
+ * passageiro/família no Brasil): Fiat Doblò (sem sufixo "Cargo") e Citroën
+ * Berlingo. Caminhões/ônibus pesados (sem equivalente no PBE) ainda não
+ * têm dado no catálogo — pendente de pesquisa por PBT (peso bruto total),
+ * o mesmo princípio da cilindrada de moto: spec real e pública guiando uma
+ * estimativa de consumo, documentada como tal.
+ *
  * {@code tipoCombustivel} (GASOLINA/ETANOL/DIESEL/ELETRICO) é parte da
  * IDENTIDADE do registro, não um detalhe: um carro flex vira DUAS linhas
  * (mesmo marca/modelo/ano, uma GASOLINA e uma ETANOL, cada uma com seu

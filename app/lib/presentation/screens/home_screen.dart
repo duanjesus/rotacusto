@@ -36,8 +36,6 @@ class _HomeScreenState extends State<HomeScreen> {
   final _destinoController = TextEditingController(text: 'Guarapari, ES');
   final _precoController = TextEditingController(text: _precoPadraoPorCombustivel[TipoCombustivel.gasolina]);
 
-  // Só carro e moto têm dado de verdade no catálogo por enquanto
-  // (caminhão/van/ônibus ficam pra uma próxima rodada da Fase 3).
   VehicleType _selectedTipo = VehicleType.carro;
   VehicleModelSummary? _selectedModelSummary;
   List<VehicleModel> _availableVersions = [];
@@ -309,6 +307,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 segments: const [
                   ButtonSegment(value: VehicleType.carro, label: Text('Carro'), icon: Icon(Icons.directions_car_rounded)),
                   ButtonSegment(value: VehicleType.moto, label: Text('Moto'), icon: Icon(Icons.two_wheeler_rounded)),
+                  ButtonSegment(value: VehicleType.van, label: Text('Van'), icon: Icon(Icons.airport_shuttle_rounded)),
+                  ButtonSegment(value: VehicleType.caminhao, label: Text('Caminhão'), icon: Icon(Icons.local_shipping_rounded)),
+                  ButtonSegment(value: VehicleType.onibus, label: Text('Ônibus'), icon: Icon(Icons.directions_bus_rounded)),
                 ],
                 selected: {_selectedTipo},
                 onSelectionChanged: (novo) => _onTipoSelected(novo.first),
@@ -321,6 +322,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 initialValue: _selectedModelSummary,
                 fetchSuggestions: (q) => _apiClient.searchVehicleModels(q, tipo: _selectedTipo),
                 onSelected: _onModelSelected,
+                tipoLabel: _selectedTipo.label,
               ),
               if (_loadingVersions) ...[
                 const SizedBox(height: 8),

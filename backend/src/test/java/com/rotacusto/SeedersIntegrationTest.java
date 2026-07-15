@@ -60,6 +60,16 @@ class SeedersIntegrationTest {
                 .filter(v -> v.getTipo() == VehicleType.MOTO)
                 .allMatch(v -> v.getCilindradaCC() != null && v.getCilindradaCC() > 0),
                 "toda moto deveria ter cilindrada preenchida");
+
+        // Vans/caminhões leves/micro-ônibus vieram de reclassificar entradas já
+        // existentes (extraídas do PBE/INMETRO como CARRO) por nome de modelo
+        // conhecido — não são dados novos, então mantêm consumo/desgaste reais.
+        long vans = todos.stream().filter(v -> v.getTipo() == VehicleType.VAN).count();
+        assertTrue(vans > 0, "catálogo deveria ter pelo menos uma van (Fase 3)");
+        long caminhoes = todos.stream().filter(v -> v.getTipo() == VehicleType.CAMINHAO).count();
+        assertTrue(caminhoes > 0, "catálogo deveria ter pelo menos um caminhão (Fase 3)");
+        long onibus = todos.stream().filter(v -> v.getTipo() == VehicleType.ONIBUS).count();
+        assertTrue(onibus > 0, "catálogo deveria ter pelo menos um ônibus (Fase 3)");
     }
 
     @Test

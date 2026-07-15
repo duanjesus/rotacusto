@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../domain/models/vehicle_model_summary.dart';
 
@@ -12,12 +13,15 @@ class VehicleSearchField extends StatefulWidget {
   final VehicleModelSummary? initialValue;
   final Future<List<VehicleModelSummary>> Function(String query) fetchSuggestions;
   final void Function(VehicleModelSummary?) onSelected;
+  /// Só usado pra pré-preencher o link "não achou seu veículo" — não afeta a busca.
+  final String tipoLabel;
 
   const VehicleSearchField({
     super.key,
     this.initialValue,
     required this.fetchSuggestions,
     required this.onSelected,
+    required this.tipoLabel,
   });
 
   @override
@@ -83,6 +87,26 @@ class _VehicleSearchFieldState extends State<VehicleSearchField> {
     FocusScope.of(context).unfocus();
   }
 
+  Future<void> _reportMissingVehicle() async {
+    final digitado = _controller.text.trim();
+    final title = 'Veículo faltando (${widget.tipoLabel})${digitado.isNotEmpty ? ': $digitado' : ''}';
+    final body = 'Descreva o veículo que não encontrou (marca, modelo, ano e, se souber, '
+        'motorização/cilindrada):\n\n';
+    final uri = Uri.https('github.com', '/duanjesus/rotacusto/issues/new', {
+      'title': title,
+      'body': body,
+      'labels': 'veiculo-faltando',
+    });
+    try {
+      await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Não foi possível abrir o link de relato.')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -128,6 +152,27 @@ class _VehicleSearchFieldState extends State<VehicleSearchField> {
               ),
             ),
           ),
+        Padding(
+          padding: const EdgeInsets.only(top: 6),
+          child: InkWell(
+            onTap: _reportMissingVehicle,
+            borderRadius: BorderRadius.circular(6),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 2),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.help_outline_rounded, size: 14, color: Theme.of(context).colorScheme.primary),
+                  const SizedBox(width: 4),
+                  Text(
+                    'Não achou seu veículo? Relate aqui',
+                    style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.primary),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
       ],
     );
   }
