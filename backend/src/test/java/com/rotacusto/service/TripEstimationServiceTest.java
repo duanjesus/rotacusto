@@ -7,9 +7,9 @@ import static org.mockito.Mockito.when;
 
 import java.util.List;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -41,8 +41,21 @@ class TripEstimationServiceTest {
     @Mock
     private FuelStationService fuelStationService;
 
-    @InjectMocks
     private TripEstimationService tripEstimationService;
+
+    /**
+     * @InjectMocks não dá conta dos dois parâmetros @Value primitivos
+     * (intervalo/custo de parada pra lanche) — o Mockito passaria 0.0 pra
+     * eles, o que geraria NaN nos totais (divisão por intervalo zero). A
+     * maioria dos testes aqui não é sobre lanche, então um intervalo bem
+     * largo (1000h) desliga isso sem afetar as asserções existentes.
+     */
+    @BeforeEach
+    void setUp() {
+        tripEstimationService = new TripEstimationService(
+                geocodingService, routingService, vehicleModelService, tollService, fuelStationService,
+                1000.0, 25.0);
+    }
 
     @Test
     void estimatesTripCostUsingVehicleModelFromCatalog() {
@@ -222,5 +235,37 @@ class TripEstimationServiceTest {
 
         org.junit.jupiter.api.Assertions.assertThrows(IllegalArgumentException.class,
                 () -> tripEstimationService.estimate(request));
+    }
+
+    @Test
+    void includesFoodStopCostForLongTrips() {
+        Coordinates origem = new Coordinates(-22.9711, -43.1822);
+        Coordinates destino = new Coordinates(-20.6633, -40.4967);
+        when(geocodingService.resolve("Copacabana, RJ")).thenReturn(origem);
+        when(geocodingService.resolve("Guarapari, ES")).thenReturn(destino);
+
+        // 8h de viagem — usa o service com intervalo real (3h) em vez do
+        // setUp() padrão (que desliga lanche pra não afetar os outros testes).
+        tripEstimationService = new TripEstimationService(
+                geocodingService, routingService, vehicleModelService, tollService, fuelStationService,
+                3.0, 25.0);
+        RouteResult route = new RouteResult(700.0, 480.0, List.of(origem, destino));
+        when(routingService.route(origem, destino)).thenReturn(route);
+
+        VehicleModel mobi = new VehicleModel();
+        mobi.setId(1L);
+        mobi.setTipo(VehicleType.CARRO);
+        mobi.setConsumoEstradaKmL(10.0);
+        mobi.setNumeroEixos(2);
+        mobi.setCustoDesgastePorKm(0.35);
+        when(vehicleModelService.findById(1L)).thenReturn(mobi);
+
+        TripEstimateRequestDTO request = new TripEstimateRequestDTO(
+                "Copacabana, RJ", "Guarapari, ES", 1L, null, 6.0, null);
+
+        TripCostBreakdownDTO result = tripEstimationService.estimate(request);
+
+        // 480 min = 8h, intervalo 3h -> floor(8/3) = 2 paradas * R$ 25 = R$ 50
+        assertEquals(50.0, result.custoLanche(), 0.001);
     }
 }

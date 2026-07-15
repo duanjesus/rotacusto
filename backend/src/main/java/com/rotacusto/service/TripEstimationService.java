@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.rotacusto.domain.Coordinates;
@@ -31,14 +32,20 @@ public class TripEstimationService {
     private final VehicleModelService vehicleModelService;
     private final TollService tollService;
     private final FuelStationService fuelStationService;
+    private final double foodStopIntervalHours;
+    private final double foodStopAverageCost;
 
     public TripEstimationService(GeocodingService geocodingService, RoutingService routingService,
-            VehicleModelService vehicleModelService, TollService tollService, FuelStationService fuelStationService) {
+            VehicleModelService vehicleModelService, TollService tollService, FuelStationService fuelStationService,
+            @Value("${rotacusto.food-stop.interval-hours}") double foodStopIntervalHours,
+            @Value("${rotacusto.food-stop.average-cost}") double foodStopAverageCost) {
         this.geocodingService = geocodingService;
         this.routingService = routingService;
         this.vehicleModelService = vehicleModelService;
         this.tollService = tollService;
         this.fuelStationService = fuelStationService;
+        this.foodStopIntervalHours = foodStopIntervalHours;
+        this.foodStopAverageCost = foodStopAverageCost;
     }
 
     public TripCostBreakdownDTO estimate(TripEstimateRequestDTO request) {
@@ -64,7 +71,7 @@ public class TripEstimationService {
         List<OsmFuelStation> postos = postosFuture.join();
 
         TripCostBreakdown breakdown = TripCostCalculator.calculate(route.distanciaKm(), route.duracaoMin(), profile,
-                praçasCruzadas);
+                praçasCruzadas, foodStopIntervalHours, foodStopAverageCost);
         Optional<OsmFuelStation> postoSugerido = eletrico ? Optional.empty()
                 : fuelStationService.suggestStop(postos, route.geometria());
 
