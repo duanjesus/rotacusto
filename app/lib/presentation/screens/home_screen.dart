@@ -42,8 +42,13 @@ class _HomeScreenState extends State<HomeScreen> {
   VehicleModel? _selectedVehicle;
   AddressSuggestion? _origemSelecionada;
   AddressSuggestion? _destinoSelecionado;
+  bool _idaEVolta = false;
   bool _loadingEstimate = false;
   TripCostBreakdown? _breakdown;
+  // Guarda se o _breakdown atual é de ida e volta separado do checkbox ao
+  // vivo — se o usuário desmarcar depois de calcular sem recalcular, o
+  // resumo exibido continua rotulado corretamente.
+  bool _breakdownIdaEVolta = false;
   String? _errorMessage;
 
   // _availableVersions já vem ordenado por ano desc (do back-end) — o Set
@@ -138,15 +143,28 @@ class _HomeScreenState extends State<HomeScreen> {
           ? '${_destinoSelecionado!.lat},${_destinoSelecionado!.lon}'
           : _destinoController.text;
 
-      final result = await _apiClient.estimateTrip(
-        origem: origem,
-        destino: destino,
-        vehicleModelId: _selectedVehicle!.id,
-        precoPorLitro: isEletrico ? null : preco,
-        precoPorKWh: isEletrico ? preco : null,
-      );
+      Future<TripCostBreakdown> estimar(String de, String para) => _apiClient.estimateTrip(
+            origem: de,
+            destino: para,
+            vehicleModelId: _selectedVehicle!.id,
+            precoPorLitro: isEletrico ? null : preco,
+            precoPorKWh: isEletrico ? preco : null,
+          );
+
+      TripCostBreakdown result;
+      if (_idaEVolta) {
+        // Ida e volta calculadas separadamente (não é só dobrar o valor da
+        // ida): a volta pode cruzar pedágios diferentes (praças de sentido
+        // único) ou uma rota diferente. As duas em paralelo pra não dobrar o
+        // tempo de espera.
+        final resultados = await Future.wait([estimar(origem, destino), estimar(destino, origem)]);
+        result = TripCostBreakdown.combine(resultados[0], resultados[1]);
+      } else {
+        result = await estimar(origem, destino);
+      }
       setState(() {
         _breakdown = result;
+        _breakdownIdaEVolta = _idaEVolta;
         _loadingEstimate = false;
       });
     } on DioException catch (e) {
@@ -246,6 +264,14 @@ class _HomeScreenState extends State<HomeScreen> {
                 label: 'Destino',
                 fetchSuggestions: _apiClient.suggestAddress,
                 onSelected: (s) => _destinoSelecionado = s,
+              ),
+              CheckboxListTile(
+                value: _idaEVolta,
+                onChanged: (v) => setState(() => _idaEVolta = v ?? false),
+                title: const Text('Ida e volta'),
+                contentPadding: EdgeInsets.zero,
+                controlAffinity: ListTileControlAffinity.leading,
+                dense: true,
               ),
             ],
           ),
@@ -353,7 +379,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return SectionCard(
       icon: Icons.receipt_long_rounded,
-      title: 'Resumo da viagem',
+      title: _breakdownIdaEVolta ? 'Resumo da viagem (ida e volta)' : 'Resumo da viagem',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

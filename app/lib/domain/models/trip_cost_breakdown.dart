@@ -30,6 +30,26 @@ class TripCostBreakdown {
     required this.postoSugerido,
   });
 
+  /// Combina ida + volta calculadas separadamente (não é só multiplicar por
+  /// 2: a volta pode ter pedágios diferentes da ida — praças de sentido
+  /// único, tarifa por eixo variando com o sentido, rota escolhida pelo
+  /// roteador podendo diferir — cada perna é uma consulta real ao back-end).
+  factory TripCostBreakdown.combine(TripCostBreakdown ida, TripCostBreakdown volta) {
+    return TripCostBreakdown(
+      distanciaKm: ida.distanciaKm + volta.distanciaKm,
+      duracaoMin: ida.duracaoMin + volta.duracaoMin,
+      custoCombustivel: ida.custoCombustivel + volta.custoCombustivel,
+      custoDesgaste: ida.custoDesgaste + volta.custoDesgaste,
+      custoPedagio: ida.custoPedagio + volta.custoPedagio,
+      custoLanche: ida.custoLanche + volta.custoLanche,
+      total: ida.total + volta.total,
+      geometriaRota: [...ida.geometriaRota, ...volta.geometriaRota],
+      pedagiosNaRota: [...ida.pedagiosNaRota, ...volta.pedagiosNaRota],
+      postosNaRota: [...ida.postosNaRota, ...volta.postosNaRota],
+      postoSugerido: ida.postoSugerido ?? volta.postoSugerido,
+    );
+  }
+
   factory TripCostBreakdown.fromJson(Map<String, dynamic> json) {
     return TripCostBreakdown(
       distanciaKm: (json['distanciaKm'] as num).toDouble(),
