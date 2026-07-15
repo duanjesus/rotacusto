@@ -56,3 +56,8 @@ rotacusto:
   # gratuita de preço por posto em tempo real no Brasil.
   fuel-stations:
     detection-radius-km: 0.3
+  # Relatos de "veículo não encontrado no catálogo" (link no app). Vai pra
+  # arquivo em vez do banco porque o H2 é só em memória (reseta a cada
+  # restart) — ver VehicleReportService.
+  vehicle-reports:
+    file: vehicle-reports.log

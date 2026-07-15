@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 
 import '../../data/api_client.dart';
 import '../../domain/models/address_suggestion.dart';
@@ -13,6 +14,7 @@ import '../widgets/cost_breakdown_bar.dart';
 import '../widgets/section_card.dart';
 import '../widgets/trip_map.dart';
 import '../widgets/vehicle_search_field.dart';
+import '../../theme/theme_controller.dart';
 import 'navigation_screen.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -85,6 +87,41 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  Future<void> _usarLocalizacaoAtual() async {
+    if (!await Geolocator.isLocationServiceEnabled()) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text('Localização desligada no dispositivo.')));
+      return;
+    }
+
+    var permissao = await Geolocator.checkPermission();
+    if (permissao == LocationPermission.denied) {
+      permissao = await Geolocator.requestPermission();
+    }
+    if (permissao == LocationPermission.denied || permissao == LocationPermission.deniedForever) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Sem permissão de localização.')));
+      return;
+    }
+
+    try {
+      final posicao = await Geolocator.getCurrentPosition();
+      setState(() {
+        _origemController.text = 'Localização atual';
+        _origemSelecionada = AddressSuggestion(
+          displayName: 'Localização atual',
+          lat: posicao.latitude,
+          lon: posicao.longitude,
+        );
+      });
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text('Não foi possível obter sua localização.')));
+    }
+  }
+
   void _onTipoSelected(VehicleType tipo) {
     setState(() {
       _selectedTipo = tipo;
@@ -133,8 +170,14 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _onVehicleSelected(VehicleModel? v) {
+    // _selectedVehicle == null cobre tanto o estado inicial do app quanto
+    // toda troca de modelo/tipo de veículo (_onModelSelected reseta pra null
+    // antes de auto-selecionar o primeiro ano/combustível) — sem esse caso,
+    // o preço nunca atualizava na primeira escolha de um veículo, ficando
+    // preso no default de gasolina mesmo escolhendo direto um caminhão a
+    // diesel.
     final combustivelMudou =
-        v != null && _selectedVehicle != null && _selectedVehicle!.tipoCombustivel != v.tipoCombustivel;
+        v != null && (_selectedVehicle == null || _selectedVehicle!.tipoCombustivel != v.tipoCombustivel);
     setState(() {
       _selectedVehicle = v;
       if (combustivelMudou) {
@@ -231,6 +274,20 @@ class _HomeScreenState extends State<HomeScreen> {
             const Text('RotaCusto'),
           ],
         ),
+        actions: [
+          ValueListenableBuilder<ThemeMode>(
+            valueListenable: themeModeNotifier,
+            builder: (context, themeMode, _) {
+              final escuro = themeMode == ThemeMode.dark ||
+                  (themeMode == ThemeMode.system && MediaQuery.platformBrightnessOf(context) == Brightness.dark);
+              return IconButton(
+                tooltip: escuro ? 'Mudar pro modo claro' : 'Mudar pro modo escuro',
+                icon: Icon(escuro ? Icons.light_mode_rounded : Icons.dark_mode_rounded),
+                onPressed: () => toggleThemeMode(context),
+              );
+            },
+          ),
+        ],
       ),
       body: SafeArea(
         child: Padding(
@@ -285,6 +342,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 label: 'Origem',
                 fetchSuggestions: _apiClient.suggestAddress,
                 onSelected: (s) => _origemSelecionada = s,
+                onUseCurrentLocation: _usarLocalizacaoAtual,
               ),
               const SizedBox(height: 12),
               AddressField(
@@ -319,27 +377,25 @@ class _HomeScreenState extends State<HomeScreen> {
           title: 'Veículo',
           child: Column(
             children: [
-              // 5 opções com ícone+texto não cabem na largura de um celular.
-              // SegmentedButton dentro de SingleChildScrollView quebra o
-              // hit-test dos segmentos além do primeiro visível (confirmado
-              // testando num emulador Android real — visual certo, toque não
-              // registra) — ChoiceChip numa Row rolável não tem esse problema.
-              SizedBox(
-                height: 40,
-                child: ListView(
-                  scrollDirection: Axis.horizontal,
-                  children: [
-                    for (final tipo in VehicleType.values) ...[
-                      ChoiceChip(
-                        avatar: Icon(_iconeTipo(tipo), size: 18),
-                        label: Text(tipo.label),
-                        selected: _selectedTipo == tipo,
-                        onSelected: (_) => _onTipoSelected(tipo),
-                      ),
-                      if (tipo != VehicleType.values.last) const SizedBox(width: 8),
-                    ],
-                  ],
-                ),
+              // 5 opções com ícone+texto não cabem numa linha só, nem no
+              // celular nem nos 400px do painel do desktop. Um scroll
+              // horizontal (tentativa anterior) esconde as opções sem
+              // nenhuma pista visual disso no Windows/desktop (usuário só
+              // via 3 cortadas, sem saber que dava pra rolar) — Wrap deixa
+              // tudo visível, só quebrando pra segunda linha quando precisa.
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  for (final tipo in VehicleType.values)
+                    ChoiceChip(
+                      avatar: Icon(_iconeTipo(tipo), size: 18),
+                      label: Text(tipo.label),
+                      selected: _selectedTipo == tipo,
+                      showCheckmark: false,
+                      onSelected: (_) => _onTipoSelected(tipo),
+                    ),
+                ],
               ),
               const SizedBox(height: 12),
               VehicleSearchField(
@@ -349,7 +405,8 @@ class _HomeScreenState extends State<HomeScreen> {
                 initialValue: _selectedModelSummary,
                 fetchSuggestions: (q) => _apiClient.searchVehicleModels(q, tipo: _selectedTipo),
                 onSelected: _onModelSelected,
-                tipoLabel: _selectedTipo.label,
+                tipo: _selectedTipo,
+                onReportMissingVehicle: _apiClient.reportMissingVehicle,
               ),
               if (_loadingVersions) ...[
                 const SizedBox(height: 8),

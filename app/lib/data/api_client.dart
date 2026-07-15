@@ -84,4 +84,14 @@ class ApiClient {
     });
     return TripCostBreakdown.fromJson(response.data as Map<String, dynamic>);
   }
+
+  /// "Não achou seu veículo?" — grava o pedido no back-end pra eu revisar
+  /// depois (substituiu um link pro GitHub Issues: poucos usuários do app
+  /// têm familiaridade com GitHub).
+  Future<void> reportMissingVehicle(VehicleType tipo, String descricao) async {
+    await _dio.post('/vehicle-reports', data: {
+      'tipo': tipo.apiValue,
+      'descricao': descricao,
+    });
+  }
 }

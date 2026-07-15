@@ -79,4 +79,29 @@ void main() {
 
     expect(selected, isNull);
   });
+
+  testWidgets('shows the current-location link only when the callback is provided', (tester) async {
+    final controller = TextEditingController();
+
+    await tester.pumpWidget(wrap(AddressField(
+      controller: controller,
+      label: 'Origem',
+      fetchSuggestions: (q) async => [],
+      onSelected: (_) {},
+    )));
+    expect(find.text('Usar localização atual'), findsNothing);
+
+    var tapped = false;
+    await tester.pumpWidget(wrap(AddressField(
+      controller: controller,
+      label: 'Origem',
+      fetchSuggestions: (q) async => [],
+      onSelected: (_) {},
+      onUseCurrentLocation: () => tapped = true,
+    )));
+    expect(find.text('Usar localização atual'), findsOneWidget);
+
+    await tester.tap(find.text('Usar localização atual'));
+    expect(tapped, isTrue);
+  });
 }

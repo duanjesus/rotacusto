@@ -27,7 +27,7 @@ class SeedersIntegrationTest {
 
     @Test
     void vehicleModelCatalogIsSeededOnStartup() {
-        assertEquals(7830, vehicleModelRepository.count());
+        assertEquals(8870, vehicleModelRepository.count());
         long marcasDistintas = vehicleModelRepository.findAll().stream()
                 .map(v -> v.getMarca())
                 .distinct()
@@ -81,6 +81,29 @@ class SeedersIntegrationTest {
                 .filter(v -> v.getTipo() == VehicleType.ONIBUS)
                 .anyMatch(v -> v.getPbtKg() != null && v.getPbtKg() > 0),
                 "catálogo deveria ter pelo menos um ônibus pesado com pbtKg preenchido");
+
+        // Moto e caminhão/ônibus pesados (só estimativa, sem fonte PBE por
+        // ano) foram replicados em 2016-2026 pra ter a mesma faixa de anos
+        // que carro — pedido explícito do usuário, mesmo sem dado real
+        // por ano-modelo.
+        long anosDaMoto = todos.stream()
+                .filter(v -> v.getTipo() == VehicleType.MOTO)
+                .map(v -> v.getAno())
+                .distinct()
+                .count();
+        assertEquals(11, anosDaMoto, "moto deveria cobrir os 11 anos de 2016 a 2026");
+        long anosDoCaminhaoPesado = todos.stream()
+                .filter(v -> v.getTipo() == VehicleType.CAMINHAO && v.getPbtKg() != null)
+                .map(v -> v.getAno())
+                .distinct()
+                .count();
+        assertEquals(11, anosDoCaminhaoPesado, "caminhão pesado deveria cobrir os 11 anos de 2016 a 2026");
+        long anosDoOnibusPesado = todos.stream()
+                .filter(v -> v.getTipo() == VehicleType.ONIBUS && v.getPbtKg() != null)
+                .map(v -> v.getAno())
+                .distinct()
+                .count();
+        assertEquals(11, anosDoOnibusPesado, "ônibus pesado deveria cobrir os 11 anos de 2016 a 2026");
     }
 
     @Test

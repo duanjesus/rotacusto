@@ -11,6 +11,9 @@ class AddressField extends StatefulWidget {
   final String label;
   final Future<List<AddressSuggestion>> Function(String query) fetchSuggestions;
   final void Function(AddressSuggestion?) onSelected;
+  /// Só faz sentido pro campo de Origem — null esconde o link (Destino não
+  /// tem esse botão).
+  final VoidCallback? onUseCurrentLocation;
 
   const AddressField({
     super.key,
@@ -18,6 +21,7 @@ class AddressField extends StatefulWidget {
     required this.label,
     required this.fetchSuggestions,
     required this.onSelected,
+    this.onUseCurrentLocation,
   });
 
   @override
@@ -93,6 +97,28 @@ class _AddressFieldState extends State<AddressField> {
           ),
           onChanged: _onChanged,
         ),
+        if (widget.onUseCurrentLocation != null)
+          Padding(
+            padding: const EdgeInsets.only(top: 6),
+            child: InkWell(
+              onTap: widget.onUseCurrentLocation,
+              borderRadius: BorderRadius.circular(6),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 2),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.my_location_rounded, size: 14, color: Theme.of(context).colorScheme.primary),
+                    const SizedBox(width: 4),
+                    Text(
+                      'Usar localização atual',
+                      style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.primary),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
         if (_suggestions.isNotEmpty)
           Padding(
             padding: const EdgeInsets.only(top: 6),

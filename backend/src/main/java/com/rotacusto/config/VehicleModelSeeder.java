@@ -28,8 +28,11 @@ import com.rotacusto.repository.VehicleModelRepository;
  * ~28km/l pra uma 250cc) — não é medição real por modelo. Combustível
  * sempre GASOLINA (simplificação: várias motos populares são flex de
  * verdade, mas separar isso por modelo exigiria pesquisa adicional não
- * feita ainda). Ano fixo em 2025 pra todas — cilindrada não muda
- * ano-a-ano o bastante pra justificar entradas duplicadas por ano.
+ * feita ainda). Cada modelo é replicado em TODOS os anos 2016-2026 (mesmo
+ * consumo/desgaste em cada um, cilindrada não muda ano-a-ano o bastante
+ * pra justificar valores diferentes) — pedido explícito do usuário pra ter
+ * a mesma faixa de anos disponível que carro tem, mesmo sem dado real
+ * por ano-modelo de moto.
  *
  * VAN/CAMINHÃO leve/ÔNIBUS micro (Fase 3, parte 1): não são dado novo —
  * são entradas que já existiam no catálogo como CARRO (o PBE do INMETRO
@@ -64,8 +67,10 @@ import com.rotacusto.repository.VehicleModelRepository;
  * custoDesgastePorKm} escalona por faixa de PBT a partir da mesma faixa
  * "só desgaste físico" usada pra carro (R$0,08-0,24/km), maior pra veículo
  * mais pesado — estimativa minha, sem fonte citável, mesmo espírito do
- * desgaste de carro. Ano fixo em 2025, sempre DIESEL (não existe caminhão/
- * ônibus a gasolina/flex vendido no Brasil). Ônibus ficou com só 5 modelos
+ * desgaste de carro. Sempre DIESEL (não existe caminhão/ônibus a gasolina/
+ * flex vendido no Brasil); cada modelo replicado em TODOS os anos
+ * 2016-2026 (mesmo motivo da moto: sem dado real por ano-modelo, mas o
+ * usuário pediu a mesma faixa de anos do carro). Ônibus ficou com só 5 modelos
  * (não os ~10-12 planejados) porque vários chassis pesquisados (Volvo
  * B270F, Scania K-series) tinham só a ficha técnica em PDF não-legível por
  * busca — preferi um catálogo menor mas com fonte real a inventar PBT.

@@ -1,9 +1,9 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import '../../domain/models/vehicle_model_summary.dart';
+import '../../domain/models/vehicle_type.dart';
 
 /// Campo de texto com dropdown de sugestões de veículo (passo 1: marca+modelo,
 /// sem ano ainda), buscando no back-end conforme o usuário digita, com
@@ -13,15 +13,16 @@ class VehicleSearchField extends StatefulWidget {
   final VehicleModelSummary? initialValue;
   final Future<List<VehicleModelSummary>> Function(String query) fetchSuggestions;
   final void Function(VehicleModelSummary?) onSelected;
-  /// Só usado pra pré-preencher o link "não achou seu veículo" — não afeta a busca.
-  final String tipoLabel;
+  final VehicleType tipo;
+  final Future<void> Function(VehicleType tipo, String descricao) onReportMissingVehicle;
 
   const VehicleSearchField({
     super.key,
     this.initialValue,
     required this.fetchSuggestions,
     required this.onSelected,
-    required this.tipoLabel,
+    required this.tipo,
+    required this.onReportMissingVehicle,
   });
 
   @override
@@ -87,22 +88,50 @@ class _VehicleSearchFieldState extends State<VehicleSearchField> {
     FocusScope.of(context).unfocus();
   }
 
-  Future<void> _reportMissingVehicle() async {
-    final digitado = _controller.text.trim();
-    final title = 'Veículo faltando (${widget.tipoLabel})${digitado.isNotEmpty ? ': $digitado' : ''}';
-    final body = 'Descreva o veículo que não encontrou (marca, modelo, ano e, se souber, '
-        'motorização/cilindrada):\n\n';
-    final uri = Uri.https('github.com', '/duanjesus/rotacusto/issues/new', {
-      'title': title,
-      'body': body,
-      'labels': 'veiculo-faltando',
-    });
+  Future<void> _abrirDialogoDeRelato() async {
+    final textoController = TextEditingController(text: _controller.text.trim());
+    final resultado = await showDialog<String>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('Veículo não encontrado'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Descreva o veículo (${widget.tipo.label}) que não achou — marca, modelo, ano '
+                'e, se souber, motorização/cilindrada:'),
+            const SizedBox(height: 12),
+            TextField(
+              controller: textoController,
+              autofocus: true,
+              maxLines: 3,
+              decoration: const InputDecoration(border: OutlineInputBorder()),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.of(dialogContext).pop(), child: const Text('Cancelar')),
+          FilledButton(
+            onPressed: () => Navigator.of(dialogContext).pop(textoController.text.trim()),
+            child: const Text('Enviar'),
+          ),
+        ],
+      ),
+    );
+
+    if (resultado == null || resultado.isEmpty) return;
+    if (!mounted) return;
+
     try {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
+      await widget.onReportMissingVehicle(widget.tipo, resultado);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Obrigado! Vamos analisar a inclusão desse veículo.')),
+      );
     } catch (_) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Não foi possível abrir o link de relato.')),
+        const SnackBar(content: Text('Não foi possível enviar agora. Tenta de novo mais tarde.')),
       );
     }
   }
@@ -155,7 +184,7 @@ class _VehicleSearchFieldState extends State<VehicleSearchField> {
         Padding(
           padding: const EdgeInsets.only(top: 6),
           child: InkWell(
-            onTap: _reportMissingVehicle,
+            onTap: _abrirDialogoDeRelato,
             borderRadius: BorderRadius.circular(6),
             child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 2),

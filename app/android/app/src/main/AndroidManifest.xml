@@ -51,12 +51,5 @@
             <action android:name="android.intent.action.PROCESS_TEXT"/>
             <data android:mimeType="text/plain"/>
         </intent>
-        <!-- Necessário pro url_launcher abrir o link de "reportar veículo"
-             (GitHub Issues) no navegador — Android 11+ (API 30+) esconde
-             apps/browsers de canQueryIntent() sem isso declarado. -->
-        <intent>
-            <action android:name="android.intent.action.VIEW"/>
-            <data android:scheme="https"/>
-        </intent>
     </queries>
 </manifest>

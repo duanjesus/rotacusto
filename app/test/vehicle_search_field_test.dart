@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:rotacusto_app/domain/models/vehicle_model_summary.dart';
+import 'package:rotacusto_app/domain/models/vehicle_type.dart';
 import 'package:rotacusto_app/presentation/widgets/vehicle_search_field.dart';
 
 VehicleModelSummary _vehicle(String marca, String modelo) {
@@ -20,7 +21,8 @@ void main() {
         return [];
       },
       onSelected: (_) {},
-      tipoLabel: 'Carro',
+      tipo: VehicleType.carro,
+      onReportMissingVehicle: (_, _) async {},
     )));
 
     await tester.enterText(find.byType(TextField), 'C');
@@ -38,7 +40,8 @@ void main() {
         _vehicle('Toyota', 'Corolla Cross'),
       ],
       onSelected: (v) => selected = v,
-      tipoLabel: 'Carro',
+      tipo: VehicleType.carro,
+      onReportMissingVehicle: (_, _) async {},
     )));
 
     await tester.enterText(find.byType(TextField), 'Corolla');
@@ -61,7 +64,8 @@ void main() {
       initialValue: _vehicle('Honda', 'Civic'),
       fetchSuggestions: (q) async => [],
       onSelected: (_) {},
-      tipoLabel: 'Carro',
+      tipo: VehicleType.carro,
+      onReportMissingVehicle: (_, _) async {},
     )));
 
     expect(find.text('Honda Civic'), findsOneWidget);
@@ -71,9 +75,55 @@ void main() {
     await tester.pumpWidget(wrap(VehicleSearchField(
       fetchSuggestions: (q) async => [],
       onSelected: (_) {},
-      tipoLabel: 'Caminhão',
+      tipo: VehicleType.caminhao,
+      onReportMissingVehicle: (_, _) async {},
     )));
 
     expect(find.text('Não achou seu veículo? Relate aqui'), findsOneWidget);
+  });
+
+  testWidgets('tapping the report link opens a dialog that submits tipo+descrição on send', (tester) async {
+    VehicleType? tipoRecebido;
+    String? descricaoRecebida;
+
+    await tester.pumpWidget(wrap(VehicleSearchField(
+      fetchSuggestions: (q) async => [],
+      onSelected: (_) {},
+      tipo: VehicleType.moto,
+      onReportMissingVehicle: (tipo, descricao) async {
+        tipoRecebido = tipo;
+        descricaoRecebida = descricao;
+      },
+    )));
+
+    await tester.tap(find.text('Não achou seu veículo? Relate aqui'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Veículo não encontrado'), findsOneWidget);
+
+    await tester.enterText(find.byType(TextField).last, 'Honda Elite 125 2018');
+    await tester.tap(find.text('Enviar'));
+    await tester.pumpAndSettle();
+
+    expect(tipoRecebido, VehicleType.moto);
+    expect(descricaoRecebida, 'Honda Elite 125 2018');
+  });
+
+  testWidgets('cancelling the dialog does not call onReportMissingVehicle', (tester) async {
+    var called = false;
+
+    await tester.pumpWidget(wrap(VehicleSearchField(
+      fetchSuggestions: (q) async => [],
+      onSelected: (_) {},
+      tipo: VehicleType.carro,
+      onReportMissingVehicle: (_, _) async => called = true,
+    )));
+
+    await tester.tap(find.text('Não achou seu veículo? Relate aqui'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Cancelar'));
+    await tester.pumpAndSettle();
+
+    expect(called, isFalse);
   });
 }

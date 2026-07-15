@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'presentation/screens/home_screen.dart';
 import 'theme/app_theme.dart';
+import 'theme/theme_controller.dart';
 
 void main() {
   runApp(const RotaCustoApp());
@@ -12,12 +13,17 @@ class RotaCustoApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'RotaCusto',
-      theme: AppTheme.light(),
-      darkTheme: AppTheme.dark(),
-      themeMode: ThemeMode.system,
-      home: const HomeScreen(),
+    return ValueListenableBuilder<ThemeMode>(
+      valueListenable: themeModeNotifier,
+      builder: (context, themeMode, _) {
+        return MaterialApp(
+          title: 'RotaCusto',
+          theme: AppTheme.light(),
+          darkTheme: AppTheme.dark(),
+          themeMode: themeMode,
+          home: const HomeScreen(),
+        );
+      },
     );
   }
 }
