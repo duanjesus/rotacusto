@@ -38,12 +38,21 @@ class _HomeScreenState extends State<HomeScreen> {
   VehicleModelSummary? _selectedModelSummary;
   List<VehicleModel> _availableVersions = [];
   bool _loadingVersions = false;
+  int? _selectedAno;
   VehicleModel? _selectedVehicle;
   AddressSuggestion? _origemSelecionada;
   AddressSuggestion? _destinoSelecionado;
   bool _loadingEstimate = false;
   TripCostBreakdown? _breakdown;
   String? _errorMessage;
+
+  // _availableVersions já vem ordenado por ano desc (do back-end) — o Set
+  // preserva essa ordem de inserção, então os anos saem do mais recente
+  // pro mais antigo sem precisar ordenar de novo.
+  List<int> get _anosDisponiveis => {for (final v in _availableVersions) v.ano}.toList();
+
+  List<VehicleModel> get _combustiveisDoAno =>
+      _availableVersions.where((v) => v.ano == _selectedAno).toList();
 
   @override
   void dispose() {
@@ -57,6 +66,7 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       _selectedModelSummary = summary;
       _availableVersions = [];
+      _selectedAno = null;
       _selectedVehicle = null;
     });
     if (summary == null) return;
@@ -71,7 +81,7 @@ class _HomeScreenState extends State<HomeScreen> {
       });
       // Anos vêm do mais recente pro mais antigo — pré-seleciona o mais recente.
       if (versions.isNotEmpty) {
-        _onVehicleSelected(versions.first);
+        _onAnoSelected(versions.first.ano);
       }
     } catch (_) {
       if (!mounted) return;
@@ -80,6 +90,13 @@ class _HomeScreenState extends State<HomeScreen> {
         _errorMessage = 'Não foi possível carregar os anos desse modelo.';
       });
     }
+  }
+
+  void _onAnoSelected(int? ano) {
+    setState(() => _selectedAno = ano);
+    // Pré-seleciona o primeiro combustível disponível nesse ano (a ordem já
+    // vem fixa do back-end: Gasolina, Etanol, Diesel, Elétrico).
+    _onVehicleSelected(_combustiveisDoAno.isNotEmpty ? _combustiveisDoAno.first : null);
   }
 
   void _onVehicleSelected(VehicleModel? v) {
@@ -247,15 +264,37 @@ class _HomeScreenState extends State<HomeScreen> {
                 const SizedBox(height: 8),
                 const LinearProgressIndicator(),
               ],
-              if (_availableVersions.isNotEmpty) ...[
+              if (_anosDisponiveis.isNotEmpty) ...[
                 const SizedBox(height: 12),
-                DropdownButtonFormField<VehicleModel>(
-                  initialValue: _selectedVehicle,
-                  decoration: const InputDecoration(labelText: 'Ano / combustível'),
-                  items: _availableVersions
-                      .map((v) => DropdownMenuItem(value: v, child: Text(v.versaoLabel)))
-                      .toList(),
-                  onChanged: _onVehicleSelected,
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: DropdownButtonFormField<int>(
+                        initialValue: _selectedAno,
+                        decoration: const InputDecoration(labelText: 'Ano'),
+                        items: _anosDisponiveis
+                            .map((ano) => DropdownMenuItem(value: ano, child: Text(ano.toString())))
+                            .toList(),
+                        onChanged: _onAnoSelected,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: DropdownButtonFormField<VehicleModel>(
+                        // Precisa de key: a lista de itens muda toda vez que o ano
+                        // muda (ids diferentes) — sem isso o Flutter tenta manter
+                        // o valor antigo, que não existe mais nessa nova lista.
+                        key: ValueKey(_selectedAno),
+                        initialValue: _selectedVehicle,
+                        decoration: const InputDecoration(labelText: 'Combustível'),
+                        items: _combustiveisDoAno
+                            .map((v) => DropdownMenuItem(value: v, child: Text(v.tipoCombustivel.label)))
+                            .toList(),
+                        onChanged: _onVehicleSelected,
+                      ),
+                    ),
+                  ],
                 ),
               ],
               const SizedBox(height: 12),
