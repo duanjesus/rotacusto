@@ -8,6 +8,7 @@ import java.util.Locale;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
@@ -25,15 +26,27 @@ public class OverpassClient {
 
     private final RestClient restClient;
 
+    /**
+     * O Overpass público às vezes fica sobrecarregado e demora bastante pra
+     * responder (ou nem responde) antes de devolver 504 — sem timeout aqui,
+     * uma consulta lenta poderia segurar a requisição inteira tempo demais
+     * (o cliente desiste antes do back-end sequer cair pro fallback). Os dois
+     * chamadores (TollService, FuelStationService) já tratam falha do
+     * Overpass com try/catch + fallback; esse timeout é o que garante que
+     * esse fallback aconteça rápido.
+     */
     public OverpassClient(@Value("${rotacusto.overpass.base-url}") String baseUrl) {
-        this.restClient = RestClient.builder().baseUrl(baseUrl).build();
+        SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
+        requestFactory.setConnectTimeout(5_000);
+        requestFactory.setReadTimeout(8_000);
+        this.restClient = RestClient.builder().baseUrl(baseUrl).requestFactory(requestFactory).build();
     }
 
     public List<OsmTollBooth> findTollBoothsInBoundingBox(double minLat, double minLon, double maxLat, double maxLon) {
         // Locale.ROOT é obrigatório aqui: %f usa o locale padrão da JVM, que em
         // pt-BR usa vírgula decimal e quebraria a sintaxe do Overpass QL.
         String query = String.format(Locale.ROOT, """
-                [out:json][timeout:20][bbox:%f,%f,%f,%f];
+                [out:json][timeout:8][bbox:%f,%f,%f,%f];
                 (
                   node["barrier"="toll_booth"];
                   way["highway"="toll_gantry"];
@@ -62,7 +75,7 @@ public class OverpassClient {
 
     public List<OsmFuelStation> findFuelStationsInBoundingBox(double minLat, double minLon, double maxLat, double maxLon) {
         String query = String.format(Locale.ROOT, """
-                [out:json][timeout:20][bbox:%f,%f,%f,%f];
+                [out:json][timeout:8][bbox:%f,%f,%f,%f];
                 (
                   node["amenity"="fuel"];
                   way["amenity"="fuel"];

@@ -2,6 +2,7 @@ package com.rotacusto.service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 
 import org.springframework.stereotype.Service;
 
@@ -46,14 +47,24 @@ public class TripEstimationService {
         RouteResult route = routingService.route(origem, destino);
 
         VehicleProfile profile = resolveProfile(request);
-        List<TollPlaza> praçasCruzadas = tollService.findCrossedPlazas(route.geometria());
+
+        // Pedágios e postos são duas consultas Overpass independentes — rodar em
+        // paralelo corta o pior caso de latência quase pela metade (cada uma já
+        // tem timeout+fallback próprio, mas em série os dois piores casos somam).
+        // Postos de gasolina não fazem sentido pra elétrico (precisaria de pontos
+        // de recarga, um recurso diferente, fora de escopo por enquanto).
+        boolean eletrico = profile.tipoEnergia() == TipoEnergia.ELETRICO;
+        CompletableFuture<List<TollPlaza>> praçasFuture = CompletableFuture
+                .supplyAsync(() -> tollService.findCrossedPlazas(route.geometria()));
+        CompletableFuture<List<OsmFuelStation>> postosFuture = eletrico
+                ? CompletableFuture.completedFuture(List.of())
+                : CompletableFuture.supplyAsync(() -> fuelStationService.findStationsNearRoute(route.geometria()));
+
+        List<TollPlaza> praçasCruzadas = praçasFuture.join();
+        List<OsmFuelStation> postos = postosFuture.join();
+
         TripCostBreakdown breakdown = TripCostCalculator.calculate(route.distanciaKm(), route.duracaoMin(), profile,
                 praçasCruzadas);
-
-        // Postos de gasolina não fazem sentido pra elétrico (precisaria de pontos de
-        // recarga, um recurso diferente, fora de escopo por enquanto).
-        boolean eletrico = profile.tipoEnergia() == TipoEnergia.ELETRICO;
-        List<OsmFuelStation> postos = eletrico ? List.of() : fuelStationService.findStationsNearRoute(route.geometria());
         Optional<OsmFuelStation> postoSugerido = eletrico ? Optional.empty()
                 : fuelStationService.suggestStop(postos, route.geometria());
 

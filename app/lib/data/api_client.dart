@@ -13,7 +13,14 @@ class ApiClient {
   final Dio _dio;
 
   ApiClient({String baseUrl = 'http://localhost:8080/api'})
-      : _dio = Dio(BaseOptions(baseUrl: baseUrl, connectTimeout: const Duration(seconds: 10)));
+      : _dio = Dio(BaseOptions(
+          baseUrl: baseUrl,
+          connectTimeout: const Duration(seconds: 10),
+          // /trips/estimate encadeia geocode x2 + rota + pedágios/postos (OSM
+          // Overpass, com fallback se lento) — pode legitimamente passar de
+          // 20s em condições normais.
+          receiveTimeout: const Duration(seconds: 45),
+        ));
 
   /// Passo 1 da escolha de veículo: marca+modelo distintos (sem ano ainda).
   Future<List<VehicleModelSummary>> searchVehicleModels(String query) async {

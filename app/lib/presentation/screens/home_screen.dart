@@ -126,7 +126,16 @@ class _HomeScreenState extends State<HomeScreen> {
       });
     } on DioException catch (e) {
       final data = e.response?.data;
-      final message = (data is Map && data['message'] != null) ? data['message'].toString() : 'Erro ao calcular a viagem.';
+      String message;
+      if (data is Map && data['message'] != null) {
+        message = data['message'].toString();
+      } else if (e.type == DioExceptionType.receiveTimeout || e.type == DioExceptionType.connectionTimeout) {
+        message = 'A busca de pedágios/postos está lenta (fonte pública sobrecarregada). Tente de novo em instantes.';
+      } else if (e.type == DioExceptionType.connectionError) {
+        message = 'Não foi possível falar com o back-end. Ele está rodando em localhost:8080?';
+      } else {
+        message = 'Erro ao calcular a viagem.';
+      }
       setState(() {
         _loadingEstimate = false;
         _errorMessage = message;
