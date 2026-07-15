@@ -27,7 +27,7 @@ class SeedersIntegrationTest {
 
     @Test
     void vehicleModelCatalogIsSeededOnStartup() {
-        assertEquals(8959, vehicleModelRepository.count());
+        assertEquals(9003, vehicleModelRepository.count());
         long marcasDistintas = vehicleModelRepository.findAll().stream()
                 .map(v -> v.getMarca())
                 .distinct()
@@ -81,6 +81,12 @@ class SeedersIntegrationTest {
                 .filter(v -> v.getTipo() == VehicleType.ONIBUS)
                 .anyMatch(v -> v.getPbtKg() != null && v.getPbtKg() > 0),
                 "catálogo deveria ter pelo menos um ônibus pesado com pbtKg preenchido");
+        long modelosOnibusPesado = todos.stream()
+                .filter(v -> v.getTipo() == VehicleType.ONIBUS && v.getPbtKg() != null)
+                .map(v -> v.getMarca() + "|" + v.getModelo())
+                .distinct()
+                .count();
+        assertEquals(9, modelosOnibusPesado, "catálogo deveria ter 9 modelos distintos de ônibus pesado");
 
         // Moto e caminhão/ônibus pesados (só estimativa, sem fonte PBE por
         // ano) foram replicados em 2016-2026 pra ter a mesma faixa de anos

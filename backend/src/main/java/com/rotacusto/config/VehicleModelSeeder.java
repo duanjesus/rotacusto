@@ -70,10 +70,23 @@ import com.rotacusto.repository.VehicleModelRepository;
  * desgaste de carro. Sempre DIESEL (não existe caminhão/ônibus a gasolina/
  * flex vendido no Brasil); cada modelo replicado em TODOS os anos
  * 2016-2026 (mesmo motivo da moto: sem dado real por ano-modelo, mas o
- * usuário pediu a mesma faixa de anos do carro). Ônibus ficou com só 5 modelos
- * (não os ~10-12 planejados) porque vários chassis pesquisados (Volvo
- * B270F, Scania K-series) tinham só a ficha técnica em PDF não-legível por
- * busca — preferi um catálogo menor mas com fonte real a inventar PBT.
+ * usuário pediu a mesma faixa de anos do carro).
+ *
+ * ÔNIBUS pesado, segunda rodada (+4 modelos: Agrale MA 8.5 TCE, Iveco Bus
+ * 10-190, Volksbus 17.230 EOD, Mercedes-Benz OH-1628L — total 9, ainda não
+ * os ~10-12 planejados originalmente). Volvo B270F e Scania K270/K310/K360
+ * continuam de fora — tentei de novo com fontes diferentes (imprensa
+ * especializada e sites de ficha técnica em HTML, tipo viacircular.com.br
+ * e diariodotransporte.com.br, em vez de PDF de fabricante) e emplacou 4
+ * modelos novos que a tentativa anterior não achou, mas essas marcas
+ * específicas continuam só em PDF ilegível ou com a página de ficha
+ * técnica genuinamente incompleta (viacircular explicitamente marca como
+ * "em formatação", sem o campo de peso). Um quinto candidato (Scania K124,
+ * chassi mais antigo, fonte tabela governamental do DER-SP) foi descartado
+ * por ambiguidade — a fonte só dava uma faixa (16-19,5t) misturando duas
+ * variantes (IB/EB) sem separar qual pesa quanto, não um número único
+ * confiável — mesmo critério do resto do catálogo, preferir menos dado a
+ * dado impreciso.
  *
  * HÍBRIDO PLUG-IN/PHEV (9 modelos curados, ~90 linhas): o PBE do INMETRO
  * certifica PHEV, mas com um problema sério pra esse app — a tabela expõe
