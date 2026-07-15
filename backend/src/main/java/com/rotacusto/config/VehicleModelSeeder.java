@@ -75,6 +75,37 @@ import com.rotacusto.repository.VehicleModelRepository;
  * B270F, Scania K-series) tinham só a ficha técnica em PDF não-legível por
  * busca — preferi um catálogo menor mas com fonte real a inventar PBT.
  *
+ * HÍBRIDO PLUG-IN/PHEV (9 modelos curados, ~90 linhas): o PBE do INMETRO
+ * certifica PHEV, mas com um problema sério pra esse app — a tabela expõe
+ * um consumo "equivalente" (mistura energia elétrica convertida + gasolina
+ * num único número inflado, ex. "38 km/l") junto do consumo real em modo
+ * só-combustão (bateria descarregada), sem distinguir claramente os dois na
+ * extração original — alguns PHEVs (ex. Volvo XC90 T8, BMW 530e) entraram
+ * no catálogo como GASOLINA usando o número EQUIVALENTE, superestimando
+ * MUITO a economia real quando a bateria já acabou. Corrigido pesquisando
+ * fonte por fonte (evitando qualquer número de imprensa que não deixasse
+ * claro qual dos dois modos estava medindo) pra achar o par real: autonomia
+ * elétrica ({@code consumoKmPorKWh} = autonomia (km) ÷ capacidade da
+ * bateria (kWh), já que o INMETRO não expõe km/kWh de PHEV diretamente
+ * como expõe pra elétrico puro) + consumo real em modo combustão (linha
+ * separada, mesmo padrão de carro flex: duas linhas por ano, uma ELETRICO
+ * e uma GASOLINA/ETANOL). {@code custoDesgastePorKm} 0,18-0,24 (segmento
+ * premium/SUV pesado, topo da faixa "só desgaste físico" de carro).
+ * Removida a entrada antiga do Volvo XC90 T8 (usava o número equivalente);
+ * o **BMW 530e ficou como estava** (não achei fonte confiável que
+ * separasse os dois modos pra ele) — documentado aqui como limitação
+ * conhecida, não escondido. Vários PHEVs pesquisados ficaram de fora por
+ * falta de dado real separável (BMW 330e/X5 45e, Mercedes GLC 300e — nem
+ * vendido no Brasil como plug-in, Porsche Panamera E-Hybrid, Range Rover
+ * P400e, Chery Tiggo 7/8 Pro PHEV, GWM Haval H6 GT PHEV) — mesmo princípio
+ * do resto do catálogo: não inventar número, catálogo menor mas real.
+ * GWM Tank 300 PHEV Hi4-T é flex de verdade (gasolina E etanol em modo
+ * combustão) — três linhas por ano em vez de duas. Ano de cada modelo
+ * cobre só o intervalo real que ele existe no mercado brasileiro (não
+ * 2016-2026 uniforme como moto/caminhão pesado — aqui existe diferenciação
+ * real por ano de lançamento, faria pouco sentido um PHEV "existir" antes
+ * do ano em que foi lançado no Brasil).
+ *
  * {@code tipoCombustivel} (GASOLINA/ETANOL/DIESEL/ELETRICO) é parte da
  * IDENTIDADE do registro, não um detalhe: um carro flex vira DUAS linhas
  * (mesmo marca/modelo/ano, uma GASOLINA e uma ETANOL, cada uma com seu

@@ -27,7 +27,7 @@ class SeedersIntegrationTest {
 
     @Test
     void vehicleModelCatalogIsSeededOnStartup() {
-        assertEquals(8870, vehicleModelRepository.count());
+        assertEquals(8959, vehicleModelRepository.count());
         long marcasDistintas = vehicleModelRepository.findAll().stream()
                 .map(v -> v.getMarca())
                 .distinct()
@@ -104,6 +104,24 @@ class SeedersIntegrationTest {
                 .distinct()
                 .count();
         assertEquals(11, anosDoOnibusPesado, "ônibus pesado deveria cobrir os 11 anos de 2016 a 2026");
+
+        // Híbrido plug-in: cada modelo tem uma linha ELETRICO (autonomia da
+        // bateria) e uma linha a combustão pareadas no mesmo ano — mesmo
+        // padrão de carro flex, corrigindo o número "equivalente" enganoso
+        // que a extração original do PBE capturava pra PHEV.
+        var xc90EletricoPorAno = todos.stream()
+                .filter(v -> v.getMarca().equals("Volvo") && v.getModelo().equals("XC90 Recharge T8")
+                        && v.getTipoCombustivel() == TipoCombustivel.ELETRICO)
+                .map(v -> v.getAno())
+                .collect(java.util.stream.Collectors.toSet());
+        var xc90GasolinaPorAno = todos.stream()
+                .filter(v -> v.getMarca().equals("Volvo") && v.getModelo().equals("XC90 Recharge T8")
+                        && v.getTipoCombustivel() == TipoCombustivel.GASOLINA)
+                .map(v -> v.getAno())
+                .collect(java.util.stream.Collectors.toSet());
+        assertTrue(!xc90EletricoPorAno.isEmpty(), "Volvo XC90 Recharge T8 deveria ter linha ELETRICO");
+        assertEquals(xc90EletricoPorAno, xc90GasolinaPorAno,
+                "Volvo XC90 Recharge T8 deveria ter os mesmos anos pareados entre ELETRICO e GASOLINA");
     }
 
     @Test
