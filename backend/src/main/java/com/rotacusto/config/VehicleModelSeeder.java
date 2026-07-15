@@ -52,7 +52,11 @@ import com.rotacusto.repository.VehicleModelRepository;
  * Desgaste (custoDesgastePorKm) NÃO tem fonte oficial no Brasil — continua
  * sendo uma estimativa por categoria/segmento do próprio INMETRO (Sub
  * Compacto, Compacto, Médio, SUV, Picape etc.), documentada como placeholder
- * a refinar.
+ * a refinar. Representa só desgaste FÍSICO (pneu, óleo, manutenção
+ * preventiva proporcional à distância) — **não inclui depreciação do
+ * veículo**, faixa aproximada R$0,08/km (micro-compacto) a R$0,24/km
+ * (esportivo). Um valor anterior (R$0,28-0,58/km) embutia depreciação
+ * implicitamente e o usuário achou alto demais pra uma viagem pontual.
  */
 @Component
 public class VehicleModelSeeder implements CommandLineRunner {
