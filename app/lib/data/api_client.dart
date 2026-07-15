@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart' show TargetPlatform, defaultTargetPlatform, kIsWeb;
 
 import '../domain/models/address_suggestion.dart';
 import '../domain/models/trip_cost_breakdown.dart';
@@ -6,16 +7,29 @@ import '../domain/models/vehicle_model.dart';
 import '../domain/models/vehicle_model_summary.dart';
 import '../domain/models/vehicle_type.dart';
 
+/// `localhost` do PONTO DE VISTA DE QUEM RODA O APP: em Windows/web
+/// (Chrome/Edge) e num celular Android FÍSICO com `adb reverse tcp:8080
+/// tcp:8080`, aponta certo pra própria máquina. O **emulador Android** é a
+/// exceção: `localhost` dentro dele é o próprio emulador, não o PC —
+/// precisa do alias especial `10.0.2.2`. Um Android físico na mesma
+/// rede (sem `adb reverse`) precisaria do IP de LAN real do PC, não coberto
+/// aqui (fora do escopo de teste local).
+String _defaultBaseUrl() {
+  if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
+    return 'http://10.0.2.2:8080/api';
+  }
+  return 'http://localhost:8080/api';
+}
+
 /// Client HTTP para o back-end do RotaCusto.
-/// Em desktop/mobile nativo, `localhost` aponta para a própria máquina.
 /// Rodando via `flutter run -d chrome/edge`, o back-end precisa liberar CORS
 /// (já configurado em WebConfig no back-end para desenvolvimento local).
 class ApiClient {
   final Dio _dio;
 
-  ApiClient({String baseUrl = 'http://localhost:8080/api'})
+  ApiClient({String? baseUrl})
       : _dio = Dio(BaseOptions(
-          baseUrl: baseUrl,
+          baseUrl: baseUrl ?? _defaultBaseUrl(),
           connectTimeout: const Duration(seconds: 10),
           // /trips/estimate encadeia geocode x2 + rota + pedágios/postos (OSM
           // Overpass, com fallback se lento) — pode legitimamente passar de

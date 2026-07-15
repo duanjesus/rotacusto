@@ -69,6 +69,21 @@ class _HomeScreenState extends State<HomeScreen> {
     super.dispose();
   }
 
+  IconData _iconeTipo(VehicleType tipo) {
+    switch (tipo) {
+      case VehicleType.carro:
+        return Icons.directions_car_rounded;
+      case VehicleType.moto:
+        return Icons.two_wheeler_rounded;
+      case VehicleType.van:
+        return Icons.airport_shuttle_rounded;
+      case VehicleType.caminhao:
+        return Icons.local_shipping_rounded;
+      case VehicleType.onibus:
+        return Icons.directions_bus_rounded;
+    }
+  }
+
   void _onTipoSelected(VehicleType tipo) {
     setState(() {
       _selectedTipo = tipo;
@@ -303,16 +318,27 @@ class _HomeScreenState extends State<HomeScreen> {
           title: 'Veículo',
           child: Column(
             children: [
-              SegmentedButton<VehicleType>(
-                segments: const [
-                  ButtonSegment(value: VehicleType.carro, label: Text('Carro'), icon: Icon(Icons.directions_car_rounded)),
-                  ButtonSegment(value: VehicleType.moto, label: Text('Moto'), icon: Icon(Icons.two_wheeler_rounded)),
-                  ButtonSegment(value: VehicleType.van, label: Text('Van'), icon: Icon(Icons.airport_shuttle_rounded)),
-                  ButtonSegment(value: VehicleType.caminhao, label: Text('Caminhão'), icon: Icon(Icons.local_shipping_rounded)),
-                  ButtonSegment(value: VehicleType.onibus, label: Text('Ônibus'), icon: Icon(Icons.directions_bus_rounded)),
-                ],
-                selected: {_selectedTipo},
-                onSelectionChanged: (novo) => _onTipoSelected(novo.first),
+              // 5 opções com ícone+texto não cabem na largura de um celular.
+              // SegmentedButton dentro de SingleChildScrollView quebra o
+              // hit-test dos segmentos além do primeiro visível (confirmado
+              // testando num emulador Android real — visual certo, toque não
+              // registra) — ChoiceChip numa Row rolável não tem esse problema.
+              SizedBox(
+                height: 40,
+                child: ListView(
+                  scrollDirection: Axis.horizontal,
+                  children: [
+                    for (final tipo in VehicleType.values) ...[
+                      ChoiceChip(
+                        avatar: Icon(_iconeTipo(tipo), size: 18),
+                        label: Text(tipo.label),
+                        selected: _selectedTipo == tipo,
+                        onSelected: (_) => _onTipoSelected(tipo),
+                      ),
+                      if (tipo != VehicleType.values.last) const SizedBox(width: 8),
+                    ],
+                  ],
+                ),
               ),
               const SizedBox(height: 12),
               VehicleSearchField(
@@ -335,6 +361,12 @@ class _HomeScreenState extends State<HomeScreen> {
                   children: [
                     Expanded(
                       child: DropdownButtonFormField<int>(
+                        // Sem isExpanded, o botão tenta usar a largura
+                        // intrínseca do texto selecionado — em telas
+                        // estreitas (celular) isso estoura o espaço que o
+                        // Expanded reservou (overflow só visível testando
+                        // num device real, não no preview largo do Windows).
+                        isExpanded: true,
                         initialValue: _selectedAno,
                         decoration: const InputDecoration(labelText: 'Ano'),
                         items: _anosDisponiveis
@@ -350,10 +382,14 @@ class _HomeScreenState extends State<HomeScreen> {
                         // muda (ids diferentes) — sem isso o Flutter tenta manter
                         // o valor antigo, que não existe mais nessa nova lista.
                         key: ValueKey(_selectedAno),
+                        isExpanded: true,
                         initialValue: _selectedVehicle,
                         decoration: const InputDecoration(labelText: 'Combustível'),
                         items: _combustiveisDoAno
-                            .map((v) => DropdownMenuItem(value: v, child: Text(v.tipoCombustivel.label)))
+                            .map((v) => DropdownMenuItem(
+                                  value: v,
+                                  child: Text(v.tipoCombustivel.label, overflow: TextOverflow.ellipsis),
+                                ))
                             .toList(),
                         onChanged: _onVehicleSelected,
                       ),

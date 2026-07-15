@@ -31,6 +31,9 @@
             android:name="flutterEmbedding"
             android:value="2" />
     </application>
+    <!-- API do back-end é HTTP/HTTPS puro (dio) — sem isso, todo request de
+         rede falha silenciosamente com SocketException no Android. -->
+    <uses-permission android:name="android.permission.INTERNET"/>
     <!-- Required to query activities that can process text, see:
          https://developer.android.com/training/package-visibility and
          https://developer.android.com/reference/android/content/Intent#ACTION_PROCESS_TEXT.
@@ -40,6 +43,13 @@
         <intent>
             <action android:name="android.intent.action.PROCESS_TEXT"/>
             <data android:mimeType="text/plain"/>
+        </intent>
+        <!-- Necessário pro url_launcher abrir o link de "reportar veículo"
+             (GitHub Issues) no navegador — Android 11+ (API 30+) esconde
+             apps/browsers de canQueryIntent() sem isso declarado. -->
+        <intent>
+            <action android:name="android.intent.action.VIEW"/>
+            <data android:scheme="https"/>
         </intent>
     </queries>
 </manifest>
