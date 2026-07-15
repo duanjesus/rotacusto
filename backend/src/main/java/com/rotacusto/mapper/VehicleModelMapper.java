@@ -21,6 +21,7 @@ public class VehicleModelMapper {
                 model.getConsumoKmPorKWh(),
                 model.getNumeroEixos(),
                 model.getCustoDesgastePorKm(),
-                model.getCilindradaCC());
+                model.getCilindradaCC(),
+                model.getPbtKg());
     }
 }

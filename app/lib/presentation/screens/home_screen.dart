@@ -370,6 +370,15 @@ class _HomeScreenState extends State<HomeScreen> {
                       ),
                 ),
               ],
+              if (_selectedVehicle?.pbtKg != null) ...[
+                const SizedBox(height: 8),
+                Text(
+                  '${_selectedVehicle!.pbtKg} kg (PBT) · consumo estimado pelo peso bruto total (sem tabela oficial pra esse porte)',
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
+                      ),
+                ),
+              ],
               const SizedBox(height: 12),
               TextField(
                 controller: _precoController,

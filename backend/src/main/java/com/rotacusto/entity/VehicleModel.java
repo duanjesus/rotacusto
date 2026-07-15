@@ -68,6 +68,16 @@ public class VehicleModel {
     @Column(name = "cilindrada_cc")
     private Integer cilindradaCC;
 
+    /**
+     * Só preenchido pra CAMINHAO/ONIBUS "pesados" (curados manualmente, sem
+     * equivalente no PBE do INMETRO). O PBT (peso bruto total, ficha técnica
+     * do fabricante) é dado público real, usado pra estimar
+     * consumoCidadeKmL/EstradaKmL por interpolação — mesmo princípio da
+     * cilindrada de moto, spec real guiando estimativa documentada.
+     */
+    @Column(name = "pbt_kg")
+    private Integer pbtKg;
+
     public VehicleModel() {
     }
 
@@ -165,5 +175,13 @@ public class VehicleModel {
 
     public void setCilindradaCC(Integer cilindradaCC) {
         this.cilindradaCC = cilindradaCC;
+    }
+
+    public Integer getPbtKg() {
+        return pbtKg;
+    }
+
+    public void setPbtKg(Integer pbtKg) {
+        this.pbtKg = pbtKg;
     }
 }

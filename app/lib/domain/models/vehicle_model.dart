@@ -14,6 +14,7 @@ class VehicleModel {
   final int numeroEixos;
   final double custoDesgastePorKm;
   final int? cilindradaCC;
+  final int? pbtKg;
 
   bool get isEletrico => tipoCombustivel == TipoCombustivel.eletrico;
 
@@ -35,6 +36,7 @@ class VehicleModel {
     required this.numeroEixos,
     required this.custoDesgastePorKm,
     this.cilindradaCC,
+    this.pbtKg,
   });
 
   String get displayName => '$marca $modelo ($ano)';
@@ -53,6 +55,7 @@ class VehicleModel {
       numeroEixos: json['numeroEixos'] as int,
       custoDesgastePorKm: (json['custoDesgastePorKm'] as num).toDouble(),
       cilindradaCC: json['cilindradaCC'] as int?,
+      pbtKg: json['pbtKg'] as int?,
     );
   }
 }

@@ -46,6 +46,30 @@ import com.rotacusto.repository.VehicleModelRepository;
  * o mesmo princípio da cilindrada de moto: spec real e pública guiando uma
  * estimativa de consumo, documentada como tal.
  *
+ * CAMINHÃO/ÔNIBUS pesados (Fase 3, parte 2, 28 modelos curados): mesmo
+ * princípio da moto, agora com {@code pbtKg} (peso bruto total, ficha
+ * técnica pública do fabricante) no lugar da cilindrada. Consumo é
+ * ESTIMATIVA por interpolação linear entre faixas de km/l por classe de
+ * peso pesquisadas em fontes do setor de transporte (infleet.com.br pra
+ * caminhão; ANTP/NBR 15570/SIMEFRE pra ônibus) — não é medição por modelo.
+ * Duas faixas de âncora, não uma curva única: caminhão rígido (3,5t→7,0km/l
+ * até 29t→2,0km/l) e cavalo mecânico articulado (40t→2,5km/l até
+ * 74t→1,8km/l, usando PBTC — peso bruto total combinado — no lugar do PBT
+ * do próprio trator, que sozinho não é um número que a indústria costuma
+ * publicar). As duas faixas SE SOBREPÕEM de propósito (um rígido perto do
+ * limite de 29t roda pior que uma combinação de 40t) — não é bug, reflete
+ * que são categorias de veículo diferentes, não pontos na mesma reta.
+ * {@code consumoCidadeKmL} = {@code consumoEstradaKmL} × 0,82 (penalidade
+ * genérica de cidade, sem fonte específica por modelo). {@code
+ * custoDesgastePorKm} escalona por faixa de PBT a partir da mesma faixa
+ * "só desgaste físico" usada pra carro (R$0,08-0,24/km), maior pra veículo
+ * mais pesado — estimativa minha, sem fonte citável, mesmo espírito do
+ * desgaste de carro. Ano fixo em 2025, sempre DIESEL (não existe caminhão/
+ * ônibus a gasolina/flex vendido no Brasil). Ônibus ficou com só 5 modelos
+ * (não os ~10-12 planejados) porque vários chassis pesquisados (Volvo
+ * B270F, Scania K-series) tinham só a ficha técnica em PDF não-legível por
+ * busca — preferi um catálogo menor mas com fonte real a inventar PBT.
+ *
  * {@code tipoCombustivel} (GASOLINA/ETANOL/DIESEL/ELETRICO) é parte da
  * IDENTIDADE do registro, não um detalhe: um carro flex vira DUAS linhas
  * (mesmo marca/modelo/ano, uma GASOLINA e uma ETANOL, cada uma com seu

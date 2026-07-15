@@ -27,7 +27,7 @@ class SeedersIntegrationTest {
 
     @Test
     void vehicleModelCatalogIsSeededOnStartup() {
-        assertEquals(7802, vehicleModelRepository.count());
+        assertEquals(7830, vehicleModelRepository.count());
         long marcasDistintas = vehicleModelRepository.findAll().stream()
                 .map(v -> v.getMarca())
                 .distinct()
@@ -70,6 +70,17 @@ class SeedersIntegrationTest {
         assertTrue(caminhoes > 0, "catálogo deveria ter pelo menos um caminhão (Fase 3)");
         long onibus = todos.stream().filter(v -> v.getTipo() == VehicleType.ONIBUS).count();
         assertTrue(onibus > 0, "catálogo deveria ter pelo menos um ônibus (Fase 3)");
+
+        // Caminhão/ônibus PESADOS (curados por PBT, sem fonte PBE) coexistem com
+        // os leves reetiquetados acima (que mantêm consumo real, sem pbtKg).
+        assertTrue(todos.stream()
+                .filter(v -> v.getTipo() == VehicleType.CAMINHAO)
+                .anyMatch(v -> v.getPbtKg() != null && v.getPbtKg() > 0),
+                "catálogo deveria ter pelo menos um caminhão pesado com pbtKg preenchido");
+        assertTrue(todos.stream()
+                .filter(v -> v.getTipo() == VehicleType.ONIBUS)
+                .anyMatch(v -> v.getPbtKg() != null && v.getPbtKg() > 0),
+                "catálogo deveria ter pelo menos um ônibus pesado com pbtKg preenchido");
     }
 
     @Test
