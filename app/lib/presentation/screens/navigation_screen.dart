@@ -1,35 +1,46 @@
 import 'dart:async';
+import 'dart:convert';
 
+import 'package:flutter/foundation.dart' show TargetPlatform, defaultTargetPlatform, kIsWeb;
 import 'package:flutter/material.dart';
+import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import '../../data/api_client.dart';
 import '../../domain/models/trip_cost_breakdown.dart';
 import '../../domain/navigation/deviation_detector.dart';
+import '../../domain/navigation/navigation_task_handler.dart';
 import '../../domain/navigation/route_progress.dart';
 import '../widgets/trip_map.dart';
 
 enum _NavStatus { carregando, semPermissao, semServico, ativo }
 
+bool get _isAndroid => !kIsWeb && defaultTargetPlatform == TargetPlatform.android;
+
 /// Navegação turn-by-turn ao vivo pra uma viagem já calculada — mapa segue
 /// a posição GPS, banner mostra a instrução atual, voz fala a instrução
-/// quando ela muda. Recalcula a rota se o usuário sair do caminho por 3
+/// quando ela muda, recalcula a rota se o usuário sair do caminho por 3
 /// leituras de GPS seguidas (só quando [destino]/[vehicleModelId] são
-/// passados — viagem de ida-e-volta não suporta recálculo, ver comentário
-/// no construtor). Só funciona com o app aberto e a tela ligada (operação
-/// em segundo plano é fora de escopo, item separado do punch list).
+/// passados — viagem de ida-e-volta ou com paradas não suporta recálculo).
+///
+/// **No Android** (Fase 6.3), tudo isso roda dentro de um serviço em
+/// primeiro plano (`NavigationTaskHandler`, isolate separado com
+/// notificação persistente) — sobrevive à tela apagada e ao usuário
+/// trocando de app. **Em outras plataformas** (Windows/web, sem esse
+/// conceito de serviço em segundo plano) a tela assina o GPS direto, mesmo
+/// jeito de sempre — a navegação só funciona com o app aberto/tela ligada
+/// ali, e não tem como ser diferente (sem foreground service no Windows).
 class NavigationScreen extends StatefulWidget {
   final TripCostBreakdown breakdown;
 
   /// Estes 4 parâmetros habilitam o recálculo de rota em desvio — vêm
-  /// preenchidos só quando a viagem foi calculada como trecho único
-  /// (não ida-e-volta). O `breakdown` combinado de ida+volta mistura a
-  /// geometria/passos das duas pernas concatenados, e não dá pra saber de
-  /// forma simples qual perna o usuário desviou — nesse caso os 4 ficam
-  /// null e a tela se comporta como antes (só mostra a rota original).
+  /// preenchidos só quando a viagem foi calculada como trecho único (não
+  /// ida-e-volta, não com paradas). `null` = recálculo desabilitado, mesmo
+  /// comportamento nos dois ramos (Android/outras plataformas).
   final String? destino;
   final int? vehicleModelId;
   final double? precoPorLitro;
@@ -50,19 +61,22 @@ class NavigationScreen extends StatefulWidget {
 
 class _NavigationScreenState extends State<NavigationScreen> {
   final MapController _mapController = MapController();
-  final FlutterTts _tts = FlutterTts();
   final ApiClient _apiClient = ApiClient();
-  final DeviationDetector _detector = DeviationDetector();
 
   late TripCostBreakdown _breakdown = widget.breakdown;
   _NavStatus _status = _NavStatus.carregando;
-  StreamSubscription<Position>? _positionSub;
   LatLng? _posicaoAtual;
   RouteProgress? _progresso;
-  int? _ultimoStepFalado;
   bool _recalculando = false;
 
   bool get _recalculoHabilitado => widget.destino != null && widget.vehicleModelId != null;
+
+  // --- Só usados no ramo Windows/outras plataformas (sem serviço em segundo
+  // plano) — no Android essa lógica vive inteira em NavigationTaskHandler. ---
+  final FlutterTts _tts = FlutterTts();
+  final DeviationDetector _detector = DeviationDetector();
+  StreamSubscription<Position>? _positionSub;
+  int? _ultimoStepFalado;
 
   @override
   void initState() {
@@ -73,8 +87,13 @@ class _NavigationScreenState extends State<NavigationScreen> {
 
   @override
   void dispose() {
-    _positionSub?.cancel();
-    _tts.stop();
+    if (_isAndroid) {
+      FlutterForegroundTask.removeTaskDataCallback(_onDadosDoServico);
+      FlutterForegroundTask.stopService();
+    } else {
+      _positionSub?.cancel();
+      _tts.stop();
+    }
     super.dispose();
   }
 
@@ -96,13 +115,132 @@ class _NavigationScreenState extends State<NavigationScreen> {
       return;
     }
 
+    if (_isAndroid) {
+      await _iniciarServicoEmSegundoPlano();
+    } else {
+      _positionSub = Geolocator.getPositionStream(
+        locationSettings: const LocationSettings(accuracy: LocationAccuracy.high, distanceFilter: 5),
+      ).listen(_onPosicaoWindows);
+    }
+
     setState(() => _status = _NavStatus.ativo);
-    _positionSub = Geolocator.getPositionStream(
-      locationSettings: const LocationSettings(accuracy: LocationAccuracy.high, distanceFilter: 5),
-    ).listen(_onPosicao);
   }
 
-  void _onPosicao(Position posicao) {
+  Future<void> _iniciarServicoEmSegundoPlano() async {
+    if (!mounted) return;
+    // "Permitir sempre" é um passo à parte do foreground que já foi
+    // concedido acima — pedir sem explicar antes é mal visto (e o SO só
+    // mostra essa opção quando pedida separada, não junto com FINE/COARSE).
+    // Se o usuário recusar, a navegação segue normal em primeiro plano —
+    // só não sobrevive tela apagada/troca de app.
+    if (!await Permission.locationAlways.isGranted) {
+      final aceitou = await _mostrarRationaleSegundoPlano();
+      if (aceitou && mounted) {
+        await Permission.locationAlways.request();
+      }
+    }
+
+    FlutterForegroundTask.init(
+      androidNotificationOptions: AndroidNotificationOptions(
+        channelId: 'rotacusto_navigation',
+        channelName: 'Navegação RotaCusto',
+        channelDescription: 'Mostra a instrução atual enquanto a navegação está ativa.',
+        onlyAlertOnce: true,
+      ),
+      iosNotificationOptions: const IOSNotificationOptions(showNotification: false, playSound: false),
+      foregroundTaskOptions: ForegroundTaskOptions(
+        eventAction: ForegroundTaskEventAction.nothing(),
+        autoRunOnBoot: false,
+        allowWakeLock: true,
+      ),
+    );
+
+    final notificacaoPermitida = await FlutterForegroundTask.checkNotificationPermission();
+    if (notificacaoPermitida != NotificationPermission.granted) {
+      await FlutterForegroundTask.requestNotificationPermission();
+    }
+
+    await FlutterForegroundTask.clearAllData();
+    await FlutterForegroundTask.saveData(key: kNavigationBreakdownKey, value: jsonEncode(_breakdown.toJson()));
+    if (widget.destino != null) {
+      await FlutterForegroundTask.saveData(key: kNavigationDestinoKey, value: widget.destino!);
+    }
+    if (widget.vehicleModelId != null) {
+      await FlutterForegroundTask.saveData(key: kNavigationVehicleModelIdKey, value: widget.vehicleModelId!);
+    }
+    if (widget.precoPorLitro != null) {
+      await FlutterForegroundTask.saveData(key: kNavigationPrecoPorLitroKey, value: widget.precoPorLitro!);
+    }
+    if (widget.precoPorKWh != null) {
+      await FlutterForegroundTask.saveData(key: kNavigationPrecoPorKWhKey, value: widget.precoPorKWh!);
+    }
+
+    FlutterForegroundTask.addTaskDataCallback(_onDadosDoServico);
+    await FlutterForegroundTask.startService(
+      serviceId: 5000,
+      serviceTypes: const [ForegroundServiceTypes.location],
+      notificationTitle: 'RotaCusto',
+      notificationText: 'Preparando navegação...',
+      callback: navigationTaskStartCallback,
+    );
+  }
+
+  Future<bool> _mostrarRationaleSegundoPlano() async {
+    if (!mounted) return false;
+    return await showDialog<bool>(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Navegar com a tela apagada'),
+            content: const Text(
+              'Pra continuar te guiando por voz mesmo com a tela apagada ou usando outro '
+              'app, o RotaCusto precisa da permissão de localização "Permitir sempre". '
+              'Sem ela, a navegação continua funcionando normal, só não acompanha se você '
+              'sair do app.',
+            ),
+            actions: [
+              TextButton(onPressed: () => Navigator.of(context).pop(false), child: const Text('Agora não')),
+              FilledButton(onPressed: () => Navigator.of(context).pop(true), child: const Text('Permitir')),
+            ],
+          ),
+        ) ??
+        false;
+  }
+
+  void _onDadosDoServico(Object data) {
+    if (data is! Map) return;
+    switch (data['tipo']) {
+      case 'posicao':
+        final atual = LatLng((data['lat'] as num).toDouble(), (data['lon'] as num).toDouble());
+        setState(() {
+          _posicaoAtual = atual;
+          _progresso = RouteProgress(
+            currentStepIndex: data['currentStepIndex'] as int?,
+            distanciaAteProximaViradaM: (data['distanciaAteProximaViradaM'] as num).toDouble(),
+            distanciaAteRotaM: 0,
+          );
+        });
+        final zoomAtual = _mapController.camera.zoom;
+        _mapController.move(atual, zoomAtual < 15 ? 17 : zoomAtual);
+      case 'recalculando':
+        setState(() => _recalculando = data['valor'] as bool);
+        if (data['erro'] == true && mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Não foi possível recalcular a rota. Tentando de novo se o desvio continuar.')),
+          );
+        }
+      case 'rota_recalculada':
+        final novoResultado =
+            TripCostBreakdown.fromJson(jsonDecode(data['breakdownJson'] as String) as Map<String, dynamic>);
+        setState(() {
+          _breakdown = novoResultado;
+          _recalculando = false;
+        });
+    }
+  }
+
+  // --- Ramo Windows/outras plataformas — idêntico ao de antes da Fase 6.3. ---
+
+  void _onPosicaoWindows(Position posicao) {
     final atual = LatLng(posicao.latitude, posicao.longitude);
     final progresso = RouteProgressCalculator.calculate(
       posicaoAtual: atual,
@@ -124,11 +262,11 @@ class _NavigationScreenState extends State<NavigationScreen> {
     _mapController.move(atual, zoomAtual < 15 ? 17 : zoomAtual);
 
     if (_recalculoHabilitado && !_recalculando && _detector.registrarLeitura(progresso.distanciaAteRotaM)) {
-      _recalcularRota(atual);
+      _recalcularRotaWindows(atual);
     }
   }
 
-  Future<void> _recalcularRota(LatLng origemAtual) async {
+  Future<void> _recalcularRotaWindows(LatLng origemAtual) async {
     setState(() => _recalculando = true);
     try {
       final novoResultado = await _apiClient.estimateTrip(
@@ -141,8 +279,6 @@ class _NavigationScreenState extends State<NavigationScreen> {
       if (!mounted) return;
       setState(() {
         _breakdown = novoResultado;
-        // Os índices de step são relativos à NOVA lista de passos —
-        // reaproveitar o índice antigo falaria a instrução errada.
         _ultimoStepFalado = null;
         _recalculando = false;
       });

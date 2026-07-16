@@ -94,4 +94,24 @@ class TripCostBreakdown {
           .toList(),
     );
   }
+
+  /// Inverso de [fromJson] — usado pra serializar o breakdown atual como
+  /// payload inicial do serviço em segundo plano (Fase 6.3): a fronteira de
+  /// isolate do `flutter_foreground_task` só passa primitivos/JSON, não
+  /// objetos Dart direto.
+  Map<String, dynamic> toJson() => {
+        'distanciaKm': distanciaKm,
+        'duracaoMin': duracaoMin,
+        'custoCombustivel': custoCombustivel,
+        'custoDesgaste': custoDesgaste,
+        'custoPedagio': custoPedagio,
+        'custoLanche': custoLanche,
+        'total': total,
+        'geometriaRota': geometriaRota.map((p) => {'lat': p.latitude, 'lon': p.longitude}).toList(),
+        'pedagiosNaRota': pedagiosNaRota.map((p) => p.toJson()).toList(),
+        'postosNaRota': postosNaRota.map((p) => p.toJson()).toList(),
+        'postoSugerido': postoSugerido?.toJson(),
+        'passosRota': passosRota.map((p) => p.toJson()).toList(),
+        'paradasNaRota': paradasNaRota.map((p) => {'lat': p.latitude, 'lon': p.longitude}).toList(),
+      };
 }

@@ -12,4 +12,6 @@ class FuelStation {
       lon: (json['lon'] as num).toDouble(),
     );
   }
+
+  Map<String, dynamic> toJson() => {'nome': nome, 'lat': lat, 'lon': lon};
 }

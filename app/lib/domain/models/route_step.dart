@@ -28,6 +28,14 @@ class RouteStep {
     );
   }
 
+  Map<String, dynamic> toJson() => {
+        'instrucao': instrucao,
+        'distanciaM': distanciaM,
+        'duracaoS': duracaoS,
+        'wayPointInicio': wayPointInicio,
+        'wayPointFim': wayPointFim,
+      };
+
   /// Usado ao concatenar ida+volta em [TripCostBreakdown.combine] — os
   /// índices da volta precisam ser deslocados pelo tamanho da geometria da
   /// ida pra continuarem válidos contra a lista combinada.

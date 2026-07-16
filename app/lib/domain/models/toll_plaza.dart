@@ -25,4 +25,13 @@ class TollPlaza {
       valorCobrado: (json['valorCobrado'] as num).toDouble(),
     );
   }
+
+  Map<String, dynamic> toJson() => {
+        'nome': nome,
+        'rodovia': rodovia,
+        'concessionaria': concessionaria,
+        'lat': lat,
+        'lng': lng,
+        'valorCobrado': valorCobrado,
+      };
 }

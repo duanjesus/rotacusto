@@ -176,4 +176,36 @@ void main() {
 
     expect(combinado.paradasNaRota, [const LatLng(1, 1), const LatLng(2, 2)]);
   });
+
+  test('toJson followed by fromJson round-trips every field (usado pra cruzar a fronteira de isolate na Fase 6.3)', () {
+    final original = _breakdown(
+      distanciaKm: 550.3,
+      duracaoMin: 420.0,
+      custoCombustivel: 200.0,
+      custoDesgaste: 50.0,
+      custoPedagio: 60.0,
+      custoLanche: 25.0,
+      total: 335.0,
+      geometriaRota: [const LatLng(-22.9, -43.1), const LatLng(-20.6, -40.4)],
+      pedagiosNaRota: [
+        TollPlaza(nome: 'Pedágio A', rodovia: 'BR-101', concessionaria: 'X', lat: 1, lng: 1, valorCobrado: 5),
+      ],
+      postosNaRota: [FuelStation(nome: 'Posto A', lat: 1, lon: 1)],
+      postoSugerido: FuelStation(nome: 'Posto A', lat: 1, lon: 1),
+      passosRota: [
+        RouteStep(instrucao: 'Siga em frente', distanciaM: 100, duracaoS: 10, wayPointInicio: 0, wayPointFim: 1),
+      ],
+      paradasNaRota: [const LatLng(-22.7469, -41.8817)],
+    );
+
+    final resultado = TripCostBreakdown.fromJson(original.toJson());
+
+    expect(resultado.distanciaKm, original.distanciaKm);
+    expect(resultado.geometriaRota, original.geometriaRota);
+    expect(resultado.pedagiosNaRota.first.nome, 'Pedágio A');
+    expect(resultado.postosNaRota.first.nome, 'Posto A');
+    expect(resultado.postoSugerido?.nome, 'Posto A');
+    expect(resultado.passosRota.first.instrucao, 'Siga em frente');
+    expect(resultado.paradasNaRota, original.paradasNaRota);
+  });
 }

@@ -25,6 +25,13 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+        <!-- Warning: Do not change service name (nome fixo do plugin
+             flutter_foreground_task) — é isso que mantém a navegação viva
+             com a tela apagada ou o app trocado por outro (Fase 6.3). -->
+        <service
+            android:name="com.pravera.flutter_foreground_task.service.ForegroundService"
+            android:foregroundServiceType="location"
+            android:exported="false" />
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
         <meta-data
@@ -36,11 +43,17 @@
     <uses-permission android:name="android.permission.INTERNET"/>
     <!-- Navegação turn-by-turn (Fase 6) — posição ao vivo pra seguir a rota.
          COARSE é pedida junto porque alguns fabricantes/versões negam FINE mas
-         concedem COARSE; o app funciona com precisão reduzida nesse caso.
-         Sem ACCESS_BACKGROUND_LOCATION de propósito — fora de escopo, a
-         navegação só funciona com o app aberto e a tela ligada. -->
+         concedem COARSE; o app funciona com precisão reduzida nesse caso. -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <!-- Navegação em segundo plano (Fase 6.3): ACCESS_BACKGROUND_LOCATION é
+         declarada aqui mas só PEDIDA em runtime como um passo separado, depois
+         da foreground já concedida (o Android 11+ só oferece "permitir
+         sempre" quando solicitada assim — ver PermissaoSegundoPlanoScreen).
+         FOREGROUND_SERVICE/WAKE_LOCK/POST_NOTIFICATIONS já vêm do manifesto
+         próprio do plugin flutter_foreground_task, não precisam repetir aqui. -->
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION"/>
     <!-- Required to query activities that can process text, see:
          https://developer.android.com/training/package-visibility and
          https://developer.android.com/reference/android/content/Intent#ACTION_PROCESS_TEXT.
