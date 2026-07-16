@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 
 import '../../data/api_client.dart';
+import '../../data/last_trip_cache.dart';
 import '../../domain/models/address_suggestion.dart';
 import '../../domain/models/tipo_combustivel.dart';
 import '../../domain/models/trip_cost_breakdown.dart';
@@ -67,6 +68,7 @@ class _HomeScreenState extends State<HomeScreen> {
   bool _breakdownIdaEVolta = false;
   String? _errorMessage;
   bool _salvandoNoHistorico = false;
+  LastTrip? _ultimaViagem;
 
   // _availableVersions já vem ordenado por ano desc (do back-end) — o Set
   // preserva essa ordem de inserção, então os anos saem do mais recente
@@ -75,6 +77,17 @@ class _HomeScreenState extends State<HomeScreen> {
 
   List<VehicleModel> get _combustiveisDoAno =>
       _availableVersions.where((v) => v.ano == _selectedAno).toList();
+
+  @override
+  void initState() {
+    super.initState();
+    // Modo offline (Fase 6.5): se tinha uma viagem calculada antes de
+    // fechar o app, oferece continuar de onde parou sem precisar do
+    // back-end — útil se reabrir numa área sem sinal.
+    loadLastTrip().then((viagem) {
+      if (mounted && viagem != null) setState(() => _ultimaViagem = viagem);
+    });
+  }
 
   @override
   void dispose() {
@@ -272,7 +285,21 @@ class _HomeScreenState extends State<HomeScreen> {
         _breakdown = result;
         _breakdownIdaEVolta = _idaEVolta;
         _loadingEstimate = false;
+        _ultimaViagem = null; // já era a viagem que acabou de ser salva de novo — evita o card piscar
       });
+      // Guarda localmente pra dar pra retomar a navegação sem rede depois
+      // (Fase 6.5) — mesma regra de recálculo de sempre: desabilitado com
+      // ida-e-volta ou paradas.
+      final recalculoDesabilitado = _idaEVolta || paradas.isNotEmpty;
+      saveLastTrip(LastTrip(
+        breakdown: result,
+        origemLabel: _origemSelecionada?.displayName ?? _origemController.text,
+        destinoLabel: _destinoSelecionado?.displayName ?? _destinoController.text,
+        destino: recalculoDesabilitado ? null : destino,
+        vehicleModelId: recalculoDesabilitado ? null : _selectedVehicle!.id,
+        precoPorLitro: recalculoDesabilitado || isEletrico ? null : preco,
+        precoPorKWh: recalculoDesabilitado || !isEletrico ? null : preco,
+      ));
     } on DioException catch (e) {
       final data = e.response?.data;
       String message;
@@ -320,6 +347,63 @@ class _HomeScreenState extends State<HomeScreen> {
     } finally {
       if (mounted) setState(() => _salvandoNoHistorico = false);
     }
+  }
+
+  /// Vai direto pra navegação com a última viagem calculada, sem passar
+  /// pelo formulário nem falar com o back-end — o caso de uso é justamente
+  /// reabrir o app numa área sem sinal (Fase 6.5).
+  void _retomarNavegacao(LastTrip viagem) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => NavigationScreen(
+          breakdown: viagem.breakdown,
+          destino: viagem.destino,
+          vehicleModelId: viagem.vehicleModelId,
+          precoPorLitro: viagem.precoPorLitro,
+          precoPorKWh: viagem.precoPorKWh,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildRetomarViagemCard(LastTrip viagem) {
+    final scheme = Theme.of(context).colorScheme;
+    return Card(
+      color: scheme.secondaryContainer,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Row(
+          children: [
+            Icon(Icons.history_rounded, color: scheme.onSecondaryContainer),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Última viagem calculada', style: TextStyle(color: scheme.onSecondaryContainer)),
+                  Text(
+                    '${viagem.origemLabel} → ${viagem.destinoLabel}',
+                    style: TextStyle(color: scheme.onSecondaryContainer, fontWeight: FontWeight.w700),
+                  ),
+                ],
+              ),
+            ),
+            TextButton(
+              onPressed: () => _retomarNavegacao(viagem),
+              child: const Text('Retomar'),
+            ),
+            IconButton(
+              tooltip: 'Dispensar',
+              icon: Icon(Icons.close_rounded, color: scheme.onSecondaryContainer),
+              onPressed: () {
+                clearLastTrip();
+                setState(() => _ultimaViagem = null);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   @override
@@ -421,6 +505,7 @@ class _HomeScreenState extends State<HomeScreen> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       spacing: 16,
       children: [
+        if (_ultimaViagem != null) _buildRetomarViagemCard(_ultimaViagem!),
         SectionCard(
           icon: Icons.alt_route_rounded,
           title: 'Rota',

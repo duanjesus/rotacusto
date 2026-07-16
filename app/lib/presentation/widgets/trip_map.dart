@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:flutter_map_cache/flutter_map_cache.dart';
 import 'package:latlong2/latlong.dart';
 
+import '../../data/tile_cache.dart';
 import '../../domain/models/trip_cost_breakdown.dart';
 
-class TripMap extends StatelessWidget {
+class TripMap extends StatefulWidget {
   final TripCostBreakdown? breakdown;
   /// Dono é de quem precisa mover a câmera de fora (ex.: seguir o GPS ao
   /// vivo na tela de navegação) — sem isso, `TripMap` continua stateless.
@@ -16,7 +18,19 @@ class TripMap extends StatelessWidget {
   const TripMap({super.key, this.breakdown, this.mapController, this.posicaoAtual});
 
   @override
+  State<TripMap> createState() => _TripMapState();
+}
+
+class _TripMapState extends State<TripMap> {
+  // Construído uma vez (não a cada rebuild) — abrir o cache em disco é
+  // assíncrono, e recriar o provider toda hora perderia o sentido do cache.
+  late final Future<CachedTileProvider> _tileProviderFuture = buildTileProvider();
+
+  @override
   Widget build(BuildContext context) {
+    final breakdown = widget.breakdown;
+    final mapController = widget.mapController;
+    final posicaoAtual = widget.posicaoAtual;
     final route = breakdown?.geometriaRota ?? const <LatLng>[];
     final center = posicaoAtual ?? (route.isNotEmpty ? route[route.length ~/ 2] : const LatLng(-22.9068, -43.1729));
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -36,10 +50,20 @@ class TripMap extends StatelessWidget {
           initialZoom: route.isNotEmpty ? 7 : 10,
         ),
         children: [
-          TileLayer(
-            urlTemplate: tileUrl,
-            userAgentPackageName: 'com.rotacusto.app',
-            subdomains: const ['a', 'b', 'c', 'd'],
+          // FutureBuilder só troca o tileProvider (cache em disco) assim que
+          // o cache termina de abrir — enquanto isso, o TileLayer já
+          // funciona normalmente (sem cache) pra não travar o mapa esperando
+          // I/O de arquivo. Depois que resolve uma vez, fica resolvido.
+          FutureBuilder<CachedTileProvider>(
+            future: _tileProviderFuture,
+            builder: (context, snapshot) {
+              return TileLayer(
+                urlTemplate: tileUrl,
+                userAgentPackageName: 'com.rotacusto.app',
+                subdomains: const ['a', 'b', 'c', 'd'],
+                tileProvider: snapshot.data,
+              );
+            },
           ),
           if (route.isNotEmpty)
             PolylineLayer(polylines: [
@@ -48,7 +72,7 @@ class TripMap extends StatelessWidget {
           if (breakdown != null)
             MarkerLayer(
               markers: [
-                ...breakdown!.paradasNaRota.map(
+                ...breakdown.paradasNaRota.map(
                   (p) => Marker(
                     point: p,
                     width: 32,
@@ -59,7 +83,7 @@ class TripMap extends StatelessWidget {
                     ),
                   ),
                 ),
-                ...breakdown!.pedagiosNaRota.map(
+                ...breakdown.pedagiosNaRota.map(
                   (p) => Marker(
                     point: LatLng(p.lat, p.lng),
                     width: 36,
@@ -72,13 +96,13 @@ class TripMap extends StatelessWidget {
                 ),
                 // Só o posto sugerido aparece no mapa (os demais postos da
                 // rota poluiriam demais — podem passar de 100 em áreas urbanas).
-                if (breakdown!.postoSugerido != null)
+                if (breakdown.postoSugerido != null)
                   Marker(
-                    point: LatLng(breakdown!.postoSugerido!.lat, breakdown!.postoSugerido!.lon),
+                    point: LatLng(breakdown.postoSugerido!.lat, breakdown.postoSugerido!.lon),
                     width: 36,
                     height: 36,
                     child: Tooltip(
-                      message: 'Parada sugerida\n${breakdown!.postoSugerido!.nome}',
+                      message: 'Parada sugerida\n${breakdown.postoSugerido!.nome}',
                       child: const Icon(Icons.local_gas_station, color: Colors.green, size: 28),
                     ),
                   ),
@@ -87,7 +111,7 @@ class TripMap extends StatelessWidget {
           if (posicaoAtual != null)
             MarkerLayer(markers: [
               Marker(
-                point: posicaoAtual!,
+                point: posicaoAtual,
                 width: 24,
                 height: 24,
                 child: Container(

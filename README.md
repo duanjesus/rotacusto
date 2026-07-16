@@ -43,7 +43,8 @@ flutter run -d windows   # or -d chrome / -d edge
 Core roadmap complete: multi-vehicle cost calculation (fuel/energy, tolls, wear,
 food stops), multi-stop routing, Windows + Android apps, in-app turn-by-turn
 navigation with voice, automatic rerouting and Android background operation,
-a real persistent Postgres database, and optional user accounts with trip
-history. CI runs the backend and Flutter test suites on every push. See
-`CLAUDE.md`'s "Known gaps" section for what's left (offline mode, iOS, app
-store distribution).
+a real persistent Postgres database, optional user accounts with trip
+history, and offline resilience (cached map tiles, resume a calculated trip
+with no connection). CI runs the backend and Flutter test suites on every
+push. See `CLAUDE.md`'s "Known gaps" section for what's left (iOS, app store
+distribution — both blocked on hardware/accounts this environment doesn't have).

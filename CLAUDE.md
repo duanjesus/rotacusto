@@ -130,8 +130,43 @@ a separate `tarifaMoto` field when present.
 - Voice (`flutter_tts`, pt-BR) speaks a step only when it *changes* (tracked index), not
   on every GPS tick. After a reroute, that tracked index **must** reset to null — it's
   relative to the new `passosRota` list, not the old one.
-- Out of scope, deliberately: background operation (needs the app open, screen on — no
-  foreground service yet), background rerouting.
+- **Background operation** (Android): `app/lib/domain/navigation/navigation_task_handler.dart`
+  runs the whole position→instruction→voice→recálculo loop inside a
+  `flutter_foreground_task` service (separate isolate, persistent notification) —
+  survives the screen turning off or the user switching to another app.
+  `NavigationScreen` branches by platform: Android starts the service and listens via
+  `addTaskDataCallback`; other platforms (Windows) keep the original direct
+  `Geolocator.getPositionStream()` subscription, since the plugin only declares Android/iOS
+  support — calling any of its methods elsewhere throws `MissingPluginException`.
+  **Gotcha**: the background isolate has no Flutter binding by default — any
+  MethodChannel-based plugin (`flutter_tts`, `geolocator`) throws
+  `Cannot set the method call handler before the binary messenger has been initialized`
+  unless `WidgetsFlutterBinding.ensureInitialized()` runs first in the isolate's
+  `@pragma('vm:entry-point')` entry function.
+
+## Offline mode
+
+Calculating a **new** trip always needs connectivity (geocoding/routing/tolls are
+external services) — that's a hard limit, not something to work around. What's actually
+offline-resilient is a trip **already calculated**:
+
+- **Map tiles** (`app/lib/presentation/widgets/trip_map.dart`) go through a deliberate
+  disk cache (`app/lib/data/tile_cache.dart`, `flutter_map_cache` +
+  `http_cache_file_store`, stored under `getApplicationSupportDirectory()` — not
+  `getTemporaryDirectory()`, which the OS can clear). This is separate from flutter_map's
+  own built-in cache (on by default since v8.2, but explicitly documented as offering "no
+  guarantees" — not something to rely on for real offline behavior). Tiles never
+  previously seen just don't render; no crash, no error.
+- **Resuming after the app closes**: `app/lib/data/last_trip_cache.dart` persists the
+  last successfully calculated breakdown (`shared_preferences`, reusing
+  `TripCostBreakdown.toJson()`/`fromJson()` from the background-navigation work above) —
+  `HomeScreen` shows a dismissible "Retomar navegação" card that jumps straight into
+  `NavigationScreen` with zero network calls. Verified live on the emulator with WiFi and
+  mobile data both disabled (`adb shell svc wifi disable` / `svc data disable`): resuming,
+  the map, GPS position matching, and voice all worked with the connection fully off.
+- Turn-by-turn guidance itself was already offline-safe before this — `route_progress.dart`
+  and `deviation_detector.dart` are pure Dart with no network calls, and a failed reroute
+  attempt already degrades to a `SnackBar` instead of crashing.
 
 ## Frontend conventions (`app/`)
 
@@ -214,8 +249,9 @@ a separate `tarifaMoto` field when present.
 
 Recálculo de rota ✅, navegação em segundo plano ✅ (Android, foreground service),
 roteiro com múltiplas paradas ✅, banco persistente (Postgres) ✅, contas de usuário +
-histórico de viagens ✅ — suporte iOS ❌ (precisa de Mac, fora do alcance deste
-ambiente), distribuição em loja (Play Store/Microsoft Store) ❌ (precisa de conta de
-desenvolvedor/assinatura, fora do alcance), modo offline ❌. Preço de combustível/
-energia em tempo real é permanentemente fora de escopo — não existe fonte gratuita de
-preço por posto no Brasil.
+histórico de viagens ✅, modo offline ✅ (resistência durante uma viagem já calculada —
+calcular uma viagem nova sempre exige conexão, isso não muda) — restam só suporte iOS ❌
+(precisa de Mac, fora do alcance deste ambiente) e distribuição em loja (Play Store/
+Microsoft Store) ❌ (precisa de conta de desenvolvedor/assinatura, fora do alcance).
+Preço de combustível/energia em tempo real é permanentemente fora de escopo — não existe
+fonte gratuita de preço por posto no Brasil.
