@@ -1,22 +1,28 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
-import '../../data/api_client.dart';
 import '../../theme/auth_controller.dart';
 import '../widgets/section_card.dart';
 
 /// Login é opcional pro app inteiro — essa tela só existe pra desbloquear o
 /// histórico de viagens (Fase 6.4b). Alterna entre login e registro no
 /// mesmo formulário em vez de duas telas separadas (é o mesmo par de campos).
+///
+/// [register]/[login] são injetados (não um `ApiClient` fixo internamente) —
+/// mesmo padrão de `AddressField.fetchSuggestions`/`VehicleSearchField.fetchSuggestions`
+/// já usado no resto do app, o que permite testar a tela com fakes em vez de
+/// precisar de rede de verdade.
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+  final Future<AuthSession> Function(String email, String senha) register;
+  final Future<AuthSession> Function(String email, String senha) login;
+
+  const LoginScreen({super.key, required this.register, required this.login});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final ApiClient _apiClient = ApiClient();
   final _emailController = TextEditingController();
   final _senhaController = TextEditingController();
 
@@ -45,9 +51,7 @@ class _LoginScreenState extends State<LoginScreen> {
     });
 
     try {
-      final sessao = _modoRegistro
-          ? await _apiClient.register(email, senha)
-          : await _apiClient.login(email, senha);
+      final sessao = _modoRegistro ? await widget.register(email, senha) : await widget.login(email, senha);
       await saveAuthSession(sessao);
       if (!mounted) return;
       Navigator.of(context).pop();

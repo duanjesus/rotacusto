@@ -427,7 +427,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   tooltip: 'Entrar (opcional — desbloqueia o histórico de viagens)',
                   icon: const Icon(Icons.person_outline_rounded),
                   onPressed: () => Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => const LoginScreen()),
+                    MaterialPageRoute(
+                      builder: (_) => LoginScreen(register: _apiClient.register, login: _apiClient.login),
+                    ),
                   ),
                 );
               }
@@ -436,7 +438,12 @@ class _HomeScreenState extends State<HomeScreen> {
                 icon: const Icon(Icons.person_rounded),
                 onSelected: (opcao) {
                   if (opcao == 'historico') {
-                    Navigator.of(context).push(MaterialPageRoute(builder: (_) => const TripHistoryScreen()));
+                    Navigator.of(context).push(MaterialPageRoute(
+                      builder: (_) => TripHistoryScreen(
+                        fetchTripHistory: _apiClient.fetchTripHistory,
+                        fetchTripHistoryDetail: _apiClient.fetchTripHistoryDetail,
+                      ),
+                    ));
                   } else if (opcao == 'sair') {
                     clearAuthSession();
                   }

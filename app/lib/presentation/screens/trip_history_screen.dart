@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../../data/api_client.dart';
 import '../../domain/models/trip_history_detail.dart';
 import '../../domain/models/trip_history_summary.dart';
 import '../widgets/cost_breakdown_bar.dart';
@@ -9,16 +8,23 @@ import '../widgets/trip_map.dart';
 
 /// Lista as viagens que o usuário logado salvou (botão "Salvar no histórico"
 /// no resumo da viagem, ver home_screen.dart) — Fase 6.4b.
+///
+/// [fetchTripHistory]/[fetchTripHistoryDetail] são injetados (não um
+/// `ApiClient` fixo internamente) — mesmo padrão de
+/// `AddressField.fetchSuggestions` já usado no resto do app, permite testar
+/// com fakes em vez de precisar de rede de verdade.
 class TripHistoryScreen extends StatefulWidget {
-  const TripHistoryScreen({super.key});
+  final Future<List<TripHistorySummary>> Function() fetchTripHistory;
+  final Future<TripHistoryDetail> Function(int id) fetchTripHistoryDetail;
+
+  const TripHistoryScreen({super.key, required this.fetchTripHistory, required this.fetchTripHistoryDetail});
 
   @override
   State<TripHistoryScreen> createState() => _TripHistoryScreenState();
 }
 
 class _TripHistoryScreenState extends State<TripHistoryScreen> {
-  final ApiClient _apiClient = ApiClient();
-  late final Future<List<TripHistorySummary>> _future = _apiClient.fetchTripHistory();
+  late final Future<List<TripHistorySummary>> _future = widget.fetchTripHistory();
 
   @override
   Widget build(BuildContext context) {
@@ -62,7 +68,9 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
                   trailing: Text('R\$ ${v.total.toStringAsFixed(2)}',
                       style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700)),
                   onTap: () => Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => _TripHistoryDetailScreen(id: v.id)),
+                    MaterialPageRoute(
+                      builder: (_) => _TripHistoryDetailScreen(id: v.id, fetch: widget.fetchTripHistoryDetail),
+                    ),
                   ),
                 ),
               );
@@ -81,16 +89,16 @@ class _TripHistoryScreenState extends State<TripHistoryScreen> {
 
 class _TripHistoryDetailScreen extends StatefulWidget {
   final int id;
+  final Future<TripHistoryDetail> Function(int id) fetch;
 
-  const _TripHistoryDetailScreen({required this.id});
+  const _TripHistoryDetailScreen({required this.id, required this.fetch});
 
   @override
   State<_TripHistoryDetailScreen> createState() => _TripHistoryDetailScreenState();
 }
 
 class _TripHistoryDetailScreenState extends State<_TripHistoryDetailScreen> {
-  final ApiClient _apiClient = ApiClient();
-  late final Future<TripHistoryDetail> _future = _apiClient.fetchTripHistoryDetail(widget.id);
+  late final Future<TripHistoryDetail> _future = widget.fetch(widget.id);
 
   @override
   Widget build(BuildContext context) {
