@@ -1,0 +1,49 @@
+# Config usada só por @SpringBootTest (o classpath de teste prioriza este arquivo
+# sobre src/main/resources/application.yml) — continua em H2 em memória de propósito,
+# não precisa do Postgres embutido (que só sobe via RotaCustoApplication.main(),
+# nunca chamado pelos testes) nem afeta o CI, que fica sem precisar de infraestrutura
+# externa nenhuma. Ver Fase 6.4a no plano do projeto.
+spring:
+  application:
+    name: rotacusto-backend
+  datasource:
+    url: jdbc:h2:mem:rotacusto;DB_CLOSE_DELAY=-1
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    open-in-view: false
+  h2:
+    console:
+      enabled: true
+
+server:
+  port: 8080
+
+rotacusto:
+  geocoding:
+    base-url: https://nominatim.openstreetmap.org
+    user-agent: "RotaCusto/0.1 (contato: duanjesus30@gmail.com)"
+    photon-base-url: https://photon.komoot.io
+  routing:
+    base-url: https://api.openrouteservice.org
+    api-key: ${ORS_API_KEY:}
+  food-stop:
+    interval-hours: 3.0
+    average-cost: 25.0
+  overpass:
+    base-url: https://overpass-api.de/api/interpreter
+  tolls:
+    curated-detection-radius-km: 5.0
+    osm-detection-radius-km: 0.1
+    default-tarifa-por-eixo: 5.50
+    default-tarifa-moto: 4.00
+  fuel-stations:
+    detection-radius-km: 0.3
+  vehicle-reports:
+    file: vehicle-reports.log
+  jwt:
+    secret: ${JWT_SECRET:test-secret-key-only-for-automated-tests-not-for-real-use}
+    expiration-hours: 24

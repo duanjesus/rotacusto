@@ -14,8 +14,11 @@ import '../widgets/cost_breakdown_bar.dart';
 import '../widgets/section_card.dart';
 import '../widgets/trip_map.dart';
 import '../widgets/vehicle_search_field.dart';
+import '../../theme/auth_controller.dart';
 import '../../theme/theme_controller.dart';
+import 'login_screen.dart';
 import 'navigation_screen.dart';
+import 'trip_history_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -63,6 +66,7 @@ class _HomeScreenState extends State<HomeScreen> {
   // resumo exibido continua rotulado corretamente.
   bool _breakdownIdaEVolta = false;
   String? _errorMessage;
+  bool _salvandoNoHistorico = false;
 
   // _availableVersions já vem ordenado por ano desc (do back-end) — o Set
   // preserva essa ordem de inserção, então os anos saem do mais recente
@@ -293,6 +297,31 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  /// Não automático — só quando o usuário toca em "Salvar no histórico" com
+  /// uma sessão ativa (Fase 6.4b). Usa o texto exibido nos campos (não as
+  /// coordenadas) pra ficar legível na lista do histórico.
+  Future<void> _salvarNoHistorico() async {
+    final breakdown = _breakdown;
+    if (breakdown == null) return;
+
+    setState(() => _salvandoNoHistorico = true);
+    try {
+      await _apiClient.saveTripToHistory(
+        origem: _origemSelecionada?.displayName ?? _origemController.text,
+        destino: _destinoSelecionado?.displayName ?? _destinoController.text,
+        breakdown: breakdown,
+      );
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Viagem salva no histórico.')));
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text('Não foi possível salvar no histórico.')));
+    } finally {
+      if (mounted) setState(() => _salvandoNoHistorico = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -306,6 +335,35 @@ class _HomeScreenState extends State<HomeScreen> {
           ],
         ),
         actions: [
+          ValueListenableBuilder<AuthSession?>(
+            valueListenable: authSessionNotifier,
+            builder: (context, sessao, _) {
+              if (sessao == null) {
+                return IconButton(
+                  tooltip: 'Entrar (opcional — desbloqueia o histórico de viagens)',
+                  icon: const Icon(Icons.person_outline_rounded),
+                  onPressed: () => Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => const LoginScreen()),
+                  ),
+                );
+              }
+              return PopupMenuButton<String>(
+                tooltip: sessao.email,
+                icon: const Icon(Icons.person_rounded),
+                onSelected: (opcao) {
+                  if (opcao == 'historico') {
+                    Navigator.of(context).push(MaterialPageRoute(builder: (_) => const TripHistoryScreen()));
+                  } else if (opcao == 'sair') {
+                    clearAuthSession();
+                  }
+                },
+                itemBuilder: (context) => [
+                  const PopupMenuItem(value: 'historico', child: Text('Histórico de viagens')),
+                  const PopupMenuItem(value: 'sair', child: Text('Sair')),
+                ],
+              );
+            },
+          ),
           ValueListenableBuilder<ThemeMode>(
             valueListenable: themeModeNotifier,
             builder: (context, themeMode, _) {
@@ -714,6 +772,22 @@ class _HomeScreenState extends State<HomeScreen> {
               label: const Text('Navegar'),
             ),
           ],
+          ValueListenableBuilder<AuthSession?>(
+            valueListenable: authSessionNotifier,
+            builder: (context, sessao, _) {
+              if (sessao == null) return const SizedBox.shrink();
+              return Padding(
+                padding: const EdgeInsets.only(top: 8),
+                child: OutlinedButton.icon(
+                  onPressed: _salvandoNoHistorico ? null : _salvarNoHistorico,
+                  icon: _salvandoNoHistorico
+                      ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))
+                      : const Icon(Icons.bookmark_add_outlined),
+                  label: const Text('Salvar no histórico'),
+                ),
+              );
+            },
+          ),
         ],
       ),
     );

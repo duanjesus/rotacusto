@@ -25,18 +25,35 @@ routing, Overpass for tolls/fuel stations, CartoDB tiles) — no Google Maps, no
 ```bash
 # Backend (JDK 21, Maven Wrapper committed — no local Maven needed)
 cd backend
-ORS_API_KEY=<your-openrouteservice-key> ./mvnw spring-boot:run   # free key: openrouteservice.org
+ORS_API_KEY=<your-openrouteservice-key> JWT_SECRET=<32+ char random string> ./mvnw spring-boot:run   # ORS key: openrouteservice.org
 
 # App
 cd app
 flutter run -d windows   # or -d chrome/edge; Android needs an emulator/device + `adb reverse` or 10.0.2.2 (handled automatically, see api_client.dart)
 ```
 
-H2 is **in-memory only** (`jdbc:h2:mem`, `application.yml`) — the vehicle/toll catalogs
-re-seed from the JSON files in `backend/src/main/resources/data/` on every restart,
-which is what makes it safe to keep editing those files. User-submitted "missing
-vehicle" reports do **not** go through H2 for this exact reason (see below) — they'd
-vanish on every restart.
+**Postgres is real and persistent, but starts itself** — `RotaCustoApplication.main()`
+boots an embedded Postgres server (`io.zonky.test:embedded-postgres`) on port 5433
+*before* Spring context startup, pointed at `~/.rotacusto/pgdata` (outside the repo, on
+purpose — never at risk of being committed). No Docker, no separate service to start;
+`./mvnw spring-boot:run` is still the only command needed, and data survives restarts
+(including unclean ones — Postgres does WAL crash recovery on the next start). The
+vehicle/toll seeders are idempotent (`if (repository.count() > 0) return;`) so they
+never duplicate data on restart. `JWT_SECRET` is optional in dev (a random one is
+generated per-process if unset) but every existing session becomes invalid whenever the
+secret changes, so set it for anything beyond a quick local test.
+
+**Tests never touch the embedded Postgres** — `@SpringBootTest` boots the Spring context
+directly, without going through `main()`, so it never starts Postgres. Instead,
+`backend/src/test/resources/application.yml` (a separate file, picked up automatically
+because the test classpath shadows `src/main/resources` for identically-named files)
+configures H2 in-memory, exactly like the whole project used before Postgres existed.
+This is also why **CI needs zero external services** — no Postgres container, nothing.
+
+Login is **entirely optional** — every endpoint that existed before accounts were added
+stays public; only `/api/trip-history/**` requires a JWT (`Authorization: Bearer …`,
+via `SecurityConfig`/`JwtAuthFilter`). "Missing vehicle" reports still go to a flat file
+(`vehicle-reports.log`), not the database — see below for why.
 
 ## Vehicle catalog — the part with the most nuance
 
@@ -180,13 +197,25 @@ a separate `tarifaMoto` field when present.
   "report a missing vehicle" flow moved from opening a GitHub issue to an in-app
   dialog — most users aren't familiar with GitHub. Don't reintroduce it without a
   concrete new need.
+- **`embedded-postgres` two gotchas hit during setup, both fixed and worth remembering**:
+  (1) Spring Boot 3.3.5 manages `commons-lang3` at a version older than what
+  `embedded-postgres`'s `commons-compress` needs, breaking binary extraction with
+  `NoSuchMethodError: SystemProperties.getUserName` — fixed by explicitly overriding
+  `commons-lang3` to 3.17.0 in `pom.xml`. (2) The builder's default behavior treats the
+  data directory as disposable and re-runs `initdb` on every start, which fails (or
+  would silently wipe data) on an already-initialized directory — fixed with
+  `.setCleanDataDirectory(false)`. (3) Separately, a JPA `@Lob` on a `String` field maps
+  to Postgres's legacy OID large-object type, which requires an explicit transaction and
+  breaks reads with "Objetos Grandes não podem ser usados no modo de efetivação
+  automática" — use `@Column(columnDefinition = "TEXT")` instead for any future
+  arbitrary-length text column (see `TripHistoryEntry.breakdownJson`).
 
 ## Known gaps (not started, or deliberately out of scope)
 
-Recálculo de rota ✅, navegação em segundo plano ❌ (precisa de foreground service
-Android), banco persistente (H2→Postgres) ❌, contas de usuário/histórico de viagens ❌
-(depende do item anterior), suporte iOS ❌ (precisa de Mac, fora do alcance deste
+Recálculo de rota ✅, navegação em segundo plano ✅ (Android, foreground service),
+roteiro com múltiplas paradas ✅, banco persistente (Postgres) ✅, contas de usuário +
+histórico de viagens ✅ — suporte iOS ❌ (precisa de Mac, fora do alcance deste
 ambiente), distribuição em loja (Play Store/Microsoft Store) ❌ (precisa de conta de
-desenvolvedor/assinatura, fora do alcance), roteiro com múltiplas paradas ❌, modo
-offline ❌. Preço de combustível/energia em tempo real é permanentemente fora de
-escopo — não existe fonte gratuita de preço por posto no Brasil.
+desenvolvedor/assinatura, fora do alcance), modo offline ❌. Preço de combustível/
+energia em tempo real é permanentemente fora de escopo — não existe fonte gratuita de
+preço por posto no Brasil.

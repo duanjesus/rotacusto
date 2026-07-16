@@ -3,14 +3,19 @@ import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 
 import 'presentation/screens/home_screen.dart';
 import 'theme/app_theme.dart';
+import 'theme/auth_controller.dart';
 import 'theme/theme_controller.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   // Necessário mesmo em plataformas sem suporte a foreground service
   // (Windows/web) — a chamada é um no-op segura nelas, e sem ela a
   // comunicação TaskHandler↔UI da navegação em segundo plano (Fase 6.3)
   // não funciona no Android.
   FlutterForegroundTask.initCommunicationPort();
+  // Login é opcional — se o usuário já tinha logado numa sessão anterior,
+  // isso recupera o token salvo antes do primeiro frame (Fase 6.4b).
+  await restoreAuthSession();
   runApp(const RotaCustoApp());
 }
 

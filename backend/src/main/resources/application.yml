@@ -1,18 +1,22 @@
 spring:
   application:
     name: rotacusto-backend
+  # Postgres real, embutido e gerenciado pelo próprio processo do back-end (ver
+  # RotaCustoApplication.main() — sobe ANTES do Spring, na porta 5433) — Docker não
+  # funciona nesta máquina, e isso evita depender de um Postgres instalado à parte.
+  # Dados ficam em ~/.rotacusto/pgdata, fora do repo, e sobrevivem a restarts.
   datasource:
-    url: jdbc:h2:mem:rotacusto;DB_CLOSE_DELAY=-1
-    driver-class-name: org.h2.Driver
-    username: sa
+    url: jdbc:postgresql://localhost:5433/postgres
+    driver-class-name: org.postgresql.Driver
+    username: postgres
     password:
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      # NUNCA create-drop aqui — apagaria histórico de viagens/contas a cada
+      # restart. create-drop só faz sentido com H2 em memória (testes, ver
+      # src/test/resources/application.yml), que já reseta sozinho.
+      ddl-auto: update
     open-in-view: false
-  h2:
-    console:
-      enabled: true
 
 server:
   port: 8080
@@ -56,8 +60,13 @@ rotacusto:
   # gratuita de preço por posto em tempo real no Brasil.
   fuel-stations:
     detection-radius-km: 0.3
-  # Relatos de "veículo não encontrado no catálogo" (link no app). Vai pra
-  # arquivo em vez do banco porque o H2 é só em memória (reseta a cada
-  # restart) — ver VehicleReportService.
+  # Relatos de "veículo não encontrado no catálogo" (link no app) — ver
+  # VehicleReportService. Continua indo pra arquivo (não pro banco, mesmo
+  # agora com Postgres persistente) por simplicidade: é um log de baixo
+  # volume só pra eu revisar depois, não precisa de modelo relacional.
   vehicle-reports:
     file: vehicle-reports.log
+  # Autenticação (Fase 6.4b) — segredo do JWT via env var, nunca versionado.
+  jwt:
+    secret: ${JWT_SECRET:}
+    expiration-hours: 24

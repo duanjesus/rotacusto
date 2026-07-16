@@ -3,9 +3,12 @@ import 'package:flutter/foundation.dart' show TargetPlatform, defaultTargetPlatf
 
 import '../domain/models/address_suggestion.dart';
 import '../domain/models/trip_cost_breakdown.dart';
+import '../domain/models/trip_history_detail.dart';
+import '../domain/models/trip_history_summary.dart';
 import '../domain/models/vehicle_model.dart';
 import '../domain/models/vehicle_model_summary.dart';
 import '../domain/models/vehicle_type.dart';
+import '../theme/auth_controller.dart';
 
 /// `localhost` do PONTO DE VISTA DE QUEM RODA O APP: em Windows/web
 /// (Chrome/Edge) e num celular Android FÍSICO com `adb reverse tcp:8080
@@ -35,7 +38,17 @@ class ApiClient {
           // Overpass, com fallback se lento) — pode legitimamente passar de
           // 20s em condições normais.
           receiveTimeout: const Duration(seconds: 45),
-        ));
+        )) {
+    // Anexa o token em toda requisição quando há sessão logada — a maioria
+    // dos endpoints ignora o header (são públicos), só /trip-history exige.
+    _dio.interceptors.add(InterceptorsWrapper(onRequest: (options, handler) {
+      final sessao = authSessionNotifier.value;
+      if (sessao != null) {
+        options.headers['Authorization'] = 'Bearer ${sessao.token}';
+      }
+      handler.next(options);
+    }));
+  }
 
   /// Passo 1 da escolha de veículo: marca+modelo distintos (sem ano ainda).
   /// [tipo] filtra por tipo de veículo (carro/moto/...) — sem isso, buscar
@@ -95,5 +108,47 @@ class ApiClient {
       'tipo': tipo.apiValue,
       'descricao': descricao,
     });
+  }
+
+  // --- Fase 6.4b: conta de usuário + histórico de viagens (login opcional). ---
+
+  Future<AuthSession> register(String email, String senha) async {
+    final response = await _dio.post('/auth/register', data: {'email': email, 'senha': senha});
+    return _sessionFromResponse(response.data as Map<String, dynamic>);
+  }
+
+  Future<AuthSession> login(String email, String senha) async {
+    final response = await _dio.post('/auth/login', data: {'email': email, 'senha': senha});
+    return _sessionFromResponse(response.data as Map<String, dynamic>);
+  }
+
+  AuthSession _sessionFromResponse(Map<String, dynamic> json) {
+    return AuthSession(token: json['token'] as String, email: json['email'] as String);
+  }
+
+  /// Salva a viagem já calculada no histórico — não automático, só quando o
+  /// usuário toca em "Salvar no histórico" com uma sessão ativa.
+  Future<void> saveTripToHistory({
+    required String origem,
+    required String destino,
+    required TripCostBreakdown breakdown,
+  }) async {
+    await _dio.post('/trip-history', data: {
+      'origem': origem,
+      'destino': destino,
+      'breakdown': breakdown.toJson(),
+    });
+  }
+
+  Future<List<TripHistorySummary>> fetchTripHistory() async {
+    final response = await _dio.get('/trip-history');
+    return (response.data as List<dynamic>)
+        .map((json) => TripHistorySummary.fromJson(json as Map<String, dynamic>))
+        .toList();
+  }
+
+  Future<TripHistoryDetail> fetchTripHistoryDetail(int id) async {
+    final response = await _dio.get('/trip-history/$id');
+    return TripHistoryDetail.fromJson(response.data as Map<String, dynamic>);
   }
 }

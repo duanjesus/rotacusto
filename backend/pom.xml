@@ -34,11 +34,63 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
 
+        <!-- JWT (Fase 6.4b) — geração/validação de token pra login/histórico de
+             viagens. Só isso usa autenticação; o resto da API continua público. -->
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-api</artifactId>
+            <version>0.13.0</version>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-impl</artifactId>
+            <version>0.13.0</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>io.jsonwebtoken</groupId>
+            <artifactId>jjwt-jackson</artifactId>
+            <version>0.13.0</version>
+            <scope>runtime</scope>
+        </dependency>
+
+        <!-- H2 só é usado no classpath de teste agora (src/test/resources/application.yml)
+             — a aplicação real usa Postgres (embutido via EmbeddedPostgres, ver
+             RotaCustoApplication.main() e o Postgres driver logo abaixo). -->
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
             <scope>runtime</scope>
+        </dependency>
+
+        <!-- Sobe um Postgres real embutido, gerenciado pelo próprio processo do
+             back-end (ver RotaCustoApplication.main()) — evita depender de Docker
+             (não funciona nesta máquina) ou de um Postgres instalado à parte. -->
+        <dependency>
+            <groupId>io.zonky.test</groupId>
+            <artifactId>embedded-postgres</artifactId>
+            <version>2.2.2</version>
+        </dependency>
+        <!-- Força uma versão mais nova que o commons-compress puxado pelo
+             embedded-postgres precisa (SystemProperties.getUserName) — o Spring
+             Boot 3.3.5 gerencia commons-lang3 numa versão mais antiga (3.14.0) que
+             não tem esse método, quebrando a extração do binário do Postgres com
+             NoSuchMethodError. -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.17.0</version>
         </dependency>
 
         <dependency>
