@@ -1,5 +1,7 @@
 package com.rotacusto.service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
 import com.rotacusto.client.OpenRouteServiceClient;
@@ -15,7 +17,10 @@ public class RoutingService {
         this.client = client;
     }
 
-    public RouteResult route(Coordinates origin, Coordinates destination) {
-        return client.getRoute(origin, destination);
+    /**
+     * @param waypoints origem, zero ou mais paradas intermediárias, destino — nesta ordem.
+     */
+    public RouteResult route(List<Coordinates> waypoints) {
+        return client.getRoute(waypoints);
     }
 }

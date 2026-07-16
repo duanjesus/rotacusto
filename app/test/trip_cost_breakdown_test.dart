@@ -19,6 +19,7 @@ TripCostBreakdown _breakdown({
   List<FuelStation> postosNaRota = const [],
   FuelStation? postoSugerido,
   List<RouteStep> passosRota = const [],
+  List<LatLng> paradasNaRota = const [],
 }) {
   return TripCostBreakdown(
     distanciaKm: distanciaKm,
@@ -33,6 +34,7 @@ TripCostBreakdown _breakdown({
     postosNaRota: postosNaRota,
     postoSugerido: postoSugerido,
     passosRota: passosRota,
+    paradasNaRota: paradasNaRota,
   );
 }
 
@@ -141,5 +143,37 @@ void main() {
     expect(combinado.passosRota[1].instrucao, 'Vire à esquerda');
     expect(combinado.passosRota[1].wayPointInicio, 3, reason: 'deslocado pelos 3 pontos da geometria da ida');
     expect(combinado.passosRota[1].wayPointFim, 4);
+  });
+
+  test('fromJson parses paradasNaRota', () {
+    final json = {
+      'distanciaKm': 600.0,
+      'duracaoMin': 420.0,
+      'custoCombustivel': 0.0,
+      'custoDesgaste': 0.0,
+      'custoPedagio': 0.0,
+      'custoLanche': 0.0,
+      'total': 0.0,
+      'geometriaRota': <Map<String, dynamic>>[],
+      'pedagiosNaRota': <Map<String, dynamic>>[],
+      'postosNaRota': <Map<String, dynamic>>[],
+      'postoSugerido': null,
+      'paradasNaRota': [
+        {'lat': -22.7469, 'lon': -41.8817},
+      ],
+    };
+
+    final breakdown = TripCostBreakdown.fromJson(json);
+
+    expect(breakdown.paradasNaRota, [const LatLng(-22.7469, -41.8817)]);
+  });
+
+  test('combine concatenates paradasNaRota from both legs without offsetting', () {
+    final ida = _breakdown(paradasNaRota: [const LatLng(1, 1)]);
+    final volta = _breakdown(paradasNaRota: [const LatLng(2, 2)]);
+
+    final combinado = TripCostBreakdown.combine(ida, volta);
+
+    expect(combinado.paradasNaRota, [const LatLng(1, 1), const LatLng(2, 2)]);
   });
 }

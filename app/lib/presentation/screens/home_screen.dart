@@ -33,6 +33,13 @@ const _precoPadraoPorCombustivel = {
   TipoCombustivel.eletrico: '0.90',
 };
 
+/// Uma parada intermediária no roteiro — mesmo par controller+seleção já
+/// usado pra origem/destino, só que numa lista crescível.
+class _ParadaField {
+  final TextEditingController controller = TextEditingController();
+  AddressSuggestion? selecionada;
+}
+
 class _HomeScreenState extends State<HomeScreen> {
   final ApiClient _apiClient = ApiClient();
   final _origemController = TextEditingController(text: 'Copacabana, Rio de Janeiro, RJ');
@@ -47,6 +54,7 @@ class _HomeScreenState extends State<HomeScreen> {
   VehicleModel? _selectedVehicle;
   AddressSuggestion? _origemSelecionada;
   AddressSuggestion? _destinoSelecionado;
+  final List<_ParadaField> _paradas = [];
   bool _idaEVolta = false;
   bool _loadingEstimate = false;
   TripCostBreakdown? _breakdown;
@@ -69,7 +77,23 @@ class _HomeScreenState extends State<HomeScreen> {
     _origemController.dispose();
     _destinoController.dispose();
     _precoController.dispose();
+    for (final parada in _paradas) {
+      parada.controller.dispose();
+    }
     super.dispose();
+  }
+
+  void _adicionarParada() {
+    setState(() {
+      _paradas.add(_ParadaField());
+      // Paradas e ida-e-volta não se combinam nesta rodada (mesma filosofia
+      // do recálculo de rota) — adicionar uma parada desliga o checkbox.
+      _idaEVolta = false;
+    });
+  }
+
+  void _removerParada(int index) {
+    setState(() => _paradas.removeAt(index).controller.dispose());
   }
 
   IconData _iconeTipo(VehicleType tipo) {
@@ -213,6 +237,12 @@ class _HomeScreenState extends State<HomeScreen> {
       final destino = _destinoSelecionado != null
           ? '${_destinoSelecionado!.lat},${_destinoSelecionado!.lon}'
           : _destinoController.text;
+      // Mesma resolução coordenada-ou-texto já usada pra origem/destino —
+      // vazio quando não há paradas (ida-e-volta e paradas não coexistem,
+      // ver _adicionarParada).
+      final paradas = _paradas
+          .map((p) => p.selecionada != null ? '${p.selecionada!.lat},${p.selecionada!.lon}' : p.controller.text)
+          .toList();
 
       Future<TripCostBreakdown> estimar(String de, String para) => _apiClient.estimateTrip(
             origem: de,
@@ -220,6 +250,7 @@ class _HomeScreenState extends State<HomeScreen> {
             vehicleModelId: _selectedVehicle!.id,
             precoPorLitro: isEletrico ? null : preco,
             precoPorKWh: isEletrico ? preco : null,
+            paradas: paradas,
           );
 
       TripCostBreakdown result;
@@ -344,6 +375,31 @@ class _HomeScreenState extends State<HomeScreen> {
                 onSelected: (s) => _origemSelecionada = s,
                 onUseCurrentLocation: _usarLocalizacaoAtual,
               ),
+              // Paradas ficam entre Origem e Destino (ordem real do
+              // roteiro) — uma parada nova entra logo acima do Destino,
+              // empurrando-o pra baixo, em vez de aparecer depois dele.
+              for (var i = 0; i < _paradas.length; i++)
+                Padding(
+                  padding: const EdgeInsets.only(top: 12),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: AddressField(
+                          controller: _paradas[i].controller,
+                          label: 'Parada ${i + 1}',
+                          fetchSuggestions: _apiClient.suggestAddress,
+                          onSelected: (s) => _paradas[i].selecionada = s,
+                        ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.close_rounded, size: 20),
+                        tooltip: 'Remover parada',
+                        onPressed: () => _removerParada(i),
+                      ),
+                    ],
+                  ),
+                ),
               const SizedBox(height: 12),
               AddressField(
                 controller: _destinoController,
@@ -351,20 +407,32 @@ class _HomeScreenState extends State<HomeScreen> {
                 fetchSuggestions: _apiClient.suggestAddress,
                 onSelected: (s) => _destinoSelecionado = s,
               ),
-              const SizedBox(height: 4),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: TextButton.icon(
+                  onPressed: _adicionarParada,
+                  icon: const Icon(Icons.add_location_alt_outlined, size: 18),
+                  label: const Text('Adicionar parada'),
+                ),
+              ),
               InkWell(
                 borderRadius: BorderRadius.circular(10),
-                onTap: () => setState(() => _idaEVolta = !_idaEVolta),
+                onTap: _paradas.isEmpty ? () => setState(() => _idaEVolta = !_idaEVolta) : null,
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 8),
                   child: Row(
                     children: [
                       Checkbox(
                         value: _idaEVolta,
-                        onChanged: (v) => setState(() => _idaEVolta = v ?? false),
+                        onChanged: _paradas.isEmpty ? (v) => setState(() => _idaEVolta = v ?? false) : null,
                       ),
                       const SizedBox(width: 4),
-                      const Text('Ida e volta'),
+                      Text(
+                        _paradas.isEmpty ? 'Ida e volta' : 'Ida e volta (indisponível com paradas)',
+                        style: _paradas.isEmpty
+                            ? null
+                            : TextStyle(color: Theme.of(context).disabledColor),
+                      ),
                     ],
                   ),
                 ),
@@ -615,29 +683,33 @@ class _HomeScreenState extends State<HomeScreen> {
           if (b.passosRota.isNotEmpty) ...[
             const SizedBox(height: 12),
             OutlinedButton.icon(
-              onPressed: () => Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (_) => NavigationScreen(
-                    breakdown: b,
-                    // Recálculo de rota em desvio só é oferecido pra trecho
-                    // único — o breakdown de ida-e-volta mistura a geometria
-                    // das duas pernas concatenadas, sem dar pra saber de
-                    // forma simples qual delas o usuário desviou.
-                    destino: _breakdownIdaEVolta
-                        ? null
-                        : (_destinoSelecionado != null
-                            ? '${_destinoSelecionado!.lat},${_destinoSelecionado!.lon}'
-                            : _destinoController.text),
-                    vehicleModelId: _breakdownIdaEVolta ? null : _selectedVehicle!.id,
-                    precoPorLitro: _breakdownIdaEVolta || _selectedVehicle!.isEletrico
-                        ? null
-                        : double.tryParse(_precoController.text.replaceAll(',', '.')),
-                    precoPorKWh: _breakdownIdaEVolta || !_selectedVehicle!.isEletrico
-                        ? null
-                        : double.tryParse(_precoController.text.replaceAll(',', '.')),
+              onPressed: () {
+                // Recálculo de rota em desvio só é oferecido pra trecho único
+                // sem paradas — o breakdown de ida-e-volta mistura a
+                // geometria das duas pernas concatenadas, e recalcular com
+                // paradas exigiria saber em qual trecho do roteiro o usuário
+                // está (fora de escopo por enquanto, mesma filosofia).
+                final recalculoDesabilitado = _breakdownIdaEVolta || b.paradasNaRota.isNotEmpty;
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => NavigationScreen(
+                      breakdown: b,
+                      destino: recalculoDesabilitado
+                          ? null
+                          : (_destinoSelecionado != null
+                              ? '${_destinoSelecionado!.lat},${_destinoSelecionado!.lon}'
+                              : _destinoController.text),
+                      vehicleModelId: recalculoDesabilitado ? null : _selectedVehicle!.id,
+                      precoPorLitro: recalculoDesabilitado || _selectedVehicle!.isEletrico
+                          ? null
+                          : double.tryParse(_precoController.text.replaceAll(',', '.')),
+                      precoPorKWh: recalculoDesabilitado || !_selectedVehicle!.isEletrico
+                          ? null
+                          : double.tryParse(_precoController.text.replaceAll(',', '.')),
+                    ),
                   ),
-                ),
-              ),
+                );
+              },
               icon: const Icon(Icons.navigation_rounded),
               label: const Text('Navegar'),
             ),

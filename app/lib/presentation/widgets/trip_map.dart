@@ -48,6 +48,17 @@ class TripMap extends StatelessWidget {
           if (breakdown != null)
             MarkerLayer(
               markers: [
+                ...breakdown!.paradasNaRota.map(
+                  (p) => Marker(
+                    point: p,
+                    width: 32,
+                    height: 32,
+                    child: const Tooltip(
+                      message: 'Parada do roteiro',
+                      child: Icon(Icons.flag_rounded, color: Colors.deepOrange, size: 26),
+                    ),
+                  ),
+                ),
                 ...breakdown!.pedagiosNaRota.map(
                   (p) => Marker(
                     point: LatLng(p.lat, p.lng),

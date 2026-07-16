@@ -2,8 +2,10 @@ package com.rotacusto.client;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestClient;
@@ -31,29 +33,31 @@ public class OpenRouteServiceClient {
         this.apiKey = apiKey;
     }
 
-    public RouteResult getRoute(Coordinates origin, Coordinates destination) {
+    /**
+     * @param waypoints origem, zero ou mais paradas intermediárias, destino — nesta
+     *                  ordem. Mínimo 2 elementos. O ORS passa pela lista inteira numa
+     *                  rota única contínua (não são N chamadas separadas).
+     */
+    public RouteResult getRoute(List<Coordinates> waypoints) {
         if (!StringUtils.hasText(apiKey)) {
             throw new IllegalStateException(
                     "ORS_API_KEY não configurada. Cadastre-se em openrouteservice.org e defina a variável de ambiente ORS_API_KEY.");
         }
 
-        String start = origin.lon() + "," + origin.lat();
-        String end = destination.lon() + "," + destination.lat();
+        List<List<Double>> coordinates = waypoints.stream()
+                .map(c -> List.of(c.lon(), c.lat()))
+                .toList();
 
-        JsonNode response = restClient.get()
-                .uri(uriBuilder -> uriBuilder.path("/v2/directions/driving-car")
-                        .queryParam("api_key", apiKey)
-                        .queryParam("start", start)
-                        .queryParam("end", end)
-                        // Explícito em vez de confiar no default do ORS — é o que
-                        // habilita segments[].steps[] (instruções turn-by-turn) na
-                        // resposta, usado pra Fase 6 (navegação). NÃO tem
-                        // "language=pt" aqui de propósito — testado direto contra a
-                        // API e o parâmetro é ignorado nesta implantação (instrução
-                        // continua em inglês); a tradução é feita abaixo via
-                        // ManeuverTranslator, a partir do "type" (numérico) + "name".
-                        .queryParam("instructions", "true")
-                        .build())
+        // POST em vez de GET: o endpoint GET /v2/directions/driving-car só aceita
+        // exatamente 2 pontos (start/end) — passar por paradas intermediárias exige
+        // o endpoint /geojson com o array "coordinates" no corpo. Autenticação por
+        // header aqui (o GET usa "api_key" como query param, mas o corpo POST usa
+        // "Authorization" — convenção da própria API do ORS, não deste projeto).
+        JsonNode response = restClient.post()
+                .uri("/v2/directions/driving-car/geojson")
+                .header("Authorization", apiKey)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(Map.of("coordinates", coordinates, "instructions", true))
                 .retrieve()
                 .body(JsonNode.class);
 

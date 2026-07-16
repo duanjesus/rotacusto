@@ -1,5 +1,6 @@
 package com.rotacusto.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
@@ -51,8 +52,15 @@ public class TripEstimationService {
 
     public TripCostBreakdownDTO estimate(TripEstimateRequestDTO request) {
         Coordinates origem = geocodingService.resolve(request.origem());
+        List<Coordinates> paradas = request.paradas() == null ? List.of()
+                : request.paradas().stream().map(geocodingService::resolve).toList();
         Coordinates destino = geocodingService.resolve(request.destino());
-        RouteResult route = routingService.route(origem, destino);
+
+        List<Coordinates> waypoints = new ArrayList<>();
+        waypoints.add(origem);
+        waypoints.addAll(paradas);
+        waypoints.add(destino);
+        RouteResult route = routingService.route(waypoints);
 
         VehicleProfile profile = resolveProfile(request);
 
@@ -89,6 +97,7 @@ public class TripEstimationService {
         List<RouteStepDTO> passos = route.passos().stream()
                 .map(s -> new RouteStepDTO(s.instrucao(), s.distanciaM(), s.duracaoS(), s.wayPointInicio(), s.wayPointFim()))
                 .toList();
+        List<CoordinateDTO> paradasNaRota = paradas.stream().map(c -> new CoordinateDTO(c.lat(), c.lon())).toList();
 
         return new TripCostBreakdownDTO(
                 breakdown.distanciaKm(),
@@ -102,7 +111,8 @@ public class TripEstimationService {
                 pedagios,
                 postosDTO,
                 postoSugerido.map(p -> new FuelStationResponseDTO(p.nome(), p.lat(), p.lon())).orElse(null),
-                passos);
+                passos,
+                paradasNaRota);
     }
 
     private VehicleProfile resolveProfile(TripEstimateRequestDTO request) {

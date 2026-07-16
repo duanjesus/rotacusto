@@ -17,6 +17,7 @@ class TripCostBreakdown {
   final List<FuelStation> postosNaRota;
   final FuelStation? postoSugerido;
   final List<RouteStep> passosRota;
+  final List<LatLng> paradasNaRota;
 
   TripCostBreakdown({
     required this.distanciaKm,
@@ -31,6 +32,7 @@ class TripCostBreakdown {
     required this.postosNaRota,
     required this.postoSugerido,
     required this.passosRota,
+    required this.paradasNaRota,
   });
 
   /// Combina ida + volta calculadas separadamente (não é só multiplicar por
@@ -57,6 +59,9 @@ class TripCostBreakdown {
         ...ida.passosRota,
         ...volta.passosRota.map((p) => p.offsetWayPoints(ida.geometriaRota.length)),
       ],
+      // Paradas não têm índice de way-point pra deslocar (diferente de
+      // passosRota) — só coordenadas, concatenação simples já basta.
+      paradasNaRota: [...ida.paradasNaRota, ...volta.paradasNaRota],
     );
   }
 
@@ -83,6 +88,9 @@ class TripCostBreakdown {
           : null,
       passosRota: (json['passosRota'] as List<dynamic>? ?? [])
           .map((p) => RouteStep.fromJson(p as Map<String, dynamic>))
+          .toList(),
+      paradasNaRota: (json['paradasNaRota'] as List<dynamic>? ?? [])
+          .map((p) => LatLng((p['lat'] as num).toDouble(), (p['lon'] as num).toDouble()))
           .toList(),
     );
   }

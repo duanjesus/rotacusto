@@ -66,7 +66,7 @@ class TripEstimationServiceTest {
 
         RouteResult route = new RouteResult(500.0, 360.0,
                 List.of(origem, new Coordinates(-21.5, -41.5), destino), List.of());
-        when(routingService.route(origem, destino)).thenReturn(route);
+        when(routingService.route(List.of(origem, destino))).thenReturn(route);
 
         VehicleModel mobi = new VehicleModel();
         mobi.setId(1L);
@@ -81,7 +81,7 @@ class TripEstimationServiceTest {
         when(vehicleModelService.findById(1L)).thenReturn(mobi);
 
         TripEstimateRequestDTO request = new TripEstimateRequestDTO(
-                "Copacabana, RJ", "Guarapari, ES", 1L, null, 6.0, null);
+                "Copacabana, RJ", "Guarapari, ES", 1L, null, 6.0, null, null);
 
         TripCostBreakdownDTO result = tripEstimationService.estimate(request);
 
@@ -99,12 +99,12 @@ class TripEstimationServiceTest {
         Coordinates origem = new Coordinates(-22.9, -43.1);
         Coordinates destino = new Coordinates(-20.6, -40.4);
         when(geocodingService.resolve(anyString())).thenReturn(origem, destino);
-        when(routingService.route(any(), any())).thenReturn(new RouteResult(100.0, 60.0, List.of(origem, destino), List.of()));
+        when(routingService.route(any())).thenReturn(new RouteResult(100.0, 60.0, List.of(origem, destino), List.of()));
 
         var manualProfile = new com.rotacusto.dto.request.VehicleProfileRequestDTO(
                 VehicleType.MOTO, TipoCombustivel.GASOLINA, 20.0, 2, 0.15);
         TripEstimateRequestDTO request = new TripEstimateRequestDTO(
-                "A", "B", null, manualProfile, 6.0, null);
+                "A", "B", null, manualProfile, 6.0, null, null);
 
         TripCostBreakdownDTO result = tripEstimationService.estimate(request);
 
@@ -122,7 +122,7 @@ class TripEstimationServiceTest {
         when(geocodingService.resolve("Guarapari, ES")).thenReturn(destino);
 
         RouteResult route = new RouteResult(500.0, 360.0, List.of(origem, destino), List.of());
-        when(routingService.route(origem, destino)).thenReturn(route);
+        when(routingService.route(List.of(origem, destino))).thenReturn(route);
 
         VehicleModel mobi = new VehicleModel();
         mobi.setId(1L);
@@ -142,7 +142,7 @@ class TripEstimationServiceTest {
         when(tollService.findCrossedPlazas(route.geometria())).thenReturn(List.of(praca));
 
         TripEstimateRequestDTO request = new TripEstimateRequestDTO(
-                "Copacabana, RJ", "Guarapari, ES", 1L, null, 6.0, null);
+                "Copacabana, RJ", "Guarapari, ES", 1L, null, 6.0, null, null);
 
         TripCostBreakdownDTO result = tripEstimationService.estimate(request);
 
@@ -160,7 +160,7 @@ class TripEstimationServiceTest {
         when(geocodingService.resolve("Guarapari, ES")).thenReturn(destino);
 
         RouteResult route = new RouteResult(500.0, 360.0, List.of(origem, destino), List.of());
-        when(routingService.route(origem, destino)).thenReturn(route);
+        when(routingService.route(List.of(origem, destino))).thenReturn(route);
 
         VehicleModel mobi = new VehicleModel();
         mobi.setId(1L);
@@ -177,7 +177,7 @@ class TripEstimationServiceTest {
                 .thenReturn(java.util.Optional.of(posto1));
 
         TripEstimateRequestDTO request = new TripEstimateRequestDTO(
-                "Copacabana, RJ", "Guarapari, ES", 1L, null, 6.0, null);
+                "Copacabana, RJ", "Guarapari, ES", 1L, null, 6.0, null, null);
 
         TripCostBreakdownDTO result = tripEstimationService.estimate(request);
 
@@ -193,7 +193,7 @@ class TripEstimationServiceTest {
         when(geocodingService.resolve("Guarapari, ES")).thenReturn(destino);
 
         RouteResult route = new RouteResult(300.0, 240.0, List.of(origem, destino), List.of());
-        when(routingService.route(origem, destino)).thenReturn(route);
+        when(routingService.route(List.of(origem, destino))).thenReturn(route);
 
         VehicleModel bolt = new VehicleModel();
         bolt.setId(2L);
@@ -205,7 +205,7 @@ class TripEstimationServiceTest {
         when(vehicleModelService.findById(2L)).thenReturn(bolt);
 
         TripEstimateRequestDTO request = new TripEstimateRequestDTO(
-                "Copacabana, RJ", "Guarapari, ES", 2L, null, null, 0.90);
+                "Copacabana, RJ", "Guarapari, ES", 2L, null, null, 0.90, null);
 
         TripCostBreakdownDTO result = tripEstimationService.estimate(request);
 
@@ -219,7 +219,7 @@ class TripEstimationServiceTest {
     @Test
     void throwsWhenElectricVehicleResolvedButPrecoPorKWhMissing() {
         when(geocodingService.resolve(anyString())).thenReturn(new Coordinates(-22.9, -43.1), new Coordinates(-20.6, -40.4));
-        when(routingService.route(any(), any()))
+        when(routingService.route(any()))
                 .thenReturn(new RouteResult(300.0, 240.0,
                         List.of(new Coordinates(-22.9, -43.1), new Coordinates(-20.6, -40.4)), List.of()));
 
@@ -232,7 +232,7 @@ class TripEstimationServiceTest {
         bolt.setCustoDesgastePorKm(0.40);
         when(vehicleModelService.findById(2L)).thenReturn(bolt);
 
-        TripEstimateRequestDTO request = new TripEstimateRequestDTO("A", "B", 2L, null, 6.0, null);
+        TripEstimateRequestDTO request = new TripEstimateRequestDTO("A", "B", 2L, null, 6.0, null, null);
 
         org.junit.jupiter.api.Assertions.assertThrows(IllegalArgumentException.class,
                 () -> tripEstimationService.estimate(request));
@@ -251,7 +251,7 @@ class TripEstimationServiceTest {
                 geocodingService, routingService, vehicleModelService, tollService, fuelStationService,
                 3.0, 25.0);
         RouteResult route = new RouteResult(700.0, 480.0, List.of(origem, destino), List.of());
-        when(routingService.route(origem, destino)).thenReturn(route);
+        when(routingService.route(List.of(origem, destino))).thenReturn(route);
 
         VehicleModel mobi = new VehicleModel();
         mobi.setId(1L);
@@ -262,11 +262,68 @@ class TripEstimationServiceTest {
         when(vehicleModelService.findById(1L)).thenReturn(mobi);
 
         TripEstimateRequestDTO request = new TripEstimateRequestDTO(
-                "Copacabana, RJ", "Guarapari, ES", 1L, null, 6.0, null);
+                "Copacabana, RJ", "Guarapari, ES", 1L, null, 6.0, null, null);
 
         TripCostBreakdownDTO result = tripEstimationService.estimate(request);
 
         // 480 min = 8h, intervalo 3h -> floor(8/3) = 2 paradas * R$ 25 = R$ 50
         assertEquals(50.0, result.custoLanche(), 0.001);
+    }
+
+    @Test
+    void resolvesStopsInOrderAndSendsFullWaypointListToRouting() {
+        Coordinates origem = new Coordinates(-22.9711, -43.1822); // Copacabana/RJ
+        Coordinates parada = new Coordinates(-22.7469, -41.8817); // Búzios/RJ
+        Coordinates destino = new Coordinates(-20.6633, -40.4967); // Guarapari/ES
+        when(geocodingService.resolve("Copacabana, RJ")).thenReturn(origem);
+        when(geocodingService.resolve("Búzios, RJ")).thenReturn(parada);
+        when(geocodingService.resolve("Guarapari, ES")).thenReturn(destino);
+
+        RouteResult route = new RouteResult(600.0, 420.0, List.of(origem, parada, destino), List.of());
+        when(routingService.route(List.of(origem, parada, destino))).thenReturn(route);
+
+        VehicleModel mobi = new VehicleModel();
+        mobi.setId(1L);
+        mobi.setTipo(VehicleType.CARRO);
+        mobi.setConsumoEstradaKmL(10.0);
+        mobi.setNumeroEixos(2);
+        mobi.setCustoDesgastePorKm(0.35);
+        when(vehicleModelService.findById(1L)).thenReturn(mobi);
+
+        TripEstimateRequestDTO request = new TripEstimateRequestDTO(
+                "Copacabana, RJ", "Guarapari, ES", 1L, null, 6.0, null, List.of("Búzios, RJ"));
+
+        TripCostBreakdownDTO result = tripEstimationService.estimate(request);
+
+        assertEquals(600.0, result.distanciaKm(), 0.001);
+        assertEquals(1, result.paradasNaRota().size());
+        assertEquals(parada.lat(), result.paradasNaRota().get(0).lat(), 0.0001);
+        assertEquals(parada.lon(), result.paradasNaRota().get(0).lon(), 0.0001);
+    }
+
+    @Test
+    void returnsEmptyParadasNaRotaWhenNoStopsRequested() {
+        Coordinates origem = new Coordinates(-22.9711, -43.1822);
+        Coordinates destino = new Coordinates(-20.6633, -40.4967);
+        when(geocodingService.resolve("Copacabana, RJ")).thenReturn(origem);
+        when(geocodingService.resolve("Guarapari, ES")).thenReturn(destino);
+
+        RouteResult route = new RouteResult(500.0, 360.0, List.of(origem, destino), List.of());
+        when(routingService.route(List.of(origem, destino))).thenReturn(route);
+
+        VehicleModel mobi = new VehicleModel();
+        mobi.setId(1L);
+        mobi.setTipo(VehicleType.CARRO);
+        mobi.setConsumoEstradaKmL(10.0);
+        mobi.setNumeroEixos(2);
+        mobi.setCustoDesgastePorKm(0.35);
+        when(vehicleModelService.findById(1L)).thenReturn(mobi);
+
+        TripEstimateRequestDTO request = new TripEstimateRequestDTO(
+                "Copacabana, RJ", "Guarapari, ES", 1L, null, 6.0, null, null);
+
+        TripCostBreakdownDTO result = tripEstimationService.estimate(request);
+
+        assertEquals(0, result.paradasNaRota().size());
     }
 }

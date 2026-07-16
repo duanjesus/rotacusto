@@ -74,6 +74,7 @@ class ApiClient {
     required int vehicleModelId,
     double? precoPorLitro,
     double? precoPorKWh,
+    List<String>? paradas,
   }) async {
     final response = await _dio.post('/trips/estimate', data: {
       'origem': origem,
@@ -81,6 +82,7 @@ class ApiClient {
       'vehicleModelId': vehicleModelId,
       'precoPorLitro': ?precoPorLitro,
       'precoPorKWh': ?precoPorKWh,
+      if (paradas != null && paradas.isNotEmpty) 'paradas': paradas,
     });
     return TripCostBreakdown.fromJson(response.data as Map<String, dynamic>);
   }
