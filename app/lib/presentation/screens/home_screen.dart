@@ -616,7 +616,27 @@ class _HomeScreenState extends State<HomeScreen> {
             const SizedBox(height: 12),
             OutlinedButton.icon(
               onPressed: () => Navigator.of(context).push(
-                MaterialPageRoute(builder: (_) => NavigationScreen(breakdown: b)),
+                MaterialPageRoute(
+                  builder: (_) => NavigationScreen(
+                    breakdown: b,
+                    // Recálculo de rota em desvio só é oferecido pra trecho
+                    // único — o breakdown de ida-e-volta mistura a geometria
+                    // das duas pernas concatenadas, sem dar pra saber de
+                    // forma simples qual delas o usuário desviou.
+                    destino: _breakdownIdaEVolta
+                        ? null
+                        : (_destinoSelecionado != null
+                            ? '${_destinoSelecionado!.lat},${_destinoSelecionado!.lon}'
+                            : _destinoController.text),
+                    vehicleModelId: _breakdownIdaEVolta ? null : _selectedVehicle!.id,
+                    precoPorLitro: _breakdownIdaEVolta || _selectedVehicle!.isEletrico
+                        ? null
+                        : double.tryParse(_precoController.text.replaceAll(',', '.')),
+                    precoPorKWh: _breakdownIdaEVolta || !_selectedVehicle!.isEletrico
+                        ? null
+                        : double.tryParse(_precoController.text.replaceAll(',', '.')),
+                  ),
+                ),
               ),
               icon: const Icon(Icons.navigation_rounded),
               label: const Text('Navegar'),

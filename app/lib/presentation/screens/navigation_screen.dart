@@ -6,7 +6,9 @@ import 'package:flutter_tts/flutter_tts.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 
+import '../../data/api_client.dart';
 import '../../domain/models/trip_cost_breakdown.dart';
+import '../../domain/navigation/deviation_detector.dart';
 import '../../domain/navigation/route_progress.dart';
 import '../widgets/trip_map.dart';
 
@@ -14,13 +16,33 @@ enum _NavStatus { carregando, semPermissao, semServico, ativo }
 
 /// Navegação turn-by-turn ao vivo pra uma viagem já calculada — mapa segue
 /// a posição GPS, banner mostra a instrução atual, voz fala a instrução
-/// quando ela muda. Sem recálculo de rota se o usuário sair do caminho, e
-/// só funciona com o app aberto e a tela ligada (fora de escopo por ora,
-/// documentado no plano da Fase 6).
+/// quando ela muda. Recalcula a rota se o usuário sair do caminho por 3
+/// leituras de GPS seguidas (só quando [destino]/[vehicleModelId] são
+/// passados — viagem de ida-e-volta não suporta recálculo, ver comentário
+/// no construtor). Só funciona com o app aberto e a tela ligada (operação
+/// em segundo plano é fora de escopo, item separado do punch list).
 class NavigationScreen extends StatefulWidget {
   final TripCostBreakdown breakdown;
 
-  const NavigationScreen({super.key, required this.breakdown});
+  /// Estes 4 parâmetros habilitam o recálculo de rota em desvio — vêm
+  /// preenchidos só quando a viagem foi calculada como trecho único
+  /// (não ida-e-volta). O `breakdown` combinado de ida+volta mistura a
+  /// geometria/passos das duas pernas concatenados, e não dá pra saber de
+  /// forma simples qual perna o usuário desviou — nesse caso os 4 ficam
+  /// null e a tela se comporta como antes (só mostra a rota original).
+  final String? destino;
+  final int? vehicleModelId;
+  final double? precoPorLitro;
+  final double? precoPorKWh;
+
+  const NavigationScreen({
+    super.key,
+    required this.breakdown,
+    this.destino,
+    this.vehicleModelId,
+    this.precoPorLitro,
+    this.precoPorKWh,
+  });
 
   @override
   State<NavigationScreen> createState() => _NavigationScreenState();
@@ -29,12 +51,18 @@ class NavigationScreen extends StatefulWidget {
 class _NavigationScreenState extends State<NavigationScreen> {
   final MapController _mapController = MapController();
   final FlutterTts _tts = FlutterTts();
+  final ApiClient _apiClient = ApiClient();
+  final DeviationDetector _detector = DeviationDetector();
 
+  late TripCostBreakdown _breakdown = widget.breakdown;
   _NavStatus _status = _NavStatus.carregando;
   StreamSubscription<Position>? _positionSub;
   LatLng? _posicaoAtual;
   RouteProgress? _progresso;
   int? _ultimoStepFalado;
+  bool _recalculando = false;
+
+  bool get _recalculoHabilitado => widget.destino != null && widget.vehicleModelId != null;
 
   @override
   void initState() {
@@ -78,13 +106,13 @@ class _NavigationScreenState extends State<NavigationScreen> {
     final atual = LatLng(posicao.latitude, posicao.longitude);
     final progresso = RouteProgressCalculator.calculate(
       posicaoAtual: atual,
-      geometriaRota: widget.breakdown.geometriaRota,
-      passosRota: widget.breakdown.passosRota,
+      geometriaRota: _breakdown.geometriaRota,
+      passosRota: _breakdown.passosRota,
     );
 
     if (progresso.currentStepIndex != null && progresso.currentStepIndex != _ultimoStepFalado) {
       _ultimoStepFalado = progresso.currentStepIndex;
-      _tts.speak(widget.breakdown.passosRota[progresso.currentStepIndex!].instrucao);
+      _tts.speak(_breakdown.passosRota[progresso.currentStepIndex!].instrucao);
     }
 
     setState(() {
@@ -94,6 +122,38 @@ class _NavigationScreenState extends State<NavigationScreen> {
 
     final zoomAtual = _mapController.camera.zoom;
     _mapController.move(atual, zoomAtual < 15 ? 17 : zoomAtual);
+
+    if (_recalculoHabilitado && !_recalculando && _detector.registrarLeitura(progresso.distanciaAteRotaM)) {
+      _recalcularRota(atual);
+    }
+  }
+
+  Future<void> _recalcularRota(LatLng origemAtual) async {
+    setState(() => _recalculando = true);
+    try {
+      final novoResultado = await _apiClient.estimateTrip(
+        origem: '${origemAtual.latitude},${origemAtual.longitude}',
+        destino: widget.destino!,
+        vehicleModelId: widget.vehicleModelId!,
+        precoPorLitro: widget.precoPorLitro,
+        precoPorKWh: widget.precoPorKWh,
+      );
+      if (!mounted) return;
+      setState(() {
+        _breakdown = novoResultado;
+        // Os índices de step são relativos à NOVA lista de passos —
+        // reaproveitar o índice antigo falaria a instrução errada.
+        _ultimoStepFalado = null;
+        _recalculando = false;
+      });
+      _tts.speak('Rota recalculada');
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _recalculando = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Não foi possível recalcular a rota. Tentando de novo se o desvio continuar.')),
+      );
+    }
   }
 
   @override
@@ -105,6 +165,12 @@ class _NavigationScreenState extends State<NavigationScreen> {
           icon: const Icon(Icons.close_rounded),
           onPressed: () => Navigator.of(context).pop(),
         ),
+        bottom: _recalculando
+            ? const PreferredSize(
+                preferredSize: Size.fromHeight(3),
+                child: LinearProgressIndicator(minHeight: 3),
+              )
+            : null,
       ),
       body: switch (_status) {
         _NavStatus.carregando => const Center(child: CircularProgressIndicator()),
@@ -141,11 +207,11 @@ class _NavigationScreenState extends State<NavigationScreen> {
 
   Widget _buildNavegacaoAtiva(BuildContext context) {
     final stepIndex = _progresso?.currentStepIndex;
-    final stepAtual = stepIndex != null ? widget.breakdown.passosRota[stepIndex] : null;
+    final stepAtual = stepIndex != null ? _breakdown.passosRota[stepIndex] : null;
 
     return Stack(
       children: [
-        TripMap(breakdown: widget.breakdown, mapController: _mapController, posicaoAtual: _posicaoAtual),
+        TripMap(breakdown: _breakdown, mapController: _mapController, posicaoAtual: _posicaoAtual),
         if (stepAtual != null)
           Positioned(
             top: 12,
