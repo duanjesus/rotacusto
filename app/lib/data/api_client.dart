@@ -181,6 +181,17 @@ class ApiClient {
         .toList();
   }
 
+  /// Confirmação/reputação (Fase 6.8) — "ainda está lá?"/"já foi resolvido". Deixa
+  /// a exceção (DioException) subir pro chamador tratar: quem chama distingue 409
+  /// (dispositivo já votou nesse alerta) do resto.
+  Future<RoadAlert> voteRoadAlert(int alertId, String deviceId, bool confirma) async {
+    final response = await _dio.post('/road-alerts/$alertId/vote', data: {
+      'deviceId': deviceId,
+      'confirma': confirma,
+    });
+    return RoadAlert.fromJson(response.data as Map<String, dynamic>);
+  }
+
   // --- Fase 6.7: relatos automáticos de trânsito lento, sem login. ---
 
   /// Chamado automaticamente pelo app (TrafficDetector), não por uma ação

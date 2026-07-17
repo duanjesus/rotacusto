@@ -1,13 +1,16 @@
 package com.rotacusto.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,7 +20,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import com.rotacusto.domain.Coordinates;
 import com.rotacusto.entity.RoadAlert;
 import com.rotacusto.entity.enums.RoadAlertType;
+import com.rotacusto.exception.DuplicateVoteException;
+import com.rotacusto.exception.ResourceNotFoundException;
 import com.rotacusto.repository.RoadAlertRepository;
+import com.rotacusto.repository.RoadAlertVoteRepository;
 
 @ExtendWith(MockitoExtension.class)
 class RoadAlertServiceTest {
@@ -25,8 +31,11 @@ class RoadAlertServiceTest {
     @Mock
     private RoadAlertRepository repository;
 
+    @Mock
+    private RoadAlertVoteRepository voteRepository;
+
     private RoadAlertService newService() {
-        return new RoadAlertService(repository, 2.0);
+        return new RoadAlertService(repository, voteRepository, 2.0, 2);
     }
 
     private RoadAlert alertAt(RoadAlertType tipo, double lat, double lng, Instant expiraEm) {
@@ -97,5 +106,73 @@ class RoadAlertServiceTest {
         List<RoadAlert> cruzados = service.findNearRoute(rota);
 
         assertTrue(cruzados.isEmpty());
+    }
+
+    @Test
+    void voteConfirmaExtendsExpirationByTypeDefaultDuration() {
+        RoadAlertService service = newService();
+        RoadAlert blitz = alertAt(RoadAlertType.BLITZ, -22.9, -43.1, Instant.now().plusSeconds(60));
+        when(repository.findById(1L)).thenReturn(Optional.of(blitz));
+        when(voteRepository.existsByRoadAlertIdAndDeviceId(1L, "device-a")).thenReturn(false);
+        when(repository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+
+        Instant antes = Instant.now();
+        RoadAlert atualizado = service.vote(1L, "device-a", true);
+
+        // Tolerância em vez de comparar horas truncadas: as duas chamadas a
+        // Instant.now() (dentro do serviço e aqui) não são simultâneas, então um
+        // ChronoUnit.HOURS.between exato flaca se cair bem na borda da hora.
+        assertTrue(atualizado.getExpiraEm().isAfter(antes.plus(Duration.ofMinutes(119))),
+                "confirmar re-aplica a duração padrão do tipo (BLITZ = 2h)");
+        assertTrue(atualizado.getExpiraEm().isBefore(antes.plus(Duration.ofMinutes(121))),
+                "não deveria estender além da duração padrão do tipo");
+    }
+
+    @Test
+    void voteNegaBelowThresholdDoesNotExpireImmediately() {
+        RoadAlertService service = newService();
+        Instant futuro = Instant.now().plusSeconds(3600);
+        RoadAlert buraco = alertAt(RoadAlertType.BURACO, -22.9, -43.1, futuro);
+        when(repository.findById(1L)).thenReturn(Optional.of(buraco));
+        when(voteRepository.existsByRoadAlertIdAndDeviceId(1L, "device-a")).thenReturn(false);
+        when(voteRepository.countByRoadAlertIdAndConfirmou(1L, false)).thenReturn(1L);
+        when(repository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+
+        RoadAlert atualizado = service.vote(1L, "device-a", false);
+
+        assertEquals(futuro, atualizado.getExpiraEm(), "1 voto negativo, abaixo do limiar de 2, não expira");
+    }
+
+    @Test
+    void voteNegaAtThresholdExpiresImmediately() {
+        RoadAlertService service = newService();
+        RoadAlert buraco = alertAt(RoadAlertType.BURACO, -22.9, -43.1, Instant.now().plusSeconds(3600));
+        when(repository.findById(1L)).thenReturn(Optional.of(buraco));
+        when(voteRepository.existsByRoadAlertIdAndDeviceId(1L, "device-b")).thenReturn(false);
+        when(voteRepository.countByRoadAlertIdAndConfirmou(1L, false)).thenReturn(2L);
+        when(repository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+
+        RoadAlert atualizado = service.vote(1L, "device-b", false);
+
+        assertTrue(!atualizado.getExpiraEm().isAfter(Instant.now()),
+                "atingindo o limiar de votos negativos, o alerta expira imediatamente");
+    }
+
+    @Test
+    void voteFromSameDeviceTwiceThrows() {
+        RoadAlertService service = newService();
+        RoadAlert buraco = alertAt(RoadAlertType.BURACO, -22.9, -43.1, Instant.now().plusSeconds(3600));
+        when(repository.findById(1L)).thenReturn(Optional.of(buraco));
+        when(voteRepository.existsByRoadAlertIdAndDeviceId(1L, "device-a")).thenReturn(true);
+
+        assertThrows(DuplicateVoteException.class, () -> service.vote(1L, "device-a", true));
+    }
+
+    @Test
+    void voteOnMissingAlertThrowsNotFound() {
+        RoadAlertService service = newService();
+        when(repository.findById(99L)).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class, () -> service.vote(99L, "device-a", true));
     }
 }

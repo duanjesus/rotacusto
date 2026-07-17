@@ -47,7 +47,8 @@ a real persistent Postgres database, optional user accounts with trip
 history, offline resilience (cached map tiles, resume a calculated trip
 with no connection), community-reported road hazard alerts (potholes,
 police checkpoints, fog, breakdowns, accidents, roadwork — no login needed
-to report, with proximity voice warnings during navigation), and automatic
+to report, with proximity voice warnings during navigation, plus
+confirm/deny voting that extends or expires an alert early), and automatic
 crowd-sourced traffic-jam detection (compares live GPS speed to the route's
 expected speed, auto-reports without any button tap, and colors the slow
 stretch of road on the map yellow/orange/red by severity for every nearby

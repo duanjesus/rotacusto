@@ -180,6 +180,35 @@ from Fase 6.4a.
   `NavigationScreen`), not something the background isolate does on its own — unlike
   polling/voice, it isn't duplicated into `NavigationTaskHandler`, since it always needs
   someone physically tapping a button on Windows or Android.
+- **Confirmation/reputation** ("ainda está lá?"/"já foi resolvido"): the proximity
+  SnackBar in `_mostrarAvisoDeAlerta` grew two icon buttons wired to
+  `RoadAlertService.vote()`. Confirming re-applies the type's default duration to
+  `expiraEm` (same map `report()` already uses); denying accumulates until
+  `rotacusto.road-alerts.negative-votes-to-expire` (2) distinct devices have denied,
+  then `expiraEm` is set to now — reusing the same visibility mechanism instead of a new
+  `ativo` flag. One vote per device per alert, enforced by a unique constraint on
+  `RoadAlertVote(road_alert_id, device_id)` — `device_id` is a UUID generated once and
+  persisted locally (`device_id.dart`, same `shared_preferences` pattern as
+  `auth_controller.dart`), never tied to an account.
+- **Gotcha, found only by running with a real Spring context**: `limparExpirados()`'s
+  bulk `@Modifying` DELETE query threw `TransactionRequiredException` every time it ran
+  — `@Scheduled` methods don't get a transaction for free, and Mockito-backed unit tests
+  never noticed because mocks don't care about transactions. Only surfaced once a
+  `@SpringBootTest` with a real database happened to run soon after app startup (a
+  `fixedRate` `@Scheduled` fires almost immediately on boot, unlike a cron tied to a
+  specific wall-clock hour). Both `RoadAlertService.limparExpirados()` and
+  `TrafficReportService.limparExpirados()` needed `@Transactional` added — the second
+  one had silently had this same bug since Fase 6.7 shipped, just never exercised by a
+  test run.
+- **Known verification gap**: the vote buttons were confirmed to render with the right
+  label/icons/tap bounds (via `uiautomator dump`, exact `content-desc` match), and the
+  backend endpoint was fully verified via curl (confirm extends, duplicate vote → 409,
+  2 denies expire immediately, missing id → 404) — but actually tapping a button on the
+  live SnackBar during an emulator session wasn't captured on video/screenshot: the
+  SnackBar auto-dismisses after 7s, and every attempt to script a tap via `adb shell
+  input tap` lost the race against that window (confirmed by the FAB — which reflows
+  into the same screen position once the SnackBar is gone — receiving the tap instead).
+  Not a code defect, just a testing-tooling limitation with this interaction specifically.
 
 ## Automatic traffic-jam detection (community-shared)
 

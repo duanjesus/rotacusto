@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.rotacusto.domain.Coordinates;
 import com.rotacusto.domain.geo.HaversineDistance;
@@ -79,8 +80,13 @@ public class TrafficReportService {
      * de propósito: o TTL aqui é de minutos, não de horas/dias, então uma
      * limpeza só às 4h deixaria linhas expiradas se acumulando o dia inteiro.
      * Não afeta correção (as buscas já filtram por expiraEm), só armazenamento.
+     * {@code @Transactional} é obrigatório — um {@code @Modifying} de JPQL exige
+     * transação, e {@code @Scheduled} não ganha uma automaticamente (achado real,
+     * só apareceu rodando com Spring de verdade num {@code @SpringBootTest} — ver
+     * o mesmo fix em {@code RoadAlertService.limparExpirados()}).
      */
     @Scheduled(fixedRate = 600000)
+    @Transactional
     public void limparExpirados() {
         int antesDoLimite = repository.findAll().size();
         repository.deleteByExpiraEmBefore(Instant.now());

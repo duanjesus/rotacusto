@@ -76,6 +76,10 @@ rotacusto:
   # já é útil o bastante, não precisa de precisão de metro.
   road-alerts:
     detection-radius-km: 2.0
+    # Confirmação/reputação (Fase 6.8) — quantos votos "já foi resolvido" de
+    # dispositivos distintos são necessários pra expirar um alerta na hora. Baixo o
+    # bastante pra importar, alto o bastante pra 1 troll sozinho não conseguir.
+    negative-votes-to-expire: 2
   # Relatos automáticos de trânsito lento (Fase 6.7) — raio apertado, tipo
   # postos de combustível: é sobre UMA via específica, não uma área ampla
   # como os alertas de trânsito. TTL bem mais curto que road-alerts porque um

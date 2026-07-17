@@ -3,6 +3,7 @@ package com.rotacusto.controller;
 import java.util.List;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.rotacusto.domain.Coordinates;
 import com.rotacusto.dto.request.NearbyRoadAlertsRequestDTO;
 import com.rotacusto.dto.request.RoadAlertRequestDTO;
+import com.rotacusto.dto.request.RoadAlertVoteRequestDTO;
 import com.rotacusto.dto.response.RoadAlertResponseDTO;
 import com.rotacusto.entity.RoadAlert;
 import com.rotacusto.service.RoadAlertService;
@@ -54,6 +56,17 @@ public class RoadAlertController {
                 ? service.findNearPoint(ponto, request.raioKm())
                 : service.findNearPoint(ponto);
         return alerts.stream().map(this::toDTO).toList();
+    }
+
+    /**
+     * Confirmação/reputação (Fase 6.8) — "ainda está lá?"/"já foi resolvido", sem
+     * login, um voto por dispositivo (identificado por um UUID anônimo gerado e salvo
+     * localmente pelo app, ver `device_id.dart`).
+     */
+    @PostMapping("/{id}/vote")
+    public RoadAlertResponseDTO vote(@PathVariable Long id, @Valid @RequestBody RoadAlertVoteRequestDTO request) {
+        RoadAlert atualizado = service.vote(id, request.deviceId(), request.confirma());
+        return toDTO(atualizado);
     }
 
     private RoadAlertResponseDTO toDTO(RoadAlert alert) {

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart' show TargetPlatform, defaultTargetPlatform, kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_foreground_task/flutter_foreground_task.dart';
@@ -11,6 +12,7 @@ import 'package:latlong2/latlong.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import '../../data/api_client.dart';
+import '../../data/device_id.dart';
 import '../../domain/models/road_alert.dart';
 import '../../domain/models/road_alert_type.dart';
 import '../../domain/models/traffic_report.dart';
@@ -282,10 +284,52 @@ class _NavigationScreenState extends State<NavigationScreen> {
 
   void _mostrarAvisoDeAlerta(RoadAlert alerta) {
     if (!mounted) return;
+    // Confirmação/reputação (Fase 6.8) — botões de "ainda está lá"/"já foi
+    // resolvido" direto no aviso de proximidade, sem precisar de outra tela.
+    // Duração maior que o SnackBar de instrução normal (7s em vez de 5s) pra
+    // dar tempo de tocar num dos dois. Layout (ícones em vez de texto pros
+    // botões, pra caber) precisa de ajuste ao testar ao vivo, mesmo processo
+    // já usado pro RoadAlertPicker na Fase 6.6.
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Row(children: [Icon(alerta.tipo.icon), const SizedBox(width: 12), Text(alerta.tipo.label)]),
-      duration: const Duration(seconds: 5),
+      content: Row(
+        children: [
+          Icon(alerta.tipo.icon),
+          const SizedBox(width: 12),
+          Expanded(child: Text(alerta.tipo.label)),
+          IconButton(
+            icon: const Icon(Icons.thumb_up_outlined, size: 20),
+            tooltip: 'Ainda está lá',
+            onPressed: () => _votarAlerta(alerta, confirma: true),
+          ),
+          IconButton(
+            icon: const Icon(Icons.thumb_down_outlined, size: 20),
+            tooltip: 'Já foi resolvido',
+            onPressed: () => _votarAlerta(alerta, confirma: false),
+          ),
+        ],
+      ),
+      duration: const Duration(seconds: 7),
     ));
+  }
+
+  Future<void> _votarAlerta(RoadAlert alerta, {required bool confirma}) async {
+    ScaffoldMessenger.of(context).hideCurrentSnackBar();
+    final deviceId = await getOrCreateDeviceId();
+    try {
+      await _apiClient.voteRoadAlert(alerta.id, deviceId, confirma);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text('Valeu por avisar!'), duration: Duration(seconds: 2)));
+    } on DioException catch (e) {
+      if (!mounted) return;
+      final jaVotou = e.response?.statusCode == 409;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(jaVotou ? 'Você já votou nesse alerta.' : 'Não foi possível registrar seu voto.'),
+        duration: const Duration(seconds: 2),
+      ));
+    } catch (_) {
+      // Engolido silenciosamente — mesmo padrão tolerante do resto desta tela.
+    }
   }
 
   // --- Ramo Windows/outras plataformas — mesma lógica do NavigationTaskHandler

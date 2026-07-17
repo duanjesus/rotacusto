@@ -31,4 +31,10 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
                 .body(new ErrorResponse(HttpStatus.SERVICE_UNAVAILABLE.value(), ex.getMessage()));
     }
+
+    @ExceptionHandler(DuplicateVoteException.class)
+    public ResponseEntity<ErrorResponse> handleDuplicateVote(DuplicateVoteException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(new ErrorResponse(HttpStatus.CONFLICT.value(), ex.getMessage()));
+    }
 }
