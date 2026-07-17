@@ -306,6 +306,40 @@ provisioning, TestFlight, or App Store Connect has been touched.
   on their behalf). Once that exists, code signing / provisioning profiles can be set up
   (including scripted via Fastlane in the same `macos-latest` CI job), and only then does
   running on a simulator/device, TestFlight, or App Store submission become possible.
+- **App icon** (`assets/icon/icon.png`, generated to every platform via
+  `dart run flutter_launcher_icons`, config in `pubspec.yaml`): a simple white map-pin on
+  the app's Material 3 seed color (`#0E8C7F`) — replaces the default Flutter logo, which
+  Android and web had also never had replaced until now (not iOS-specific, fixed
+  everywhere in the same pass since it's the same one source image).
+  `remove_alpha_ios: true` strips the alpha channel, which the App Store rejects icons
+  for having. To change the icon later: edit `assets/icon/icon.png`, re-run the same
+  command — don't hand-edit the generated per-platform files.
+
+### Checklist for once the Apple Developer Program membership exists
+
+Nothing below this line can be done without it — this is the literal next-actions list,
+not a "someday" wishlist:
+
+1. **Register the app** in developer.apple.com: create an App ID matching the bundle
+   identifier already set (`com.rotacusto.rotacustoApp` — `flutter create` derived it
+   from the Android `applicationId`, already consistent, no need to change it), then
+   create the corresponding app record in App Store Connect.
+2. **Code signing**: simplest path is opening `ios/Runner.xcworkspace` in Xcode on a
+   real Mac once one is available and letting Xcode's "Automatically manage signing"
+   handle certificates/provisioning profiles against the new account. For CI-driven
+   signing instead (no Mac needed even at this stage), use Fastlane `match` to generate
+   and store certificates, add them as encrypted GitHub secrets, and extend the `ios` CI
+   job to do a signed `flutter build ipa` instead of `--no-codesign`.
+3. **First real device/simulator run** — only possible after step 2. This is also the
+   first point where genuine iOS-specific bugs might surface (none have been found yet,
+   since nothing has run beyond compiling).
+4. **TestFlight**: upload a signed build (`fastlane pilot upload` or Xcode Organizer),
+   internal testing needs no review; external testing needs a quick beta app review.
+5. **App Store submission checklist**: screenshots for required device sizes, app
+   description/keywords, support URL, a **privacy policy URL** (mandatory — the app
+   requests location access, must be disclosed), the App Privacy "nutrition label"
+   questionnaire in App Store Connect (location data collected, not sold or used for
+   tracking/ads), and an age rating questionnaire. Review is typically 24–48h.
 
 ## Frontend conventions (`app/`)
 

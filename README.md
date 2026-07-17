@@ -52,7 +52,9 @@ confirm/deny voting that extends or expires an alert early), and automatic
 crowd-sourced traffic-jam detection (compares live GPS speed to the route's
 expected speed, auto-reports without any button tap, and colors the slow
 stretch of road on the map yellow/orange/red by severity for every nearby
-user). CI runs the backend and Flutter test suites on every push. See
-`CLAUDE.md`'s "Known gaps" section for what's left (iOS, app store
-distribution — both blocked on hardware/accounts this environment doesn't
-have).
+user). CI runs the backend and Flutter test suites on every push, plus an
+unsigned iOS build on a GitHub-hosted Mac to confirm the app compiles for
+that target. See `CLAUDE.md`'s "iOS support" and "Known gaps" sections for
+what's left (running on a real iOS device/simulator, app store
+distribution — both blocked on an Apple Developer Program membership this
+environment can't create on the user's behalf).

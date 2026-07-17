@@ -56,6 +56,21 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^6.0.0
+  flutter_launcher_icons: ^0.14.4
+
+# Ícone do app (Fase 7) — gerado a partir de assets/icon/icon.png (pin de mapa
+# branco sobre a cor semente do tema, #0E8C7F) via `dart run
+# flutter_launcher_icons`. Roda pra todas as plataformas de propósito: Android
+# e web estavam usando o logo padrão do Flutter até agora, não só o iOS.
+flutter_launcher_icons:
+  image_path: "assets/icon/icon.png"
+  android: true
+  ios: true
+  remove_alpha_ios: true
+  web:
+    generate: true
+    background_color: "#0E8C7F"
+    theme_color: "#0E8C7F"
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
