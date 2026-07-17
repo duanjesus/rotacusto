@@ -276,6 +276,37 @@ offline-resilient is a trip **already calculated**:
   and `deviation_detector.dart` are pure Dart with no network calls, and a failed reroute
   attempt already degrades to a `SnackBar` instead of crashing.
 
+## iOS support
+
+**Compiles, nothing beyond that** — this environment has no macOS access (Xcode is
+macOS-only, no workaround), so `ios/` was scaffolded (`flutter create --platforms=ios .`,
+safe to run from any OS) and CI got a new `ios` job (`.github/workflows/ci.yml`,
+`runs-on: macos-latest`, a free GitHub-hosted Mac) running `flutter build ios --release
+--no-codesign`. That job going green is the *only* verification possible right now — it
+confirms the Dart code and every plugin in use compile for the iOS target, nothing more.
+Nobody has run this on a simulator or real device, and nothing about signing,
+provisioning, TestFlight, or App Store Connect has been touched.
+
+- `ios/Runner/Info.plist` got `NSLocationWhenInUseUsageDescription` and
+  `NSLocationAlwaysAndWhenInUseUsageDescription` (mirrors the `ACCESS_FINE_LOCATION`/
+  `ACCESS_COARSE_LOCATION`/`ACCESS_BACKGROUND_LOCATION` already in
+  `android/app/src/main/AndroidManifest.xml`) — required for `geolocator` to not crash
+  requesting permission, plus a defensive entry for `permission_handler`'s native side
+  even though the "always" branch is only ever reached on Android
+  (`NavigationScreen._isAndroid`).
+- **No code changes were needed for navigation itself** — `_isAndroid` already routes
+  everything that isn't Android (Windows today, iOS now) through the same
+  foreground-only branch: direct `Geolocator.getPositionStream()` subscription, no
+  `flutter_foreground_task` service. iOS background navigation (the equivalent of the
+  Fase 6.3 Android foreground service) would need entirely different APIs
+  (`UIBackgroundModes`) and its own App Store review scrutiny — deliberately not
+  attempted this round.
+- **What only the user can unlock next**: an Apple Developer Program membership
+  (US$99/year, requires their own identity and payment — not something that can be done
+  on their behalf). Once that exists, code signing / provisioning profiles can be set up
+  (including scripted via Fastlane in the same `macos-latest` CI job), and only then does
+  running on a simulator/device, TestFlight, or App Store submission become possible.
+
 ## Frontend conventions (`app/`)
 
 - `lib/domain/models/` mirror backend DTOs; `lib/domain/navigation/`,
@@ -358,8 +389,10 @@ offline-resilient is a trip **already calculated**:
 Recálculo de rota ✅, navegação em segundo plano ✅ (Android, foreground service),
 roteiro com múltiplas paradas ✅, banco persistente (Postgres) ✅, contas de usuário +
 histórico de viagens ✅, modo offline ✅ (resistência durante uma viagem já calculada —
-calcular uma viagem nova sempre exige conexão, isso não muda) — restam só suporte iOS ❌
-(precisa de Mac, fora do alcance deste ambiente) e distribuição em loja (Play Store/
-Microsoft Store) ❌ (precisa de conta de desenvolvedor/assinatura, fora do alcance).
-Preço de combustível/energia em tempo real é permanentemente fora de escopo — não existe
-fonte gratuita de preço por posto no Brasil.
+calcular uma viagem nova sempre exige conexão, isso não muda) — suporte iOS 🟡 (compila
+via CI num Mac na nuvem, ver "iOS support" acima; falta o usuário assinar a Apple
+Developer Program pra destravar assinatura/device/TestFlight/loja) e distribuição em
+loja (Play Store/Microsoft Store) ❌ (precisa de conta de desenvolvedor/assinatura —
+Play Store é o caminho mais rápido, só US$25 e Android já funciona 100%; ainda não
+pedida). Preço de combustível/energia em tempo real é permanentemente fora de escopo —
+não existe fonte gratuita de preço por posto no Brasil.

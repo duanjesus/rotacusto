@@ -57,3 +57,30 @@ jobs:
 
       - name: Testes
         run: flutter test
+
+  ios:
+    name: iOS – Build (sem assinatura)
+    runs-on: macos-latest
+    defaults:
+      run:
+        working-directory: app
+
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Configurar Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.44.6'
+          channel: 'stable'
+          cache: true
+
+      - name: Instalar dependências
+        run: flutter pub get
+
+      # Fase 7 — sem conta Apple Developer, não dá pra assinar nem publicar; este
+      # build só prova que o código Dart e os plugins usados compilam de verdade
+      # pro alvo iOS, sem acesso a Mac físico algum neste ambiente.
+      - name: Build iOS (--no-codesign)
+        run: flutter build ios --release --no-codesign
