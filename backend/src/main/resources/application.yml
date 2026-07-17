@@ -76,3 +76,11 @@ rotacusto:
   # já é útil o bastante, não precisa de precisão de metro.
   road-alerts:
     detection-radius-km: 2.0
+  # Relatos automáticos de trânsito lento (Fase 6.7) — raio apertado, tipo
+  # postos de combustível: é sobre UMA via específica, não uma área ampla
+  # como os alertas de trânsito. TTL bem mais curto que road-alerts porque um
+  # engarrafamento é sempre uma condição transitória, sem "tipo" com duração
+  # física diferente.
+  traffic-reports:
+    detection-radius-km: 0.3
+    ttl-minutes: 15

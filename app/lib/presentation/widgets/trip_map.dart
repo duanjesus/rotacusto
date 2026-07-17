@@ -5,7 +5,9 @@ import 'package:latlong2/latlong.dart';
 
 import '../../data/tile_cache.dart';
 import '../../domain/models/road_alert.dart';
+import '../../domain/models/traffic_report.dart';
 import '../../domain/models/trip_cost_breakdown.dart';
+import '../../domain/navigation/traffic_overlay.dart';
 
 class TripMap extends StatefulWidget {
   final TripCostBreakdown? breakdown;
@@ -20,8 +22,20 @@ class TripMap extends StatefulWidget {
   /// [breakdown.alertasNaRota] no cálculo inicial. Mesclado por id (sem
   /// duplicar) na hora de desenhar os marcadores; null fora da navegação.
   final List<RoadAlert>? alertasAoVivo;
+  /// Relatos de trânsito lento (Fase 6.7) descobertos pelo polling ao vivo
+  /// durante a navegação, além dos que já vieram embutidos em
+  /// [breakdown.trafegoNaRota] no cálculo inicial — mesmo padrão de
+  /// [alertasAoVivo]. null fora da navegação.
+  final List<TrafficReport>? trafegoAoVivo;
 
-  const TripMap({super.key, this.breakdown, this.mapController, this.posicaoAtual, this.alertasAoVivo});
+  const TripMap({
+    super.key,
+    this.breakdown,
+    this.mapController,
+    this.posicaoAtual,
+    this.alertasAoVivo,
+    this.trafegoAoVivo,
+  });
 
   @override
   State<TripMap> createState() => _TripMapState();
@@ -45,6 +59,11 @@ class _TripMapState extends State<TripMap> {
       for (final a in widget.alertasAoVivo ?? const <RoadAlert>[]) a.id: a,
     };
     final alertas = alertasPorId.values.toList();
+    final trafegoPorId = <int, TrafficReport>{
+      for (final t in breakdown?.trafegoNaRota ?? const <TrafficReport>[]) t.id: t,
+      for (final t in widget.trafegoAoVivo ?? const <TrafficReport>[]) t.id: t,
+    };
+    final segmentosTrafego = buildTrafficSegments(route, trafegoPorId.values.toList());
     final center = posicaoAtual ?? (route.isNotEmpty ? route[route.length ~/ 2] : const LatLng(-22.9068, -43.1729));
     final isDark = Theme.of(context).brightness == Brightness.dark;
     // Tiles CartoDB (estilo mais limpo, com variante clara/escura) em vez do
@@ -81,6 +100,14 @@ class _TripMapState extends State<TripMap> {
           if (route.isNotEmpty)
             PolylineLayer(polylines: [
               Polyline(points: route, strokeWidth: 4, color: Theme.of(context).colorScheme.primary),
+            ]),
+          // Trechos de trânsito lento (Fase 6.7) por cima da rota base, mais
+          // grossos, coloridos conforme a severidade — aproximação visual em
+          // torno do ponto de cada relato (ver traffic_overlay.dart).
+          if (segmentosTrafego.isNotEmpty)
+            PolylineLayer(polylines: [
+              for (final s in segmentosTrafego)
+                Polyline(points: s.pontos, strokeWidth: 7, color: s.severidade.color),
             ]),
           if (breakdown != null)
             MarkerLayer(

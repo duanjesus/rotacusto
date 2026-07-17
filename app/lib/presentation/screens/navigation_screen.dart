@@ -13,11 +13,14 @@ import 'package:permission_handler/permission_handler.dart';
 import '../../data/api_client.dart';
 import '../../domain/models/road_alert.dart';
 import '../../domain/models/road_alert_type.dart';
+import '../../domain/models/traffic_report.dart';
+import '../../domain/models/traffic_severity.dart';
 import '../../domain/models/trip_cost_breakdown.dart';
 import '../../domain/navigation/deviation_detector.dart';
 import '../../domain/navigation/navigation_task_handler.dart';
 import '../../domain/navigation/road_alert_proximity.dart';
 import '../../domain/navigation/route_progress.dart';
+import '../../domain/navigation/traffic_detector.dart';
 import '../widgets/road_alert_picker.dart';
 import '../widgets/trip_map.dart';
 
@@ -76,6 +79,9 @@ class _NavigationScreenState extends State<NavigationScreen> {
   // que já roda dentro do NavigationTaskHandler; no Windows, de um polling
   // próprio desta tela (ver _pollNearbyAlertsWindows).
   List<RoadAlert> _alertasConhecidos = [];
+  // Relatos de trânsito lento conhecidos (Fase 6.7) — mesma origem dupla de
+  // _alertasConhecidos.
+  List<TrafficReport> _trafegoConhecido = [];
 
   bool get _recalculoHabilitado => widget.destino != null && widget.vehicleModelId != null;
 
@@ -84,8 +90,10 @@ class _NavigationScreenState extends State<NavigationScreen> {
   final FlutterTts _tts = FlutterTts();
   final DeviationDetector _detector = DeviationDetector();
   final RoadAlertProximityChecker _alertProximity = RoadAlertProximityChecker();
+  final TrafficDetector _trafficDetector = TrafficDetector();
   StreamSubscription<Position>? _positionSub;
   Timer? _roadAlertPollingTimer;
+  Timer? _trafficPollingTimer;
   int? _ultimoStepFalado;
 
   @override
@@ -103,6 +111,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
     } else {
       _positionSub?.cancel();
       _roadAlertPollingTimer?.cancel();
+      _trafficPollingTimer?.cancel();
       _tts.stop();
     }
     super.dispose();
@@ -136,6 +145,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
       // que a primeira posição chega (chamar aqui seria inútil — _posicaoAtual
       // ainda está null nesse ponto). O timer só cobre as atualizações seguintes.
       _roadAlertPollingTimer = Timer.periodic(kRoadAlertPollingInterval, (_) => _pollNearbyAlertsWindows());
+      _trafficPollingTimer = Timer.periodic(kTrafficPollingInterval, (_) => _pollNearbyTrafficWindows());
     }
 
     setState(() => _status = _NavStatus.ativo);
@@ -227,6 +237,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
       case 'posicao':
         final atual = LatLng((data['lat'] as num).toDouble(), (data['lon'] as num).toDouble());
         final alertasJson = data['alertasConhecidosJson'] as String?;
+        final trafegoJson = data['trafegoConhecidoJson'] as String?;
         setState(() {
           _posicaoAtual = atual;
           _progresso = RouteProgress(
@@ -237,6 +248,11 @@ class _NavigationScreenState extends State<NavigationScreen> {
           if (alertasJson != null) {
             _alertasConhecidos = (jsonDecode(alertasJson) as List<dynamic>)
                 .map((a) => RoadAlert.fromJson(a as Map<String, dynamic>))
+                .toList();
+          }
+          if (trafegoJson != null) {
+            _trafegoConhecido = (jsonDecode(trafegoJson) as List<dynamic>)
+                .map((t) => TrafficReport.fromJson(t as Map<String, dynamic>))
                 .toList();
           }
         });
@@ -291,6 +307,31 @@ class _NavigationScreenState extends State<NavigationScreen> {
     }
   }
 
+  Future<void> _pollNearbyTrafficWindows() async {
+    final posicao = _posicaoAtual;
+    if (posicao == null) return;
+    try {
+      final trafego = await _apiClient.fetchNearbyTraffic(
+        posicao.latitude,
+        posicao.longitude,
+        raioKm: kTrafficFetchRadiusKm,
+      );
+      if (mounted) setState(() => _trafegoConhecido = trafego);
+    } catch (_) {
+      // Mesma tolerância de _pollNearbyAlertsWindows.
+    }
+  }
+
+  /// Relato automático (Fase 6.7) — fire-and-forget, mesma tolerância a
+  /// falha dos outros pollings/relatos desta tela.
+  Future<void> _reportarTrafegoAutoWindows(TrafficSeverity severidade, LatLng posicao) async {
+    try {
+      await _apiClient.reportTraffic(severidade, posicao.latitude, posicao.longitude);
+    } catch (_) {
+      // Sem sinal ou back-end fora do ar — só não reporta desta vez.
+    }
+  }
+
   void _onPosicaoWindows(Position posicao) {
     final atual = LatLng(posicao.latitude, posicao.longitude);
     final primeiraPosicao = _posicaoAtual == null;
@@ -301,6 +342,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
     );
     if (primeiraPosicao) {
       _pollNearbyAlertsWindows();
+      _pollNearbyTrafficWindows();
     }
 
     if (progresso.currentStepIndex != null && progresso.currentStepIndex != _ultimoStepFalado) {
@@ -312,6 +354,22 @@ class _NavigationScreenState extends State<NavigationScreen> {
     if (alertaProximo != null) {
       _tts.speak(alertaProximo.tipo.vozTexto);
       _mostrarAvisoDeAlerta(alertaProximo);
+    }
+
+    // Detecção automática de trânsito lento (Fase 6.7) — mesma lógica do
+    // NavigationTaskHandler (Android), reimplementada aqui (duplicação
+    // deliberada, ver Fase 6.3).
+    if (progresso.currentStepIndex != null) {
+      final passoAtual = _breakdown.passosRota[progresso.currentStepIndex!];
+      final velocidadeEsperadaMps = passoAtual.duracaoS > 0 ? passoAtual.distanciaM / passoAtual.duracaoS : 0.0;
+      final severidade = _trafficDetector.registrarLeitura(
+        velocidadeAtualMps: posicao.speed,
+        velocidadeEsperadaMps: velocidadeEsperadaMps,
+        agora: DateTime.now(),
+      );
+      if (severidade != null) {
+        _reportarTrafegoAutoWindows(severidade, atual);
+      }
     }
 
     setState(() {
@@ -456,6 +514,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
           mapController: _mapController,
           posicaoAtual: _posicaoAtual,
           alertasAoVivo: _alertasConhecidos,
+          trafegoAoVivo: _trafegoConhecido,
         ),
         if (stepAtual != null)
           Positioned(

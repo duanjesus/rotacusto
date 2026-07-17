@@ -44,6 +44,9 @@ class TripEstimationServiceTest {
     @Mock
     private RoadAlertService roadAlertService;
 
+    @Mock
+    private TrafficReportService trafficReportService;
+
     private TripEstimationService tripEstimationService;
 
     /**
@@ -57,11 +60,14 @@ class TripEstimationServiceTest {
     void setUp() {
         tripEstimationService = new TripEstimationService(
                 geocodingService, routingService, vehicleModelService, tollService, fuelStationService,
-                roadAlertService, 1000.0, 25.0);
-        // Alertas de trânsito (Fase 6.6) são consultados em toda estimativa, mas
-        // não são o foco da maioria dos testes aqui — lenient() evita falha de
-        // "unnecessary stubbing" nos poucos que não chegam a usar o retorno.
+                roadAlertService, trafficReportService, 1000.0, 25.0);
+        // Alertas/relatos de trânsito (Fases 6.6/6.7) são consultados em toda
+        // estimativa, mas não são o foco da maioria dos testes aqui — lenient()
+        // evita falha de "unnecessary stubbing" nos poucos que não chegam a usar
+        // o retorno.
         org.mockito.Mockito.lenient().when(roadAlertService.findNearRoute(org.mockito.ArgumentMatchers.any()))
+                .thenReturn(List.of());
+        org.mockito.Mockito.lenient().when(trafficReportService.findNearRoute(org.mockito.ArgumentMatchers.any()))
                 .thenReturn(List.of());
     }
 
@@ -257,7 +263,7 @@ class TripEstimationServiceTest {
         // setUp() padrão (que desliga lanche pra não afetar os outros testes).
         tripEstimationService = new TripEstimationService(
                 geocodingService, routingService, vehicleModelService, tollService, fuelStationService,
-                roadAlertService, 3.0, 25.0);
+                roadAlertService, trafficReportService, 3.0, 25.0);
         RouteResult route = new RouteResult(700.0, 480.0, List.of(origem, destino), List.of());
         when(routingService.route(List.of(origem, destino))).thenReturn(route);
 

@@ -22,9 +22,11 @@ import com.rotacusto.dto.response.FuelStationResponseDTO;
 import com.rotacusto.dto.response.RoadAlertResponseDTO;
 import com.rotacusto.dto.response.RouteStepDTO;
 import com.rotacusto.dto.response.TollPlazaResponseDTO;
+import com.rotacusto.dto.response.TrafficReportResponseDTO;
 import com.rotacusto.dto.response.TripCostBreakdownDTO;
 import com.rotacusto.entity.RoadAlert;
 import com.rotacusto.entity.TollPlaza;
+import com.rotacusto.entity.TrafficReport;
 import com.rotacusto.entity.VehicleModel;
 import com.rotacusto.entity.enums.TipoCombustivel;
 
@@ -37,12 +39,13 @@ public class TripEstimationService {
     private final TollService tollService;
     private final FuelStationService fuelStationService;
     private final RoadAlertService roadAlertService;
+    private final TrafficReportService trafficReportService;
     private final double foodStopIntervalHours;
     private final double foodStopAverageCost;
 
     public TripEstimationService(GeocodingService geocodingService, RoutingService routingService,
             VehicleModelService vehicleModelService, TollService tollService, FuelStationService fuelStationService,
-            RoadAlertService roadAlertService,
+            RoadAlertService roadAlertService, TrafficReportService trafficReportService,
             @Value("${rotacusto.food-stop.interval-hours}") double foodStopIntervalHours,
             @Value("${rotacusto.food-stop.average-cost}") double foodStopAverageCost) {
         this.geocodingService = geocodingService;
@@ -51,6 +54,7 @@ public class TripEstimationService {
         this.tollService = tollService;
         this.fuelStationService = fuelStationService;
         this.roadAlertService = roadAlertService;
+        this.trafficReportService = trafficReportService;
         this.foodStopIntervalHours = foodStopIntervalHours;
         this.foodStopAverageCost = foodStopAverageCost;
     }
@@ -69,14 +73,14 @@ public class TripEstimationService {
 
         VehicleProfile profile = resolveProfile(request);
 
-        // Pedágios, postos e alertas de trânsito são três consultas independentes —
-        // rodar em paralelo corta o pior caso de latência (cada uma já tem
-        // timeout/fallback próprio, mas em série os piores casos somam). Postos de
-        // gasolina não fazem sentido pra elétrico (precisaria de pontos de recarga,
-        // um recurso diferente, fora de escopo por enquanto). Alertas de trânsito
-        // (Fase 6.6) são só uma consulta ao próprio banco (sem serviço externo),
-        // bem mais rápida que as outras duas, mas entra no mesmo padrão por
-        // consistência.
+        // Pedágios, postos, alertas de trânsito e relatos de trânsito lento são
+        // quatro consultas independentes — rodar em paralelo corta o pior caso de
+        // latência (cada uma já tem timeout/fallback próprio, mas em série os piores
+        // casos somam). Postos de gasolina não fazem sentido pra elétrico (precisaria
+        // de pontos de recarga, um recurso diferente, fora de escopo por enquanto).
+        // Alertas/relatos de trânsito (Fases 6.6/6.7) são só consultas ao próprio
+        // banco (sem serviço externo), bem mais rápidas que as outras duas, mas
+        // entram no mesmo padrão por consistência.
         boolean eletrico = profile.tipoCombustivel() == TipoCombustivel.ELETRICO;
         CompletableFuture<List<TollPlaza>> praçasFuture = CompletableFuture
                 .supplyAsync(() -> tollService.findCrossedPlazas(route.geometria()));
@@ -85,10 +89,13 @@ public class TripEstimationService {
                 : CompletableFuture.supplyAsync(() -> fuelStationService.findStationsNearRoute(route.geometria()));
         CompletableFuture<List<RoadAlert>> alertasFuture = CompletableFuture
                 .supplyAsync(() -> roadAlertService.findNearRoute(route.geometria()));
+        CompletableFuture<List<TrafficReport>> trafegoFuture = CompletableFuture
+                .supplyAsync(() -> trafficReportService.findNearRoute(route.geometria()));
 
         List<TollPlaza> praçasCruzadas = praçasFuture.join();
         List<OsmFuelStation> postos = postosFuture.join();
         List<RoadAlert> alertas = alertasFuture.join();
+        List<TrafficReport> trafego = trafegoFuture.join();
 
         TripCostBreakdown breakdown = TripCostCalculator.calculate(route.distanciaKm(), route.duracaoMin(), profile,
                 praçasCruzadas, foodStopIntervalHours, foodStopAverageCost);
@@ -113,6 +120,10 @@ public class TripEstimationService {
                 .map(a -> new RoadAlertResponseDTO(a.getId(), a.getTipo(), a.getLat(), a.getLng(), a.getCriadoEm(),
                         a.getExpiraEm()))
                 .toList();
+        List<TrafficReportResponseDTO> trafegoDTO = trafego.stream()
+                .map(t -> new TrafficReportResponseDTO(t.getId(), t.getSeveridade(), t.getLat(), t.getLng(),
+                        t.getCriadoEm(), t.getExpiraEm()))
+                .toList();
 
         return new TripCostBreakdownDTO(
                 breakdown.distanciaKm(),
@@ -128,7 +139,8 @@ public class TripEstimationService {
                 postoSugerido.map(p -> new FuelStationResponseDTO(p.nome(), p.lat(), p.lon())).orElse(null),
                 passos,
                 paradasNaRota,
-                alertasDTO);
+                alertasDTO,
+                trafegoDTO);
     }
 
     private VehicleProfile resolveProfile(TripEstimateRequestDTO request) {

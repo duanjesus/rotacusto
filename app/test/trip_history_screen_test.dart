@@ -25,6 +25,7 @@ TripCostBreakdown _breakdown() {
     passosRota: const [],
     paradasNaRota: const [],
     alertasNaRota: const [],
+    trafegoNaRota: const [],
   );
 }
 

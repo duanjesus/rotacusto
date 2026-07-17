@@ -181,6 +181,48 @@ from Fase 6.4a.
   polling/voice, it isn't duplicated into `NavigationTaskHandler`, since it always needs
   someone physically tapping a button on Windows or Android.
 
+## Automatic traffic-jam detection (community-shared)
+
+Waze-style, but the report is **automatic**, not a button tap: the app compares live GPS
+speed (`Position.speed`, from `geolocator`, unused until now) against the *expected*
+speed of the current route step (`passosRota[i].distanciaM / duracaoS` — ORS already
+computes this per step, so no new data source is needed and there's no coverage gap like
+OSM's `maxspeed` tag would have in Brazil). `TrafficDetector` (pure, mirrors
+`DeviationDetector`) classifies the ratio into LEVE/MEDIO/INTENSO after 3 consecutive slow
+readings (avoids firing on a single stoplight stop) and enforces a cooldown between
+auto-reports (avoids POSTing on every GPS tick during a sustained jam).
+
+- **Same point+radius model as `RoadAlert`**, not a real line/segment — `TrafficReport`
+  is just `(severidade, lat, lng, criadoEm, expiraEm)`. To "color the road" on the map
+  without inventing segment geometry or OSM way-id matching, `buildTrafficSegments`
+  (`app/lib/domain/navigation/traffic_overlay.dart`, pure, tested with synthetic
+  geometry) finds the nearest point on `geometriaRota` to each report and takes a ~150m
+  window around it as the colored `Polyline` — an approximation, not an exact road cut.
+- **TTL is short and fixed (15 min)**, not per-type like `RoadAlertType` — a traffic jam
+  doesn't have a "category" with different physical persistence the way a pothole vs.
+  roadwork does. Cleanup runs every 10 min (`@Scheduled(fixedRate = ...)`), much more
+  often than `RoadAlertService`'s daily cron, since a 15-minute TTL would otherwise leave
+  expired rows piling up for most of a day between cleanups.
+- **Gotcha confirmed live on the emulator**: the polling fetch (`_pollNearbyTraffic`/
+  `_pollNearbyTrafficWindows`) is fire-and-forget — called without `await` so it doesn't
+  block the synchronous position callback — and the `sendDataToMain`/`setState` that
+  carries the fetched list to the map fires **before** that fetch resolves. With a real
+  moving car this self-corrects within the next GPS tick or two and is invisible; but
+  when testing with a single static `adb emu geo fix`, the map can show nothing until a
+  *second* position update arrives (even a tiny nudge) to re-send the by-then-completed
+  list. Not a bug to fix — the design already accepts "a tick or two of staleness" the
+  same way `_pollNearbyAlerts` does — just a testing-methodology gotcha worth remembering
+  for the next live verification.
+- **Known verification gap, documented rather than overclaimed**: the automatic
+  detection-by-GPS-speed path itself (`TrafficDetector` fed by live `Position.speed`) is
+  covered by synthetic unit tests, but wasn't confirmed live on the emulator — the
+  classic `adb emu geo fix` console command has no velocity parameter, and it's unclear
+  whether the emulator's mock location provider synthesizes a non-zero `Position.speed`
+  from consecutive fixes at all. The *reporting and display* halves of the feature (what
+  happens once a severity is detected) reuse the exact same call path already proven live
+  by manually POSTing a report via curl, which is the strongest verification available
+  without deeper emulator GPS tooling.
+
 ## Offline mode
 
 Calculating a **new** trip always needs connectivity (geocoding/routing/tolls are

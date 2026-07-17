@@ -49,3 +49,6 @@ rotacusto:
     expiration-hours: 24
   road-alerts:
     detection-radius-km: 2.0
+  traffic-reports:
+    detection-radius-km: 0.3
+    ttl-minutes: 15

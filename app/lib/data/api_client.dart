@@ -4,6 +4,8 @@ import 'package:flutter/foundation.dart' show TargetPlatform, defaultTargetPlatf
 import '../domain/models/address_suggestion.dart';
 import '../domain/models/road_alert.dart';
 import '../domain/models/road_alert_type.dart';
+import '../domain/models/traffic_report.dart';
+import '../domain/models/traffic_severity.dart';
 import '../domain/models/trip_cost_breakdown.dart';
 import '../domain/models/trip_history_detail.dart';
 import '../domain/models/trip_history_summary.dart';
@@ -176,6 +178,33 @@ class ApiClient {
     });
     return (response.data as List<dynamic>)
         .map((json) => RoadAlert.fromJson(json as Map<String, dynamic>))
+        .toList();
+  }
+
+  // --- Fase 6.7: relatos automáticos de trânsito lento, sem login. ---
+
+  /// Chamado automaticamente pelo app (TrafficDetector), não por uma ação
+  /// manual do usuário como [reportRoadAlert].
+  Future<TrafficReport> reportTraffic(TrafficSeverity severidade, double lat, double lng) async {
+    final response = await _dio.post('/traffic-reports', data: {
+      'severidade': severidade.apiValue,
+      'lat': lat,
+      'lng': lng,
+    });
+    return TrafficReport.fromJson(response.data as Map<String, dynamic>);
+  }
+
+  /// Usado pelo polling ao vivo durante a navegação — pega relatos de
+  /// trânsito de outras pessoas depois que a viagem já tinha sido calculada.
+  /// [raioKm] nulo usa o raio padrão configurado no back-end.
+  Future<List<TrafficReport>> fetchNearbyTraffic(double lat, double lng, {double? raioKm}) async {
+    final response = await _dio.post('/traffic-reports/nearby', data: {
+      'lat': lat,
+      'lng': lng,
+      'raioKm': ?raioKm,
+    });
+    return (response.data as List<dynamic>)
+        .map((json) => TrafficReport.fromJson(json as Map<String, dynamic>))
         .toList();
   }
 }

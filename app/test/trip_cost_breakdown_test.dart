@@ -5,6 +5,7 @@ import 'package:rotacusto_app/domain/models/fuel_station.dart';
 import 'package:rotacusto_app/domain/models/road_alert.dart';
 import 'package:rotacusto_app/domain/models/route_step.dart';
 import 'package:rotacusto_app/domain/models/toll_plaza.dart';
+import 'package:rotacusto_app/domain/models/traffic_report.dart';
 import 'package:rotacusto_app/domain/models/trip_cost_breakdown.dart';
 
 TripCostBreakdown _breakdown({
@@ -22,6 +23,7 @@ TripCostBreakdown _breakdown({
   List<RouteStep> passosRota = const [],
   List<LatLng> paradasNaRota = const [],
   List<RoadAlert> alertasNaRota = const [],
+  List<TrafficReport> trafegoNaRota = const [],
 }) {
   return TripCostBreakdown(
     distanciaKm: distanciaKm,
@@ -38,6 +40,7 @@ TripCostBreakdown _breakdown({
     passosRota: passosRota,
     paradasNaRota: paradasNaRota,
     alertasNaRota: alertasNaRota,
+    trafegoNaRota: trafegoNaRota,
   );
 }
 
