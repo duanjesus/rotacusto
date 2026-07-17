@@ -72,7 +72,30 @@ public class TripEstimationService {
         RouteResult route = routingService.route(waypoints);
 
         VehicleProfile profile = resolveProfile(request);
+        return buildBreakdownDTO(route, profile, paradas);
+    }
 
+    /**
+     * Rotas alternativas (Fase 10) — só disponível pra origem→destino simples, sem
+     * paradas: o ORS não oferece {@code alternative_routes} com waypoints
+     * intermediários (ver {@link RoutingService#routes}). Cada alternativa recebe um
+     * breakdown COMPLETO (pedágio, posto, alertas, trânsito — tudo, não uma versão
+     * resumida), pra comparação de custo ser honesta com o valor real de cada opção.
+     */
+    public List<TripCostBreakdownDTO> estimateAlternatives(TripEstimateRequestDTO request) {
+        if (request.paradas() != null && !request.paradas().isEmpty()) {
+            throw new IllegalArgumentException("Rotas alternativas só estão disponíveis pra viagens sem paradas.");
+        }
+        Coordinates origem = geocodingService.resolve(request.origem());
+        Coordinates destino = geocodingService.resolve(request.destino());
+        VehicleProfile profile = resolveProfile(request);
+
+        List<RouteResult> rotas = routingService.routes(List.of(origem, destino));
+        return rotas.stream().map(rota -> buildBreakdownDTO(rota, profile, List.of())).toList();
+    }
+
+    private TripCostBreakdownDTO buildBreakdownDTO(RouteResult route, VehicleProfile profile,
+            List<Coordinates> paradas) {
         // Pedágios, postos, alertas de trânsito e relatos de trânsito lento são
         // quatro consultas independentes — rodar em paralelo corta o pior caso de
         // latência (cada uma já tem timeout/fallback próprio, mas em série os piores

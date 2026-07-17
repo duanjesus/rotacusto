@@ -340,4 +340,42 @@ class TripEstimationServiceTest {
 
         assertEquals(0, result.paradasNaRota().size());
     }
+
+    @Test
+    void estimateAlternativesThrowsWhenParadasArePresent() {
+        TripEstimateRequestDTO request = new TripEstimateRequestDTO(
+                "Copacabana, RJ", "Guarapari, ES", 1L, null, 6.0, null, List.of("Búzios, RJ"));
+
+        org.junit.jupiter.api.Assertions.assertThrows(IllegalArgumentException.class,
+                () -> tripEstimationService.estimateAlternatives(request));
+    }
+
+    @Test
+    void estimateAlternativesReturnsOneBreakdownPerRoute() {
+        Coordinates origem = new Coordinates(-22.9711, -43.1822);
+        Coordinates destino = new Coordinates(-20.6633, -40.4967);
+        when(geocodingService.resolve("Copacabana, RJ")).thenReturn(origem);
+        when(geocodingService.resolve("Guarapari, ES")).thenReturn(destino);
+
+        RouteResult rotaRapida = new RouteResult(500.0, 360.0, List.of(origem, destino), List.of());
+        RouteResult rotaCurta = new RouteResult(480.0, 400.0, List.of(origem, destino), List.of());
+        when(routingService.routes(List.of(origem, destino))).thenReturn(List.of(rotaRapida, rotaCurta));
+
+        VehicleModel mobi = new VehicleModel();
+        mobi.setId(1L);
+        mobi.setTipo(VehicleType.CARRO);
+        mobi.setConsumoEstradaKmL(10.0);
+        mobi.setNumeroEixos(2);
+        mobi.setCustoDesgastePorKm(0.35);
+        when(vehicleModelService.findById(1L)).thenReturn(mobi);
+
+        TripEstimateRequestDTO request = new TripEstimateRequestDTO(
+                "Copacabana, RJ", "Guarapari, ES", 1L, null, 6.0, null, null);
+
+        List<TripCostBreakdownDTO> resultados = tripEstimationService.estimateAlternatives(request);
+
+        assertEquals(2, resultados.size());
+        assertEquals(500.0, resultados.get(0).distanciaKm(), 0.001);
+        assertEquals(480.0, resultados.get(1).distanciaKm(), 0.001);
+    }
 }

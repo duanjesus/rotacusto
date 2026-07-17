@@ -341,6 +341,76 @@ not a "someday" wishlist:
    questionnaire in App Store Connect (location data collected, not sold or used for
    tracking/ads), and an age rating questionnaire. Review is typically 24–48h.
 
+## Default origin, recent/favorite destinations, route alternatives
+
+Three small features shipped together (Fases 8–10), all client-visible on the home
+screen, one gotcha discovered live against the real ORS API.
+
+- **Origem defaults to current location** (`home_screen.dart`): `initState()` calls
+  `_usarLocalizacaoAtual(auto: true)` alongside the existing default text ("Copacabana,
+  Rio de Janeiro, RJ"). The `auto` flag makes every failure path silent — no `SnackBar`,
+  and it refuses to overwrite the field if the user already started typing something
+  else before the GPS lookup resolved (`if (auto && _origemController.text !=
+  _origemPadrao) return;` right before the winning `setState`). A manual tap on "Usar
+  localização atual" (`auto: false`, unchanged) still always overwrites and always shows
+  errors — the auto path exists specifically to avoid a bad first impression (permission
+  prompt or error banner) on cold start.
+- **Recent/favorite destinations** — local-only (`shared_preferences`, no login, same
+  philosophy as `last_trip_cache.dart`/`device_id.dart`): `app/lib/data/recent_destinations.dart`
+  (cap 5, dedup by `displayName`, most-recent-first) and
+  `app/lib/data/favorite_destinations.dart` (cap 20, toggle). `AddressField` gained
+  optional `favoritos`/`recentes` params (default `const []`, so Origem/paradas are
+  unaffected) — shown in place of the live suggestions dropdown whenever the field is
+  empty; already re-evaluates on every keystroke because the existing `_onChanged`
+  already calls `setState`. Only destinations picked from the autocomplete are eligible
+  (`AddressSuggestion` always requires resolved `lat`/`lon`) — free-text destinations
+  never resolved client-side can't be recent/favorited, an accepted limitation, not a bug.
+  Destino gained a star `IconButton` toggling favorite state; a successful `_calcular()`
+  call also records the destination as recent.
+- **Route alternatives** (`POST /api/trips/estimate/alternatives`) — only offered for
+  simple origin→destination trips (no paradas, no round trip): the ORS
+  `alternative_routes` parameter only works with exactly 2 waypoints, not with
+  intermediate stops. `OpenRouteServiceClient.getRoutes()` requests up to 2 alternatives
+  beyond the primary route (`target_count: 2, weight_factor: 1.6, share_factor: 0.6`)
+  and returns one `RouteResult` per feature in the response — may legitimately return
+  just 1 if the ORS doesn't find a genuinely different path, not an error.
+  `TripEstimationService.estimateAlternatives()` builds a full breakdown (tolls, fuel,
+  alerts, traffic — everything, not an abbreviated version) per route. On the frontend,
+  `HomeScreen._calcular()` sorts the results by `total` ascending and, when there's more
+  than one, sets `_alternativas` instead of `_breakdown` and returns — `RouteAlternativesPicker`
+  then renders **inline**, inside a `SectionCard` right below the "Calcular" button (not a
+  bottom sheet — that hid the map and didn't let the user switch options without
+  recalculating). Tapping an option calls `_selecionarAlternativa`, which reuses the
+  origem/destino/preço captured at the moment the alternatives were fetched (not
+  whatever's currently in the form fields, which the user may have started editing) and
+  calls the shared `_finalizarViagem` — the same finishing step (set `_breakdown`, record
+  the destination as recent, `saveLastTrip`) used by every other calculation path. The
+  chosen option stays highlighted in the list (`RouteAlternativesPicker.selecionada`,
+  compared by `identical`) and the list itself stays visible below the button, so the user
+  can pick a different alternative afterward without recalculating — picking one feeds
+  into the exact same downstream flow (map, navigate, save-to-history) as the single-route
+  path.
+  **Gotcha found live against the real API, not documented anywhere beforehand**: ORS
+  rejects `alternative_routes` with HTTP 400 (`error.code: 2004`) once the approximate
+  route distance exceeds 100km ("Request parameters exceed the server configuration
+  limits... approximated route distance must not be greater than 100000.0 meters") — the
+  alternatives algorithm doesn't scale to long intercity trips, which is most of what a
+  cost calculator is for in a country the size of Brazil. `getRoutes()` combines two
+  independent sources instead of relying on `alternative_routes` alone: (1) ORS's own
+  `alternative_routes` when it doesn't 400 (short/medium trips, genuinely distinct
+  geometry), and (2) a second directions request with `options.avoid_features:
+  ["tollways"]` — an ordinary single-route request, not gated by the same distance limit,
+  so it works at any distance. The avoid-tollways result is only added if its distance
+  differs from what's already collected by more than 0.5km — a route that had no tolls to
+  begin with comes back identical, and isn't added as a fake alternative. This also
+  happens to be a more useful alternative for this app specifically than an arbitrary
+  ORS-computed detour, since it's directly the tradeoff the app already prices: verified
+  live for Copacabana→Guarapari (485km) — default route 72.60 BRL in tolls/R$393.80
+  total vs. a 528km toll-free route at R$370.20 total (cheaper overall despite ~43km more
+  driving, since the toll saved outweighs the extra fuel). If the avoid-tollways request
+  itself fails (network/ORS hiccup), it's swallowed silently — whatever `alternative_routes`
+  already produced (or the single fallback route on a >100km 400) still stands.
+
 ## Frontend conventions (`app/`)
 
 - `lib/domain/models/` mirror backend DTOs; `lib/domain/navigation/`,

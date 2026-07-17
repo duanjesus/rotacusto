@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 
 import '../../data/api_client.dart';
+import '../../data/favorite_destinations.dart';
 import '../../data/last_trip_cache.dart';
+import '../../data/recent_destinations.dart';
 import '../../domain/models/address_suggestion.dart';
 import '../../domain/models/tipo_combustivel.dart';
 import '../../domain/models/trip_cost_breakdown.dart';
@@ -12,6 +14,7 @@ import '../../domain/models/vehicle_model_summary.dart';
 import '../../domain/models/vehicle_type.dart';
 import '../widgets/address_field.dart';
 import '../widgets/cost_breakdown_bar.dart';
+import '../widgets/route_alternatives_picker.dart';
 import '../widgets/section_card.dart';
 import '../widgets/trip_map.dart';
 import '../widgets/vehicle_search_field.dart';
@@ -46,7 +49,7 @@ class _ParadaField {
 
 class _HomeScreenState extends State<HomeScreen> {
   final ApiClient _apiClient = ApiClient();
-  final _origemController = TextEditingController(text: 'Copacabana, Rio de Janeiro, RJ');
+  final _origemController = TextEditingController(text: _origemPadrao);
   final _destinoController = TextEditingController(text: 'Guarapari, ES');
   final _precoController = TextEditingController(text: _precoPadraoPorCombustivel[TipoCombustivel.gasolina]);
 
@@ -69,6 +72,18 @@ class _HomeScreenState extends State<HomeScreen> {
   String? _errorMessage;
   bool _salvandoNoHistorico = false;
   LastTrip? _ultimaViagem;
+  // Destinos recentes/favoritos (Fase 9) — só no aparelho, sem login.
+  List<AddressSuggestion> _favoritos = [];
+  List<AddressSuggestion> _recentes = [];
+  // Rotas alternativas (Fase 10) — lista fica visível logo abaixo do botão
+  // "Calcular" (inline, não bottom sheet) até o usuário trocar de destino ou
+  // recalcular; guarda o contexto da busca pra dar pra "confirmar" uma opção
+  // depois, sem precisar recalcular tudo de novo.
+  List<TripCostBreakdown>? _alternativas;
+  String? _alternativasOrigem;
+  String? _alternativasDestino;
+  double? _alternativasPreco;
+  bool _alternativasIsEletrico = false;
 
   // _availableVersions já vem ordenado por ano desc (do back-end) — o Set
   // preserva essa ordem de inserção, então os anos saem do mais recente
@@ -78,6 +93,8 @@ class _HomeScreenState extends State<HomeScreen> {
   List<VehicleModel> get _combustiveisDoAno =>
       _availableVersions.where((v) => v.ano == _selectedAno).toList();
 
+  static const _origemPadrao = 'Copacabana, Rio de Janeiro, RJ';
+
   @override
   void initState() {
     super.initState();
@@ -86,6 +103,18 @@ class _HomeScreenState extends State<HomeScreen> {
     // back-end — útil se reabrir numa área sem sinal.
     loadLastTrip().then((viagem) {
       if (mounted && viagem != null) setState(() => _ultimaViagem = viagem);
+    });
+    // Fase 8: origem já entra com a localização atual, sem precisar tocar
+    // no link manualmente. Roda em paralelo, sem bloquear a tela.
+    _usarLocalizacaoAtual(auto: true);
+    // Fase 9: recentes/favoritos carregados uma vez — recentes é recarregado
+    // de novo em _calcular() (muda a cada viagem calculada), favoritos só
+    // muda ao tocar na estrela (_alternarFavorito já recarrega sozinho).
+    loadFavoriteDestinations().then((lista) {
+      if (mounted) setState(() => _favoritos = lista);
+    });
+    loadRecentDestinations().then((lista) {
+      if (mounted) setState(() => _recentes = lista);
     });
   }
 
@@ -128,8 +157,16 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  Future<void> _usarLocalizacaoAtual() async {
+  /// [auto] distingue a chamada automática no [initState] (Fase 8) do toque
+  /// manual no link "Usar localização atual": automática nunca mostra
+  /// SnackBar (pedir permissão ou avisar erro assim que o app abre seria uma
+  /// primeira impressão ruim) e desiste em silêncio se o usuário já tiver
+  /// mudado o campo Origem antes da posição resolver — nunca sobrescreve o
+  /// que a pessoa começou a digitar. O toque manual é uma ação explícita e
+  /// continua sempre sobrescrevendo e sempre avisando em caso de erro.
+  Future<void> _usarLocalizacaoAtual({bool auto = false}) async {
     if (!await Geolocator.isLocationServiceEnabled()) {
+      if (auto) return;
       if (!mounted) return;
       ScaffoldMessenger.of(context)
           .showSnackBar(const SnackBar(content: Text('Localização desligada no dispositivo.')));
@@ -141,6 +178,7 @@ class _HomeScreenState extends State<HomeScreen> {
       permissao = await Geolocator.requestPermission();
     }
     if (permissao == LocationPermission.denied || permissao == LocationPermission.deniedForever) {
+      if (auto) return;
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Sem permissão de localização.')));
       return;
@@ -148,6 +186,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     try {
       final posicao = await Geolocator.getCurrentPosition();
+      if (auto && _origemController.text != _origemPadrao) return;
       setState(() {
         _origemController.text = 'Localização atual';
         _origemSelecionada = AddressSuggestion(
@@ -157,10 +196,18 @@ class _HomeScreenState extends State<HomeScreen> {
         );
       });
     } catch (_) {
+      if (auto) return;
       if (!mounted) return;
       ScaffoldMessenger.of(context)
           .showSnackBar(const SnackBar(content: Text('Não foi possível obter sua localização.')));
     }
+  }
+
+  Future<void> _alternarFavorito() async {
+    final destino = _destinoSelecionado;
+    if (destino == null) return;
+    final atualizados = await toggleFavoriteDestination(destino);
+    if (mounted) setState(() => _favoritos = atualizados);
   }
 
   void _onTipoSelected(VehicleType tipo) {
@@ -242,6 +289,7 @@ class _HomeScreenState extends State<HomeScreen> {
       _loadingEstimate = true;
       _errorMessage = null;
       _breakdown = null;
+      _alternativas = null;
     });
 
     try {
@@ -278,28 +326,37 @@ class _HomeScreenState extends State<HomeScreen> {
         // tempo de espera.
         final resultados = await Future.wait([estimar(origem, destino), estimar(destino, origem)]);
         result = TripCostBreakdown.combine(resultados[0], resultados[1]);
+      } else if (paradas.isEmpty) {
+        // Fase 10: o ORS só oferece rotas alternativas pra origem→destino
+        // simples (sem waypoints intermediários) — daí a condição.
+        final alternativas = await _apiClient.estimateTripAlternatives(
+          origem: origem,
+          destino: destino,
+          vehicleModelId: _selectedVehicle!.id,
+          precoPorLitro: isEletrico ? null : preco,
+          precoPorKWh: isEletrico ? preco : null,
+        );
+        alternativas.sort((a, b) => a.total.compareTo(b.total));
+        if (alternativas.length == 1) {
+          result = alternativas.first;
+        } else {
+          // Mostra a lista inline (logo abaixo do botão "Calcular") em vez
+          // de escolher uma automaticamente — o usuário decide, e pode
+          // trocar de opção depois sem recalcular (ver _selecionarAlternativa).
+          setState(() {
+            _loadingEstimate = false;
+            _alternativas = alternativas;
+            _alternativasOrigem = origem;
+            _alternativasDestino = destino;
+            _alternativasPreco = preco;
+            _alternativasIsEletrico = isEletrico;
+          });
+          return;
+        }
       } else {
         result = await estimar(origem, destino);
       }
-      setState(() {
-        _breakdown = result;
-        _breakdownIdaEVolta = _idaEVolta;
-        _loadingEstimate = false;
-        _ultimaViagem = null; // já era a viagem que acabou de ser salva de novo — evita o card piscar
-      });
-      // Guarda localmente pra dar pra retomar a navegação sem rede depois
-      // (Fase 6.5) — mesma regra de recálculo de sempre: desabilitado com
-      // ida-e-volta ou paradas.
-      final recalculoDesabilitado = _idaEVolta || paradas.isNotEmpty;
-      saveLastTrip(LastTrip(
-        breakdown: result,
-        origemLabel: _origemSelecionada?.displayName ?? _origemController.text,
-        destinoLabel: _destinoSelecionado?.displayName ?? _destinoController.text,
-        destino: recalculoDesabilitado ? null : destino,
-        vehicleModelId: recalculoDesabilitado ? null : _selectedVehicle!.id,
-        precoPorLitro: recalculoDesabilitado || isEletrico ? null : preco,
-        precoPorKWh: recalculoDesabilitado || !isEletrico ? null : preco,
-      ));
+      _finalizarViagem(result, origem: origem, destino: destino, paradas: paradas, preco: preco, isEletrico: isEletrico);
     } on DioException catch (e) {
       final data = e.response?.data;
       String message;
@@ -322,6 +379,65 @@ class _HomeScreenState extends State<HomeScreen> {
         _errorMessage = 'Erro inesperado: $e';
       });
     }
+  }
+
+  /// Passos finais compartilhados entre um cálculo direto (ida-e-volta, com
+  /// paradas, ou rota única sem alternativa) e a escolha de uma rota
+  /// alternativa (_selecionarAlternativa) — exibe o resumo, registra o
+  /// destino como recente e guarda a última viagem calculada.
+  void _finalizarViagem(
+    TripCostBreakdown result, {
+    required String origem,
+    required String destino,
+    required List<String> paradas,
+    required double? preco,
+    required bool isEletrico,
+  }) {
+    setState(() {
+      _breakdown = result;
+      _breakdownIdaEVolta = _idaEVolta;
+      _loadingEstimate = false;
+      _ultimaViagem = null; // já era a viagem que acabou de ser salva de novo — evita o card piscar
+    });
+    // Fase 9: só guarda quando o destino veio do autocomplete (tem
+    // lat/lon) — texto livre nunca resolvido no cliente não entra aqui.
+    if (_destinoSelecionado != null) {
+      addRecentDestination(_destinoSelecionado!).then((_) {
+        if (!mounted) return;
+        loadRecentDestinations().then((lista) {
+          if (mounted) setState(() => _recentes = lista);
+        });
+      });
+    }
+    // Guarda localmente pra dar pra retomar a navegação sem rede depois
+    // (Fase 6.5) — mesma regra de recálculo de sempre: desabilitado com
+    // ida-e-volta ou paradas.
+    final recalculoDesabilitado = _idaEVolta || paradas.isNotEmpty;
+    saveLastTrip(LastTrip(
+      breakdown: result,
+      origemLabel: _origemSelecionada?.displayName ?? _origemController.text,
+      destinoLabel: _destinoSelecionado?.displayName ?? _destinoController.text,
+      destino: recalculoDesabilitado ? null : destino,
+      vehicleModelId: recalculoDesabilitado ? null : _selectedVehicle!.id,
+      precoPorLitro: recalculoDesabilitado || isEletrico ? null : preco,
+      precoPorKWh: recalculoDesabilitado || !isEletrico ? null : preco,
+    ));
+  }
+
+  /// Toque numa opção da lista de rotas alternativas (Fase 10) — usa o
+  /// contexto (origem/destino/preço) guardado no momento em que as
+  /// alternativas foram buscadas, não o estado atual do formulário, pra não
+  /// misturar uma escolha antiga com um formulário editado depois.
+  void _selecionarAlternativa(TripCostBreakdown escolhida) {
+    if (_alternativasOrigem == null || _alternativasDestino == null) return;
+    _finalizarViagem(
+      escolhida,
+      origem: _alternativasOrigem!,
+      destino: _alternativasDestino!,
+      paradas: const [],
+      preco: _alternativasPreco,
+      isEletrico: _alternativasIsEletrico,
+    );
   }
 
   /// Não automático — só quando o usuário toca em "Salvar no histórico" com
@@ -551,11 +667,30 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
               const SizedBox(height: 12),
-              AddressField(
-                controller: _destinoController,
-                label: 'Destino',
-                fetchSuggestions: _apiClient.suggestAddress,
-                onSelected: (s) => _destinoSelecionado = s,
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: AddressField(
+                      controller: _destinoController,
+                      label: 'Destino',
+                      fetchSuggestions: _apiClient.suggestAddress,
+                      onSelected: (s) => setState(() => _destinoSelecionado = s),
+                      favoritos: _favoritos,
+                      recentes: _recentes,
+                    ),
+                  ),
+                  IconButton(
+                    icon: Icon(
+                      _destinoSelecionado != null && isFavoriteDestination(_favoritos, _destinoSelecionado!)
+                          ? Icons.star_rounded
+                          : Icons.star_outline_rounded,
+                    ),
+                    tooltip: 'Favoritar destino',
+                    color: Theme.of(context).colorScheme.primary,
+                    onPressed: _destinoSelecionado == null ? null : _alternarFavorito,
+                  ),
+                ],
               ),
               Align(
                 alignment: Alignment.centerLeft,
@@ -734,6 +869,16 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
               ],
+            ),
+          ),
+        if (_alternativas != null)
+          SectionCard(
+            icon: Icons.alt_route_rounded,
+            title: 'Escolha uma rota',
+            child: RouteAlternativesPicker(
+              alternativas: _alternativas!,
+              selecionada: _breakdown,
+              onSelected: _selecionarAlternativa,
             ),
           ),
         if (_breakdown != null) _buildBreakdown(_breakdown!),

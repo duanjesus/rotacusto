@@ -104,6 +104,28 @@ class ApiClient {
     return TripCostBreakdown.fromJson(response.data as Map<String, dynamic>);
   }
 
+  /// Rotas alternativas (Fase 10) — só funciona sem paradas (mesma restrição do
+  /// ORS, ver back-end). Pode devolver só 1 resultado se o ORS não achar uma
+  /// alternativa genuinamente diferente da rota principal.
+  Future<List<TripCostBreakdown>> estimateTripAlternatives({
+    required String origem,
+    required String destino,
+    required int vehicleModelId,
+    double? precoPorLitro,
+    double? precoPorKWh,
+  }) async {
+    final response = await _dio.post('/trips/estimate/alternatives', data: {
+      'origem': origem,
+      'destino': destino,
+      'vehicleModelId': vehicleModelId,
+      'precoPorLitro': ?precoPorLitro,
+      'precoPorKWh': ?precoPorKWh,
+    });
+    return (response.data as List<dynamic>)
+        .map((json) => TripCostBreakdown.fromJson(json as Map<String, dynamic>))
+        .toList();
+  }
+
   /// "Não achou seu veículo?" — grava o pedido no back-end pra eu revisar
   /// depois (substituiu um link pro GitHub Issues: poucos usuários do app
   /// têm familiaridade com GitHub).

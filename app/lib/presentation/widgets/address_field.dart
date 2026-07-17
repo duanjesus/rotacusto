@@ -14,6 +14,11 @@ class AddressField extends StatefulWidget {
   /// Só faz sentido pro campo de Origem — null esconde o link (Destino não
   /// tem esse botão).
   final VoidCallback? onUseCurrentLocation;
+  /// Atalhos mostrados no lugar do dropdown de sugestões ao vivo, só quando o
+  /// campo está vazio (Fase 9) — favoritos primeiro, depois recentes. Vazios
+  /// por padrão, então Origem/Paradas continuam exatamente como antes.
+  final List<AddressSuggestion> favoritos;
+  final List<AddressSuggestion> recentes;
 
   const AddressField({
     super.key,
@@ -22,6 +27,8 @@ class AddressField extends StatefulWidget {
     required this.fetchSuggestions,
     required this.onSelected,
     this.onUseCurrentLocation,
+    this.favoritos = const [],
+    this.recentes = const [],
   });
 
   @override
@@ -81,6 +88,14 @@ class _AddressFieldState extends State<AddressField> {
 
   @override
   Widget build(BuildContext context) {
+    final campoVazio = widget.controller.text.trim().isEmpty;
+    // Um destino favoritado também aparece nos recentes se foi usado
+    // recentemente — evita listar a mesma linha duas vezes.
+    final recentesSemFavoritos = widget.recentes
+        .where((r) => !widget.favoritos.any((f) => f.displayName == r.displayName))
+        .toList();
+    final mostrarAtalhos = campoVazio && (widget.favoritos.isNotEmpty || recentesSemFavoritos.isNotEmpty);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -114,6 +129,39 @@ class _AddressFieldState extends State<AddressField> {
                       'Usar localização atual',
                       style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.primary),
                     ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        if (mostrarAtalhos)
+          Padding(
+            padding: const EdgeInsets.only(top: 6),
+            child: Material(
+              elevation: 3,
+              borderRadius: BorderRadius.circular(14),
+              clipBehavior: Clip.antiAlias,
+              color: Theme.of(context).colorScheme.surfaceContainerHigh,
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxHeight: 220),
+                child: ListView(
+                  padding: EdgeInsets.zero,
+                  shrinkWrap: true,
+                  children: [
+                    for (final favorito in widget.favoritos)
+                      ListTile(
+                        dense: true,
+                        leading: const Icon(Icons.star_rounded, size: 18),
+                        title: Text(favorito.displayName, style: const TextStyle(fontSize: 13)),
+                        onTap: () => _select(favorito),
+                      ),
+                    for (final recente in recentesSemFavoritos)
+                      ListTile(
+                        dense: true,
+                        leading: const Icon(Icons.history_rounded, size: 18),
+                        title: Text(recente.displayName, style: const TextStyle(fontSize: 13)),
+                        onTap: () => _select(recente),
+                      ),
                   ],
                 ),
               ),

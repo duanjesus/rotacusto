@@ -52,7 +52,10 @@ confirm/deny voting that extends or expires an alert early), and automatic
 crowd-sourced traffic-jam detection (compares live GPS speed to the route's
 expected speed, auto-reports without any button tap, and colors the slow
 stretch of road on the map yellow/orange/red by severity for every nearby
-user). CI runs the backend and Flutter test suites on every push, plus an
+user), the trip origin defaulting to the device's current location on open,
+local recent/favorite destinations, and route alternatives (up to 3 options
+compared by time/distance/price when going straight from origin to
+destination). CI runs the backend and Flutter test suites on every push, plus an
 unsigned iOS build on a GitHub-hosted Mac to confirm the app compiles for
 that target. See `CLAUDE.md`'s "iOS support" and "Known gaps" sections for
 what's left (running on a real iOS device/simulator, app store

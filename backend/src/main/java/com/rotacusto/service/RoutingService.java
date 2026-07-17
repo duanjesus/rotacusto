@@ -23,4 +23,12 @@ public class RoutingService {
     public RouteResult route(List<Coordinates> waypoints) {
         return client.getRoute(waypoints);
     }
+
+    /**
+     * Rotas alternativas (Fase 10) — só origem+destino, ver
+     * {@link com.rotacusto.client.OpenRouteServiceClient#getRoutes}.
+     */
+    public List<RouteResult> routes(List<Coordinates> waypoints) {
+        return client.getRoutes(waypoints);
+    }
 }

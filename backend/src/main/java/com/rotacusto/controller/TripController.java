@@ -1,5 +1,7 @@
 package com.rotacusto.controller;
 
+import java.util.List;
+
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,5 +26,11 @@ public class TripController {
     @PostMapping("/estimate")
     public TripCostBreakdownDTO estimate(@Valid @RequestBody TripEstimateRequestDTO request) {
         return service.estimate(request);
+    }
+
+    /** Rotas alternativas (Fase 10) — só origem→destino simples, sem paradas. */
+    @PostMapping("/estimate/alternatives")
+    public List<TripCostBreakdownDTO> estimateAlternatives(@Valid @RequestBody TripEstimateRequestDTO request) {
+        return service.estimateAlternatives(request);
     }
 }
