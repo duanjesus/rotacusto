@@ -144,6 +144,43 @@ a separate `tarifaMoto` field when present.
   unless `WidgetsFlutterBinding.ensureInitialized()` runs first in the isolate's
   `@pragma('vm:entry-point')` entry function.
 
+## Road alerts (community-reported hazards)
+
+Anyone can report a hazard (pothole, police checkpoint, fog, broken-down car, accident,
+roadwork) — **no login required**, same "accounts unlock extras, never gate core
+features" philosophy as the rest of the app. `RoadAlertService` (backend) has no external
+data source — it's purely `POST /api/road-alerts` (report) and `POST
+/api/road-alerts/nearby` (query by point + radius), backed by the persistent Postgres
+from Fase 6.4a.
+
+- **Expiration is time-based, not confirmation-based** — no "is this still here?" voting
+  system (v1 scope decision). Each `RoadAlertType` has a default validity duration (a
+  documented guess, not sourced data, same honesty convention as `custoDesgastePorKm`):
+  transient events (BLITZ/CARRO_QUEBRADO/ACIDENTE) expire in 2–3h, NEBLINA in 4h,
+  OBRA_NA_VIA in 14 days, BURACO in 30 days. A daily `@Scheduled` job deletes expired rows
+  (`RotaCustoApplication` needs `@EnableScheduling` for this to actually run).
+- **Two delivery paths**: alerts near the route at calculation time ride along in
+  `TripCostBreakdownDTO.alertasNaRota` (same pattern as tolls/fuel stations — a third
+  parallel `CompletableFuture` in `TripEstimationService`). Alerts reported *after* the
+  trip was calculated arrive via a separate live poll
+  (`app/lib/domain/navigation/navigation_task_handler.dart` /
+  `navigation_screen.dart`'s Windows path, `Timer.periodic` every 3 min, 5km radius) — the
+  two lists get merged by id in `TripMap`.
+- **Gotcha (found live-testing, not by compile/test)**: the first poll must NOT fire in
+  `onStart()`/`_iniciar()` directly — at that point no GPS reading has arrived yet, so
+  "current position" is still null and the fetch silently no-ops. It has to fire from
+  inside the position-stream callback, gated on "is this the first reading" (see
+  `_onPosicao`/`_onPosicaoWindows`), otherwise the app doesn't know about nearby alerts
+  until the first periodic tick, several minutes late.
+- Voice announcement (`RoadAlertProximityChecker`, pure, mirrors `DeviationDetector`)
+  fires once per alert per navigation session (tracks announced ids) when within 500m —
+  reuses the same TTS instance as turn-by-turn instructions, so it never talks over
+  itself.
+- Reporting is a **UI-triggered action** (`RoadAlertPicker` bottom sheet + a FAB on
+  `NavigationScreen`), not something the background isolate does on its own — unlike
+  polling/voice, it isn't duplicated into `NavigationTaskHandler`, since it always needs
+  someone physically tapping a button on Windows or Android.
+
 ## Offline mode
 
 Calculating a **new** trip always needs connectivity (geocoding/routing/tolls are

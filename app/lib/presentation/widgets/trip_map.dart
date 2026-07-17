@@ -4,6 +4,7 @@ import 'package:flutter_map_cache/flutter_map_cache.dart';
 import 'package:latlong2/latlong.dart';
 
 import '../../data/tile_cache.dart';
+import '../../domain/models/road_alert.dart';
 import '../../domain/models/trip_cost_breakdown.dart';
 
 class TripMap extends StatefulWidget {
@@ -14,8 +15,13 @@ class TripMap extends StatefulWidget {
   /// Posição ao vivo do usuário (Fase 6, navegação) — null fora da tela de
   /// navegação, sem nenhum efeito no uso normal (resultado da viagem).
   final LatLng? posicaoAtual;
+  /// Alertas de trânsito descobertos pelo polling ao vivo durante a
+  /// navegação (Fase 6.6) — além dos que já vieram embutidos em
+  /// [breakdown.alertasNaRota] no cálculo inicial. Mesclado por id (sem
+  /// duplicar) na hora de desenhar os marcadores; null fora da navegação.
+  final List<RoadAlert>? alertasAoVivo;
 
-  const TripMap({super.key, this.breakdown, this.mapController, this.posicaoAtual});
+  const TripMap({super.key, this.breakdown, this.mapController, this.posicaoAtual, this.alertasAoVivo});
 
   @override
   State<TripMap> createState() => _TripMapState();
@@ -32,6 +38,13 @@ class _TripMapState extends State<TripMap> {
     final mapController = widget.mapController;
     final posicaoAtual = widget.posicaoAtual;
     final route = breakdown?.geometriaRota ?? const <LatLng>[];
+    // Mescla por id — alertasAoVivo (polling durante a navegação) pode
+    // repetir um que já veio em breakdown.alertasNaRota (cálculo inicial).
+    final alertasPorId = <int, RoadAlert>{
+      for (final a in breakdown?.alertasNaRota ?? const <RoadAlert>[]) a.id: a,
+      for (final a in widget.alertasAoVivo ?? const <RoadAlert>[]) a.id: a,
+    };
+    final alertas = alertasPorId.values.toList();
     final center = posicaoAtual ?? (route.isNotEmpty ? route[route.length ~/ 2] : const LatLng(-22.9068, -43.1729));
     final isDark = Theme.of(context).brightness == Brightness.dark;
     // Tiles CartoDB (estilo mais limpo, com variante clara/escura) em vez do
@@ -104,6 +117,21 @@ class _TripMapState extends State<TripMap> {
                     child: Tooltip(
                       message: 'Parada sugerida\n${breakdown.postoSugerido!.nome}',
                       child: const Icon(Icons.local_gas_station, color: Colors.green, size: 28),
+                    ),
+                  ),
+              ],
+            ),
+          if (alertas.isNotEmpty)
+            MarkerLayer(
+              markers: [
+                for (final a in alertas)
+                  Marker(
+                    point: LatLng(a.lat, a.lng),
+                    width: 34,
+                    height: 34,
+                    child: Tooltip(
+                      message: a.tipo.label,
+                      child: Icon(a.tipo.icon, color: Colors.deepOrange, size: 26),
                     ),
                   ),
               ],

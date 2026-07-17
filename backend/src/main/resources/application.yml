@@ -70,3 +70,9 @@ rotacusto:
   jwt:
     secret: ${JWT_SECRET:}
     expiration-hours: 24
+  # Alertas de trânsito reportados por usuários (Fase 6.6) — sem login. Raio
+  # bem mais largo que o de pedágio (que é apertado de propósito): um relato
+  # de "buraco" tem imprecisão de GPS natural, e "tem buraco nos próximos km"
+  # já é útil o bastante, não precisa de precisão de metro.
+  road-alerts:
+    detection-radius-km: 2.0

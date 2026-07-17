@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:latlong2/latlong.dart';
 
 import 'package:rotacusto_app/domain/models/fuel_station.dart';
+import 'package:rotacusto_app/domain/models/road_alert.dart';
 import 'package:rotacusto_app/domain/models/route_step.dart';
 import 'package:rotacusto_app/domain/models/toll_plaza.dart';
 import 'package:rotacusto_app/domain/models/trip_cost_breakdown.dart';
@@ -20,6 +21,7 @@ TripCostBreakdown _breakdown({
   FuelStation? postoSugerido,
   List<RouteStep> passosRota = const [],
   List<LatLng> paradasNaRota = const [],
+  List<RoadAlert> alertasNaRota = const [],
 }) {
   return TripCostBreakdown(
     distanciaKm: distanciaKm,
@@ -35,6 +37,7 @@ TripCostBreakdown _breakdown({
     postoSugerido: postoSugerido,
     passosRota: passosRota,
     paradasNaRota: paradasNaRota,
+    alertasNaRota: alertasNaRota,
   );
 }
 

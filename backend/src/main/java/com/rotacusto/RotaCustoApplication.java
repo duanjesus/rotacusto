@@ -5,10 +5,14 @@ import java.nio.file.Path;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 import io.zonky.test.db.postgres.embedded.EmbeddedPostgres;
 
+// EnableScheduling: só usado hoje por RoadAlertService.limparExpirados()
+// (Fase 6.6) — limpeza diária de alertas de trânsito expirados.
 @SpringBootApplication
+@EnableScheduling
 public class RotaCustoApplication {
 
     public static void main(String[] args) throws IOException {

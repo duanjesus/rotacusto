@@ -2,6 +2,8 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart' show TargetPlatform, defaultTargetPlatform, kIsWeb;
 
 import '../domain/models/address_suggestion.dart';
+import '../domain/models/road_alert.dart';
+import '../domain/models/road_alert_type.dart';
 import '../domain/models/trip_cost_breakdown.dart';
 import '../domain/models/trip_history_detail.dart';
 import '../domain/models/trip_history_summary.dart';
@@ -150,5 +152,30 @@ class ApiClient {
   Future<TripHistoryDetail> fetchTripHistoryDetail(int id) async {
     final response = await _dio.get('/trip-history/$id');
     return TripHistoryDetail.fromJson(response.data as Map<String, dynamic>);
+  }
+
+  // --- Fase 6.6: alertas de trânsito reportados por usuários, sem login. ---
+
+  Future<RoadAlert> reportRoadAlert(RoadAlertType tipo, double lat, double lng) async {
+    final response = await _dio.post('/road-alerts', data: {
+      'tipo': tipo.apiValue,
+      'lat': lat,
+      'lng': lng,
+    });
+    return RoadAlert.fromJson(response.data as Map<String, dynamic>);
+  }
+
+  /// Usado pelo polling ao vivo durante a navegação — pega alertas
+  /// reportados por outras pessoas depois que a viagem já tinha sido
+  /// calculada. [raioKm] nulo usa o raio padrão configurado no back-end.
+  Future<List<RoadAlert>> fetchNearbyRoadAlerts(double lat, double lng, {double? raioKm}) async {
+    final response = await _dio.post('/road-alerts/nearby', data: {
+      'lat': lat,
+      'lng': lng,
+      'raioKm': ?raioKm,
+    });
+    return (response.data as List<dynamic>)
+        .map((json) => RoadAlert.fromJson(json as Map<String, dynamic>))
+        .toList();
   }
 }

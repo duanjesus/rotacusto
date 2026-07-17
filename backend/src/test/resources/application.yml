@@ -47,3 +47,5 @@ rotacusto:
   jwt:
     secret: ${JWT_SECRET:test-secret-key-only-for-automated-tests-not-for-real-use}
     expiration-hours: 24
+  road-alerts:
+    detection-radius-km: 2.0

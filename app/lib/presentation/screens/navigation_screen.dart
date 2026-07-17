@@ -11,10 +11,14 @@ import 'package:latlong2/latlong.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import '../../data/api_client.dart';
+import '../../domain/models/road_alert.dart';
+import '../../domain/models/road_alert_type.dart';
 import '../../domain/models/trip_cost_breakdown.dart';
 import '../../domain/navigation/deviation_detector.dart';
 import '../../domain/navigation/navigation_task_handler.dart';
+import '../../domain/navigation/road_alert_proximity.dart';
 import '../../domain/navigation/route_progress.dart';
+import '../widgets/road_alert_picker.dart';
 import '../widgets/trip_map.dart';
 
 enum _NavStatus { carregando, semPermissao, semServico, ativo }
@@ -68,6 +72,10 @@ class _NavigationScreenState extends State<NavigationScreen> {
   LatLng? _posicaoAtual;
   RouteProgress? _progresso;
   bool _recalculando = false;
+  // Alertas de trânsito conhecidos (Fase 6.6) — no Android vêm do polling
+  // que já roda dentro do NavigationTaskHandler; no Windows, de um polling
+  // próprio desta tela (ver _pollNearbyAlertsWindows).
+  List<RoadAlert> _alertasConhecidos = [];
 
   bool get _recalculoHabilitado => widget.destino != null && widget.vehicleModelId != null;
 
@@ -75,7 +83,9 @@ class _NavigationScreenState extends State<NavigationScreen> {
   // plano) — no Android essa lógica vive inteira em NavigationTaskHandler. ---
   final FlutterTts _tts = FlutterTts();
   final DeviationDetector _detector = DeviationDetector();
+  final RoadAlertProximityChecker _alertProximity = RoadAlertProximityChecker();
   StreamSubscription<Position>? _positionSub;
+  Timer? _roadAlertPollingTimer;
   int? _ultimoStepFalado;
 
   @override
@@ -92,6 +102,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
       FlutterForegroundTask.stopService();
     } else {
       _positionSub?.cancel();
+      _roadAlertPollingTimer?.cancel();
       _tts.stop();
     }
     super.dispose();
@@ -121,6 +132,10 @@ class _NavigationScreenState extends State<NavigationScreen> {
       _positionSub = Geolocator.getPositionStream(
         locationSettings: const LocationSettings(accuracy: LocationAccuracy.high, distanceFilter: 5),
       ).listen(_onPosicaoWindows);
+      // O primeiro poll de verdade acontece dentro de _onPosicaoWindows, assim
+      // que a primeira posição chega (chamar aqui seria inútil — _posicaoAtual
+      // ainda está null nesse ponto). O timer só cobre as atualizações seguintes.
+      _roadAlertPollingTimer = Timer.periodic(kRoadAlertPollingInterval, (_) => _pollNearbyAlertsWindows());
     }
 
     setState(() => _status = _NavStatus.ativo);
@@ -211,6 +226,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
     switch (data['tipo']) {
       case 'posicao':
         final atual = LatLng((data['lat'] as num).toDouble(), (data['lon'] as num).toDouble());
+        final alertasJson = data['alertasConhecidosJson'] as String?;
         setState(() {
           _posicaoAtual = atual;
           _progresso = RouteProgress(
@@ -218,6 +234,11 @@ class _NavigationScreenState extends State<NavigationScreen> {
             distanciaAteProximaViradaM: (data['distanciaAteProximaViradaM'] as num).toDouble(),
             distanciaAteRotaM: 0,
           );
+          if (alertasJson != null) {
+            _alertasConhecidos = (jsonDecode(alertasJson) as List<dynamic>)
+                .map((a) => RoadAlert.fromJson(a as Map<String, dynamic>))
+                .toList();
+          }
         });
         final zoomAtual = _mapController.camera.zoom;
         _mapController.move(atual, zoomAtual < 15 ? 17 : zoomAtual);
@@ -235,22 +256,62 @@ class _NavigationScreenState extends State<NavigationScreen> {
           _breakdown = novoResultado;
           _recalculando = false;
         });
+      case 'alerta_proximo':
+        // A voz já foi falada dentro do NavigationTaskHandler (Android) —
+        // aqui só mostra o aviso visual, pra não duplicar o TTS.
+        final alerta = RoadAlert.fromJson(jsonDecode(data['alertaJson'] as String) as Map<String, dynamic>);
+        _mostrarAvisoDeAlerta(alerta);
     }
   }
 
-  // --- Ramo Windows/outras plataformas — idêntico ao de antes da Fase 6.3. ---
+  void _mostrarAvisoDeAlerta(RoadAlert alerta) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Row(children: [Icon(alerta.tipo.icon), const SizedBox(width: 12), Text(alerta.tipo.label)]),
+      duration: const Duration(seconds: 5),
+    ));
+  }
+
+  // --- Ramo Windows/outras plataformas — mesma lógica do NavigationTaskHandler
+  // (Android), reimplementada aqui porque não existe isolate de segundo plano
+  // fora do Android (mesma duplicação deliberada de sempre, ver Fase 6.3). ---
+
+  Future<void> _pollNearbyAlertsWindows() async {
+    final posicao = _posicaoAtual;
+    if (posicao == null) return;
+    try {
+      final alertas = await _apiClient.fetchNearbyRoadAlerts(
+        posicao.latitude,
+        posicao.longitude,
+        raioKm: kRoadAlertFetchRadiusKm,
+      );
+      if (mounted) setState(() => _alertasConhecidos = alertas);
+    } catch (_) {
+      // Sem sinal ou back-end fora do ar — mantém a última lista conhecida.
+    }
+  }
 
   void _onPosicaoWindows(Position posicao) {
     final atual = LatLng(posicao.latitude, posicao.longitude);
+    final primeiraPosicao = _posicaoAtual == null;
     final progresso = RouteProgressCalculator.calculate(
       posicaoAtual: atual,
       geometriaRota: _breakdown.geometriaRota,
       passosRota: _breakdown.passosRota,
     );
+    if (primeiraPosicao) {
+      _pollNearbyAlertsWindows();
+    }
 
     if (progresso.currentStepIndex != null && progresso.currentStepIndex != _ultimoStepFalado) {
       _ultimoStepFalado = progresso.currentStepIndex;
       _tts.speak(_breakdown.passosRota[progresso.currentStepIndex!].instrucao);
+    }
+
+    final alertaProximo = _alertProximity.checkProximity(atual, _alertasConhecidos);
+    if (alertaProximo != null) {
+      _tts.speak(alertaProximo.tipo.vozTexto);
+      _mostrarAvisoDeAlerta(alertaProximo);
     }
 
     setState(() {
@@ -292,6 +353,42 @@ class _NavigationScreenState extends State<NavigationScreen> {
     }
   }
 
+  // --- Reportar alerta de trânsito (Fase 6.6) — funciona igual nas duas
+  // plataformas, é uma ação de UI (precisa de alguém tocando num botão), não
+  // algo orientado por posição — por isso fica só aqui, não duplicado no
+  // NavigationTaskHandler. ---
+
+  void _abrirSeletorDeAlerta() {
+    if (_posicaoAtual == null) return;
+    showModalBottomSheet<void>(
+      context: context,
+      // Sem isso, a altura do sheet fica travada em ~metade da tela e os 6
+      // tipos + título estouram em celulares menores (achado testando de
+      // verdade — ver comentário em RoadAlertPicker).
+      isScrollControlled: true,
+      builder: (context) => RoadAlertPicker(
+        onSelected: (tipo) {
+          Navigator.of(context).pop();
+          _reportarAlerta(tipo);
+        },
+      ),
+    );
+  }
+
+  Future<void> _reportarAlerta(RoadAlertType tipo) async {
+    final posicao = _posicaoAtual;
+    if (posicao == null) return;
+    try {
+      await _apiClient.reportRoadAlert(tipo, posicao.latitude, posicao.longitude);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('${tipo.label} reportado — obrigado por avisar!')));
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Não foi possível enviar o relato.')));
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -320,6 +417,13 @@ class _NavigationScreenState extends State<NavigationScreen> {
           ),
         _NavStatus.ativo => _buildNavegacaoAtiva(context),
       },
+      floatingActionButton: _status == _NavStatus.ativo && _posicaoAtual != null
+          ? FloatingActionButton.extended(
+              onPressed: _abrirSeletorDeAlerta,
+              icon: const Icon(Icons.report_gmailerrorred_rounded),
+              label: const Text('Reportar'),
+            )
+          : null,
     );
   }
 
@@ -347,7 +451,12 @@ class _NavigationScreenState extends State<NavigationScreen> {
 
     return Stack(
       children: [
-        TripMap(breakdown: _breakdown, mapController: _mapController, posicaoAtual: _posicaoAtual),
+        TripMap(
+          breakdown: _breakdown,
+          mapController: _mapController,
+          posicaoAtual: _posicaoAtual,
+          alertasAoVivo: _alertasConhecidos,
+        ),
         if (stepAtual != null)
           Positioned(
             top: 12,

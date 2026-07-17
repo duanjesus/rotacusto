@@ -1,6 +1,7 @@
 import 'package:latlong2/latlong.dart';
 
 import 'fuel_station.dart';
+import 'road_alert.dart';
 import 'route_step.dart';
 import 'toll_plaza.dart';
 
@@ -18,6 +19,7 @@ class TripCostBreakdown {
   final FuelStation? postoSugerido;
   final List<RouteStep> passosRota;
   final List<LatLng> paradasNaRota;
+  final List<RoadAlert> alertasNaRota;
 
   TripCostBreakdown({
     required this.distanciaKm,
@@ -33,6 +35,7 @@ class TripCostBreakdown {
     required this.postoSugerido,
     required this.passosRota,
     required this.paradasNaRota,
+    required this.alertasNaRota,
   });
 
   /// Combina ida + volta calculadas separadamente (não é só multiplicar por
@@ -62,6 +65,8 @@ class TripCostBreakdown {
       // Paradas não têm índice de way-point pra deslocar (diferente de
       // passosRota) — só coordenadas, concatenação simples já basta.
       paradasNaRota: [...ida.paradasNaRota, ...volta.paradasNaRota],
+      // Mesma lógica de paradasNaRota — alertas não têm way-point associado.
+      alertasNaRota: [...ida.alertasNaRota, ...volta.alertasNaRota],
     );
   }
 
@@ -92,6 +97,9 @@ class TripCostBreakdown {
       paradasNaRota: (json['paradasNaRota'] as List<dynamic>? ?? [])
           .map((p) => LatLng((p['lat'] as num).toDouble(), (p['lon'] as num).toDouble()))
           .toList(),
+      alertasNaRota: (json['alertasNaRota'] as List<dynamic>? ?? [])
+          .map((a) => RoadAlert.fromJson(a as Map<String, dynamic>))
+          .toList(),
     );
   }
 
@@ -113,5 +121,6 @@ class TripCostBreakdown {
         'postoSugerido': postoSugerido?.toJson(),
         'passosRota': passosRota.map((p) => p.toJson()).toList(),
         'paradasNaRota': paradasNaRota.map((p) => {'lat': p.latitude, 'lon': p.longitude}).toList(),
+        'alertasNaRota': alertasNaRota.map((a) => a.toJson()).toList(),
       };
 }

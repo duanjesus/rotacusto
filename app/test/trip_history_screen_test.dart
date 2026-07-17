@@ -24,6 +24,7 @@ TripCostBreakdown _breakdown() {
     postoSugerido: null,
     passosRota: const [],
     paradasNaRota: const [],
+    alertasNaRota: const [],
   );
 }
 
