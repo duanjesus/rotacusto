@@ -102,11 +102,32 @@ consistently prefers fewer real numbers over more imprecise ones.
 `backend/src/main/resources/data/tollplazas-br101.json` is a small curated seed
 (coordinates + `tarifaPorEixo`, `tarifaMoto`) combined at runtime with **live OSM
 Overpass** queries (`TollService`, national coverage, but no real tariff — falls back to
-a configured default per axle). Two entries are **directional** (`cobraApenasIndo` +
+a configured default per axle). One entry is **directional** (`cobraApenasIndo` +
 `refLat`/`refLng`, compared against the route's bearing via `domain/geo/Bearing.java`)
-— many Brazilian toll plazas only physically exist on one carriageway of a divided
-highway. Toll cost is always `tarifaPorEixo × numeroEixos`, except motorcycles which use
-a separate `tarifaMoto` field when present.
+— the Rio-Niterói bridge only physically has toll booths on one carriageway. Toll cost
+is always `tarifaPorEixo × numeroEixos`, except motorcycles which use a separate
+`tarifaMoto` field when present.
+
+**Real-tariff/direction pass (user-reported imprecision)**: verified every curated entry
+against the concessionaires' current published tariffs and confirmed the Rio-Niterói
+bridge's one-way flag is correct (charged Rio→Niterói only, per EcoRodovias), but the
+**Itaboraí RJ-116 plaza was wrongly marked one-way** (`cobraApenasIndo: false`, "só na
+volta") — Rota 116's own tariff page states the toll is bidirectional
+("cobrança bidirecional"). Removing `refLat`/`refLng`/`cobraApenasIndo` from that entry
+makes it count in both directions, same as any toll with no direction constraint.
+Arteris Fluminense's five BR-101 RJ plazas (Rio Bonito, Casimiro de Abreu, Campos dos
+Goytacazes ×2, São Gonçalo) now charge one uniform tariff (R$7.50/car, R$3.75/moto since
+the 2025-06-27 readjustment) — the curated dataset previously had three different, all
+stale, per-plaza values. Marataízes/ES is now under **Ecovias Capixaba** (renamed from
+Eco101/Rodosol), R$5.20/car and **motorcycles exempt** — the old entry still said
+"Rodosol" and charged motorcycles. Rio Bonito's curated coordinate was also replaced
+with the exact point a live Overpass query found on a real route through it (the old
+"municipality center" guess was ~9km off — too far outside `curated-detection-radius-km`
+to enrich, so the plaza fell back to the generic unidentified/default tariff instead of
+its real name and price). Casimiro de Abreu's coordinate is still an approximate guess
+— refine with an official km marker before relying on it matching automatically. See
+`TollPlazaSeeder`'s Javadoc for the full sourcing per plaza and `SeedersIntegrationTest`
+for the regression assertion locking in the Itaboraí direction fix.
 
 ## Navigation (turn-by-turn, voice, rerouting)
 

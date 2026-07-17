@@ -147,6 +147,15 @@ class SeedersIntegrationTest {
                 .filter(p -> p.getConcessionaria().equals("Rota 116"))
                 .allMatch(p -> p.getTarifaMoto() != null && p.getTarifaMoto() == 0.0),
                 "moto deveria ser isenta na praça da Rota 116");
+        // Regressão do bug reportado pelo usuário: a praça de Itaboraí estava
+        // marcada como sentido único ("só na volta"), mas a Rota 116 cobra
+        // nos dois sentidos (confirmado na própria página de tarifas da
+        // concessionária) — sem cobraApenasIndo, TollService conta em
+        // qualquer direção (ver passesDirectionConstraint).
+        assertTrue(todasPracas.stream()
+                .filter(p -> p.getConcessionaria().equals("Rota 116"))
+                .allMatch(p -> p.getCobraApenasIndo() == null),
+                "praça da Rota 116 (Itaboraí) deveria cobrar nos dois sentidos, sem restrição de direção");
         assertTrue(todasPracas.stream().anyMatch(p -> p.getConcessionaria().contains("Ecovias Ponte")),
                 "deveria ter a praça real da Ponte Rio-Niterói");
     }
