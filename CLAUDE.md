@@ -155,12 +155,26 @@ resource for this dataset, only KMZ + a PDF data dictionary.
   false`, "só na volta") when Rota 116's own tariff page says "cobrança bidirecional" —
   fixed by dropping the direction constraint entirely. The bridge's direction was already
   correct (Rio→Niterói only, confirmed by EcoRodovias).
-- **Known gap, documented rather than guessed**: state highways (non-ANTT) have no
-  equivalent national open-data source — each state has its own regulator (São Paulo's
-  ARTESP has the country's largest toll network, then Rio de Janeiro, Minas Gerais,
-  Paraná, Rio Grande do Sul, etc.). Only Itaboraí (RJ-116) is covered so far. Routes on
-  state highways still work — they fall back to live Overpass + the default tariff, same
-  as any unrecognized toll.
+- **São Paulo (ARTESP) added next — 151 more real plazas, richer data than the federal
+  set**: state highways have no equivalent to the ANTT's single national dataset (each
+  state has its own regulator), but São Paulo's `malha-rodoviaria` open-data KMZ (one
+  file per concession, 23 total) turned out to embed the **actual tariff table** (Leves/
+  Comercial por eixo/Motos) directly in each toll plaza's description — no separate
+  per-concession price research needed, unlike the federal ANTT data which is
+  location-only. Same total-vs-per-axle halving applies (`Leves` is still the flat
+  2-axle car price). ~30 plazas were skipped on purpose: free-flow/gantry tolling (billed
+  per km driven, not a fixed per-crossing price — doesn't fit this app's
+  `tarifaPorEixo × eixos` model) or explicitly marked "(Desativado)". **Gotcha that
+  silently zeroed out 21 of 23 files on the first pass**: the folder name holding each
+  concession's toll plazas varies by file — "Praças de Pedagio_25" (no accent) in one,
+  "Praça de Pedágio" (accented á) in most others — a regex that only matched the
+  unaccented form found real data in just 2 files until the accent was added to the
+  character class.
+- **Known gap, still not covered**: Rio de Janeiro's other state highways (RJ-124/Via
+  Lagos, etc. — only Itaboraí/RJ-116 is done), and every other state's highway network
+  (Minas Gerais, Paraná, Rio Grande do Sul, Bahia, and the rest) — none has had an
+  open-data source identified/processed yet. Routes there still work — they fall back to
+  live Overpass + the default tariff, same as any unrecognized toll.
 
 See `TollPlazaSeeder`'s Javadoc for the full per-concession sourcing (dates, confirmed
 values) and `SeedersIntegrationTest` for the regression assertions (159-row count,

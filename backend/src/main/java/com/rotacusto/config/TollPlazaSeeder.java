@@ -62,14 +62,38 @@ import com.rotacusto.repository.TollPlazaRepository;
  * moto isenta, fev/2026), Ecoponte (Ponte Rio-Niterói, R$6,60/R$3,30 moto,
  * 18/03/2026, sentido único confirmado — só cobra indo Rio→Niterói).
  *
- * <p><b>Fora do escopo federal</b>: Itaboraí (RJ-116) é rodovia ESTADUAL,
- * não aparece no dataset da ANTT — mantido do fix anterior (fonte:
- * rota116.com.br/tarifas). Rodovias estaduais de outros estados (São Paulo/
- * ARTESP tem a maior malha pedagiada do país, Minas, Paraná, Rio Grande do
- * Sul etc.) ainda não têm fonte aberta estruturada equivalente ao KMZ da
- * ANTT identificada — cada estado tem sua própria agência reguladora, sem
- * um dataset nacional único. Ver punch list pra status de cobertura
- * estadual.
+ * <p><b>Estadual — São Paulo (151 praças, ARTESP)</b>: cada estado tem sua
+ * própria agência reguladora, sem um dataset nacional único como o da ANTT —
+ * São Paulo foi o primeiro porque tem a maior malha pedagiada do país. A
+ * "Pedágio" dataset da ARTESP em si é só uma página institucional sem
+ * arquivo pra baixar; o dado real está no dataset "Malha Rodoviária"
+ * (23 KMZ, um por concessão — {@code dadosabertos.artesp.sp.gov.br/dataset/
+ * malha-rodoviaria}), majoritariamente geometria de rodovia (dezenas de MB
+ * por arquivo), mas cada um tem uma pasta "Praça(s) de Pedágio" com dado bem
+ * mais rico que o federal da ANTT: coordenada exata, sentido, tipo de
+ * cobrança (uni/bidirecional) **e a tabela de tarifa real (Leves/Comercial
+ * por eixo/Motos) já embutida na descrição** — não precisou de pesquisa por
+ * concessão feito à mão como no federal, o próprio dataset já tem o preço
+ * por praça. Baixado e parseado via regex (arquivo grande demais pra valer
+ * a pena um parser XML DOM completo) — mesmo bug do preço total-vs-por-eixo
+ * do federal se repetiria aqui se não dividido por 2 (o "Leves" da ARTESP
+ * também é preço total de carro, não por eixo). ~30 praças (free-flow
+ * eletrônico tipo pórtico, ou desativadas) ficaram sem tarifa curada de
+ * propósito — não têm o padrão "Leves = R$X" na descrição porque cobram por
+ * km rodado, não por passagem fixa, incompatível com o modelo
+ * tarifaPorEixo×eixos deste app. Achado de parsing: o nome da pasta varia
+ * de arquivo pra arquivo ("Praças de Pedagio_25" sem acento na Autoban,
+ * "Praça de Pedágio" com acento na maioria, "Praças de Pedágio SV" na
+ * SPVias) — a regex de busca da pasta precisa aceitar "a" OU "á" depois de
+ * "Ped", senão silenciosamente não acha nada em 21 dos 23 arquivos (bug
+ * real encontrado rodando pela primeira vez, corrigido antes de qualquer
+ * dado entrar no seed).
+ *
+ * <p><b>Fora do escopo ainda</b>: Itaboraí (RJ-116) segue sendo o único
+ * estadual do RJ coberto (fonte: rota116.com.br/tarifas, do fix anterior) —
+ * outras vias estaduais do RJ (RJ-124/Via Lagos etc.) e os demais estados
+ * (Minas Gerais, Paraná, Rio Grande do Sul, Bahia, Santa Catarina, Goiás...)
+ * ainda não têm fonte de dado estruturada identificada/processada.
  */
 @Component
 public class TollPlazaSeeder implements CommandLineRunner {

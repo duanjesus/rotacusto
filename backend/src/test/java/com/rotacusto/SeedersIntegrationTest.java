@@ -132,10 +132,12 @@ class SeedersIntegrationTest {
 
     @Test
     void tollPlazaSeedDataIsLoadedOnStartup() {
-        // 158 praças federais reais (dataset aberto da ANTT, todas as 23
-        // concessões de rodovia federal) + 1 estadual (Itaboraí, RJ-116, fora
-        // do escopo da ANTT) — ver TollPlazaSeeder.
-        assertEquals(159, tollPlazaRepository.count());
+        // 158 praças federais reais (ANTT, 23 concessões) + 1 estadual RJ
+        // (Itaboraí) + 151 estaduais SP (ARTESP, 19 concessões com praça
+        // ativa e tarifa confirmada — dataset tem coordenada+tarifa+sentido
+        // reais direto na descrição do KMZ, ao contrário do federal que só
+        // tem localização) — ver TollPlazaSeeder.
+        assertEquals(310, tollPlazaRepository.count());
         var todasPracas = tollPlazaRepository.findAll();
 
         assertTrue(todasPracas.stream()
@@ -191,5 +193,15 @@ class SeedersIntegrationTest {
                 // não o valor por eixo que este app usa internamente.
                 .allMatch(p -> p.getTarifaPorEixo() != null && p.getTarifaPorEixo() == 1.85),
                 "Autopista Fernão Dias tem tarifa uniforme confirmada (R$3,70/carro = R$1,85/eixo)");
+
+        // Estadual SP (ARTESP): o dataset da malha rodoviária traz tarifa por
+        // PRAÇA (não por concessão) direto na descrição do KMZ — ao contrário
+        // do federal, aqui a maioria das praças tem tarifa individual real, não
+        // um fallback. Confirma que pelo menos uma praça real de SP carregou
+        // com tarifa (mesma correção de dividir o preço total por 2 eixos).
+        assertTrue(todasPracas.stream()
+                .anyMatch(p -> p.getConcessionaria() != null && p.getConcessionaria().contains("Autoban")
+                        && p.getTarifaPorEixo() != null),
+                "deveria ter praças reais da Autoban (SP) com tarifa curada");
     }
 }
