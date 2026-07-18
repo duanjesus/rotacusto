@@ -1,5 +1,6 @@
 package com.rotacusto.service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -120,8 +121,9 @@ public class TripEstimationService {
         List<RoadAlert> alertas = alertasFuture.join();
         List<TrafficReport> trafego = trafegoFuture.join();
 
+        LocalDate hoje = LocalDate.now();
         TripCostBreakdown breakdown = TripCostCalculator.calculate(route.distanciaKm(), route.duracaoMin(), profile,
-                praçasCruzadas, foodStopIntervalHours, foodStopAverageCost);
+                praçasCruzadas, foodStopIntervalHours, foodStopAverageCost, hoje);
         Optional<OsmFuelStation> postoSugerido = eletrico ? Optional.empty()
                 : fuelStationService.suggestStop(postos, route.geometria());
 
@@ -130,7 +132,7 @@ public class TripEstimationService {
                 .toList();
         List<TollPlazaResponseDTO> pedagios = praçasCruzadas.stream()
                 .map(p -> new TollPlazaResponseDTO(p.getNome(), p.getRodovia(), p.getConcessionaria(), p.getLat(),
-                        p.getLng(), TollCostCalculator.calculate(List.of(p), profile)))
+                        p.getLng(), TollCostCalculator.calculate(List.of(p), profile, hoje)))
                 .toList();
         List<FuelStationResponseDTO> postosDTO = postos.stream()
                 .map(p -> new FuelStationResponseDTO(p.nome(), p.lat(), p.lon()))

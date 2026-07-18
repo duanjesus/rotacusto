@@ -40,6 +40,15 @@ public class TollPlaza {
     @Column(name = "tarifa_por_eixo")
     private Double tarifaPorEixo;
 
+    /**
+     * Tarifa por eixo pra fim de semana/feriado, quando a concessionária cobra valor
+     * diferente do dia útil (raro — só achada na Via Lagos/RJ-124 até agora, entre
+     * dezenas de praças pesquisadas nesta sessão). Nulo = mesma tarifa o tempo todo
+     * (a esmagadora maioria das praças). Ver {@link com.rotacusto.domain.cost.TollCostCalculator}.
+     */
+    @Column(name = "tarifa_por_eixo_fim_de_semana")
+    private Double tarifaPorEixoFimDeSemana;
+
     /** Tarifa fixa para moto, quando divulgada pela concessionária (categoria própria, não segue o eixo). */
     @Column(name = "tarifa_moto")
     private Double tarifaMoto;
@@ -117,6 +126,14 @@ public class TollPlaza {
 
     public void setTarifaPorEixo(Double tarifaPorEixo) {
         this.tarifaPorEixo = tarifaPorEixo;
+    }
+
+    public Double getTarifaPorEixoFimDeSemana() {
+        return tarifaPorEixoFimDeSemana;
+    }
+
+    public void setTarifaPorEixoFimDeSemana(Double tarifaPorEixoFimDeSemana) {
+        this.tarifaPorEixoFimDeSemana = tarifaPorEixoFimDeSemana;
     }
 
     public Double getTarifaMoto() {

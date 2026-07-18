@@ -136,8 +136,9 @@ class SeedersIntegrationTest {
         // (Itaboraí) + 151 estaduais SP (ARTESP, 19 concessões com praça
         // ativa e tarifa confirmada — dataset tem coordenada+tarifa+sentido
         // reais direto na descrição do KMZ, ao contrário do federal que só
-        // tem localização) — ver TollPlazaSeeder.
-        assertEquals(310, tollPlazaRepository.count());
+        // tem localização) + 1 Via Lagos (RJ-124, tarifa por dia da semana)
+        // — ver TollPlazaSeeder.
+        assertEquals(311, tollPlazaRepository.count());
         var todasPracas = tollPlazaRepository.findAll();
 
         assertTrue(todasPracas.stream()
@@ -203,5 +204,17 @@ class SeedersIntegrationTest {
                 .anyMatch(p -> p.getConcessionaria() != null && p.getConcessionaria().contains("Autoban")
                         && p.getTarifaPorEixo() != null),
                 "deveria ter praças reais da Autoban (SP) com tarifa curada");
+
+        // Via Lagos (RJ-124): única praça de toda a pesquisa desta sessão com tarifa
+        // genuinamente diferente por dia da semana — usuário pediu pra usar a data do
+        // dia no cálculo em vez de deixar sem tarifa curada (ver TollCostCalculator).
+        var viaLagos = todasPracas.stream()
+                .filter(p -> p.getConcessionaria().equals("CCR ViaLagos"))
+                .findFirst()
+                .orElseThrow();
+        assertEquals(9.20, viaLagos.getTarifaPorEixo(), 0.001, "Via Lagos dia útil: R$18,40/carro = R$9,20/eixo");
+        assertEquals(15.30, viaLagos.getTarifaPorEixoFimDeSemana(), 0.001,
+                "Via Lagos fim de semana: R$30,60/carro = R$15,30/eixo");
+        assertEquals(0.0, viaLagos.getTarifaMoto(), 0.001, "moto é isenta na Via Lagos");
     }
 }

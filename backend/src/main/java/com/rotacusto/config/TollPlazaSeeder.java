@@ -89,11 +89,55 @@ import com.rotacusto.repository.TollPlazaRepository;
  * real encontrado rodando pela primeira vez, corrigido antes de qualquer
  * dado entrar no seed).
  *
- * <p><b>Fora do escopo ainda</b>: Itaboraí (RJ-116) segue sendo o único
- * estadual do RJ coberto (fonte: rota116.com.br/tarifas, do fix anterior) —
- * outras vias estaduais do RJ (RJ-124/Via Lagos etc.) e os demais estados
- * (Minas Gerais, Paraná, Rio Grande do Sul, Bahia, Santa Catarina, Goiás...)
- * ainda não têm fonte de dado estruturada identificada/processada.
+ * <p><b>Levantamento dos demais estados (concluído, resultado majoritariamente
+ * "sem rede estadual relevante" — não é preguiça, é o cenário real)</b>:
+ * pedágio ESTADUAL de verdade (fora do que a ANTT já cobre) só existe numa
+ * minoria de estados — confirmado via busca antes de tentar processar cada
+ * um:
+ * <ul>
+ *   <li><b>Rio de Janeiro</b>: Itaboraí (RJ-116) coberto (fonte:
+ *       rota116.com.br/tarifas). RJ-124 (Via Lagos, CCR) é a única praça
+ *       encontrada nesta pesquisa inteira com tarifa genuinamente diferente
+ *       por dia da semana — R$18,40/carro em dia útil (12h segunda a 12h
+ *       sexta), R$30,60/carro em fim de semana/feriado (12h sexta a 12h
+ *       segunda + véspera/dia seguinte de feriado nacional), reajuste de
+ *       01/08/2025. Moto isenta. Usuário pediu explicitamente pra usar a
+ *       data do dia no cálculo em vez de deixar sem tarifa — {@code
+ *       TollPlaza} ganhou {@code tarifaPorEixoFimDeSemana} (nulo em toda
+ *       outra praça do dataset) e {@code TollCostCalculator} recebe a data
+ *       da viagem como parâmetro explícito (não {@code LocalDate.now()}
+ *       interno, mesmo padrão de função pura testável já usado nos
+ *       detectores do lado Flutter) pra decidir sábado/domingo → tarifa de
+ *       fim de semana. **Feriados nacionais não são detectados** — só
+ *       dia da semana; calendário de feriados ficaria desproporcional pra
+ *       uma única praça com essa característica, documentado como
+ *       simplificação aceita, não escondida. Coordenada aproximada (centro
+ *       do trecho "Rodovia Via Lagos" em Boa Esperança via Nominatim, não
+ *       o ponto exato da cabine). AGETRANSP (regulador do RJ) só publica
+ *       volume de tráfego em dado aberto, não localização/tarifa — a
+ *       tarifa veio de busca direta no site da concessionária.</li>
+ *   <li><b>São Paulo</b>: ver seção acima, 151 praças.</li>
+ *   <li><b>Paraná</b>: tem concessões estaduais históricas, mas o DER-PR
+ *       está ativamente **encerrando** pedágios estaduais (confirmado via
+ *       notícia "DER/PR reúne diretorias... para o fim dos pedágios") — o
+ *       GeoDER (mapa interativo) tem malha viária geral em KML/Shapefile,
+ *       mas nenhum dataset específico de praça de pedágio com tarifa foi
+ *       encontrado. Baixa prioridade dado que a rede está sendo desativada.</li>
+ *   <li><b>Rio Grande do Sul</b>: único outro estado com um dataset
+ *       explicitamente dedicado a "PRAÇAS DE PEDÁGIO RODOVIÁRIO DO RIO
+ *       GRANDE DO SUL" (DAER-RS, serviço WFS/i3Geo em
+ *       {@code i3geo.daer.rs.gov.br}) — mas os servidores do DAER-RS não
+ *       responderam (connection refused/timeout) nas tentativas desta
+ *       sessão, tanto via fetch de página quanto requisição direta ao WFS.
+ *       Dado real existe, só não foi possível baixar agora — candidato
+ *       natural pra uma sessão futura quando o servidor estiver acessível.</li>
+ *   <li><b>Minas Gerais, Bahia, Santa Catarina, Goiás e demais</b>: sem
+ *       rede de pedágio ESTADUAL relevante identificada — os pedágios
+ *       nesses estados são predominantemente em rodovias FEDERAIS (BR-xxx),
+ *       já cobertas pelo dataset da ANTT. Santa Catarina, por exemplo, não
+ *       tem nenhuma praça estadual em operação ainda (primeira prevista só
+ *       pra 2026, rodovia Via Mar).</li>
+ * </ul>
  */
 @Component
 public class TollPlazaSeeder implements CommandLineRunner {

@@ -170,16 +170,36 @@ resource for this dataset, only KMZ + a PDF data dictionary.
   "Praça de Pedágio" (accented á) in most others — a regex that only matched the
   unaccented form found real data in just 2 files until the accent was added to the
   character class.
-- **Known gap, still not covered**: Rio de Janeiro's other state highways (RJ-124/Via
-  Lagos, etc. — only Itaboraí/RJ-116 is done), and every other state's highway network
-  (Minas Gerais, Paraná, Rio Grande do Sul, Bahia, and the rest) — none has had an
-  open-data source identified/processed yet. Routes there still work — they fall back to
-  live Overpass + the default tariff, same as any unrecognized toll.
+- **State-by-state survey completed — most states genuinely have no state-level toll
+  network to cover**, not just unresearched: São Paulo (done, 151 plazas) and Rio de
+  Janeiro (done except one plaza, below) are the country's two biggest state networks.
+  Paraná has one too but its DER is actively *shutting down* state tolls, and no
+  toll-specific open dataset was found there. Rio Grande do Sul has a real, dedicated
+  toll-plaza dataset (DAER, WFS/i3Geo service) but its government servers refused every
+  connection attempt this session (timeouts/connection-refused, not a licensing issue) —
+  a natural candidate to revisit later. Minas Gerais, Bahia, Santa Catarina, Goiás, and
+  the rest have no meaningful state toll network at all — their tolls are on federal
+  (BR-xxx) highways, already covered by the ANTT dataset above.
+- **RJ-124 (Via Lagos) now has real weekday/weekend pricing**: the only toll found in
+  this entire effort with genuine day-of-week variation (R$18.40 total/car Mon–Fri vs.
+  R$30.60 weekends and holidays, moto exempt). `TollPlaza` gained a nullable
+  `tarifaPorEixoFimDeSemana` (null on every other plaza in the dataset), and
+  `TollCostCalculator.calculate` takes the trip's `LocalDate` as an explicit parameter —
+  Saturday/Sunday use the weekend rate when one is set, otherwise the normal
+  `tarifaPorEixo` applies. The date is threaded through as a real parameter rather than
+  called via `LocalDate.now()` inside the calculator, mirroring the pure/testable-with-
+  synthetic-input pattern already used by the Flutter-side detectors
+  (`deviation_detector.dart`, `traffic_detector.dart`) — lets tests exercise a fixed
+  Tuesday/Saturday/Sunday deterministically instead of depending on the day the suite
+  happens to run. **National holidays are not detected** — only Saturday/Sunday; a full
+  Brazilian holiday calendar (fixed + movable/Easter-based dates) is disproportionate
+  effort for the one toll plaza that needs it, documented as an accepted simplification.
 
 See `TollPlazaSeeder`'s Javadoc for the full per-concession sourcing (dates, confirmed
-values) and `SeedersIntegrationTest` for the regression assertions (159-row count,
-EcoRioMinas correctly uncurated, Fernão Dias correctly curated at the halved rate,
-Ecoponte still direction-constrained, Itaboraí still bidirectional).
+values, and the complete state-by-state survey) and `SeedersIntegrationTest` for the
+regression assertions (311-row count, EcoRioMinas correctly uncurated, Fernão Dias and
+Autoban correctly curated at the halved rate, Ecoponte still direction-constrained,
+Itaboraí still bidirectional, Via Lagos's weekday/weekend/moto values).
 
 ## Navigation (turn-by-turn, voice, rerouting)
 

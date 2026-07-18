@@ -1,6 +1,6 @@
 [
     {
-        "nome":  "PedÃ¡gio ItaboraÃ­ - km 1,9",
+        "nome":  "Pedágio Itaboraí - km 1,9",
         "rodovia":  "RJ-116",
         "concessionaria":  "Rota 116",
         "lat":  -22.7754719,
@@ -9,97 +9,97 @@
         "tarifaMoto":  0
     },
     {
-        "nome":  "PedÃ¡gio BR-381 - 1 Norte - Defasada (MairiporÃ£)/SP",
+        "nome":  "Pedágio BR-381 - 1 Norte - Defasada (Mairiporã)/SP",
         "rodovia":  "BR-381",
-        "concessionaria":  "Autopista FernÃ£o Dias",
+        "concessionaria":  "Autopista Fernão Dias",
         "lat":  -23.34121,
         "lng":  -46.573664,
         "tarifaPorEixo":  1.85,
         "tarifaMoto":  0
     },
     {
-        "nome":  "PedÃ¡gio BR-381 - 1 Norte (MairiporÃ£)/SP",
+        "nome":  "Pedágio BR-381 - 1 Norte (Mairiporã)/SP",
         "rodovia":  "BR-381",
-        "concessionaria":  "Autopista FernÃ£o Dias",
+        "concessionaria":  "Autopista Fernão Dias",
         "lat":  -23.322298,
         "lng":  -46.581097,
         "tarifaPorEixo":  1.85,
         "tarifaMoto":  0
     },
     {
-        "nome":  "PedÃ¡gio BR-381 - 1 Sul (MairiporÃ£)/SP",
+        "nome":  "Pedágio BR-381 - 1 Sul (Mairiporã)/SP",
         "rodovia":  "BR-381",
-        "concessionaria":  "Autopista FernÃ£o Dias",
+        "concessionaria":  "Autopista Fernão Dias",
         "lat":  -23.330558,
         "lng":  -46.578337,
         "tarifaPorEixo":  1.85,
         "tarifaMoto":  0
     },
     {
-        "nome":  "PedÃ¡gio BR-381 - 2 (Vargem)/SP",
+        "nome":  "Pedágio BR-381 - 2 (Vargem)/SP",
         "rodovia":  "BR-381",
-        "concessionaria":  "Autopista FernÃ£o Dias",
+        "concessionaria":  "Autopista Fernão Dias",
         "lat":  -22.908685,
         "lng":  -46.424877,
         "tarifaPorEixo":  1.85,
         "tarifaMoto":  0
     },
     {
-        "nome":  "PedÃ¡gio BR-381 - 3 (CambuÃ­)/MG",
+        "nome":  "Pedágio BR-381 - 3 (Cambuí)/MG",
         "rodovia":  "BR-381",
-        "concessionaria":  "Autopista FernÃ£o Dias",
+        "concessionaria":  "Autopista Fernão Dias",
         "lat":  -22.628487,
         "lng":  -46.07789,
         "tarifaPorEixo":  1.85,
         "tarifaMoto":  0
     },
     {
-        "nome":  "PedÃ¡gio BR-381 - 4 (SÃ£o GonÃ§alo)/MG",
+        "nome":  "Pedágio BR-381 - 4 (São Gonçalo)/MG",
         "rodovia":  "BR-381",
-        "concessionaria":  "Autopista FernÃ£o Dias",
+        "concessionaria":  "Autopista Fernão Dias",
         "lat":  -21.970441,
         "lng":  -45.631188,
         "tarifaPorEixo":  1.85,
         "tarifaMoto":  0
     },
     {
-        "nome":  "PedÃ¡gio BR-381 - 5 (Carmo da Cachoeira)/MG",
+        "nome":  "Pedágio BR-381 - 5 (Carmo da Cachoeira)/MG",
         "rodovia":  "BR-381",
-        "concessionaria":  "Autopista FernÃ£o Dias",
+        "concessionaria":  "Autopista Fernão Dias",
         "lat":  -21.5457,
         "lng":  -45.240203,
         "tarifaPorEixo":  1.85,
         "tarifaMoto":  0
     },
     {
-        "nome":  "PedÃ¡gio BR-381 - 6 (Santo AntÃ´nio do Amparo)/MG",
+        "nome":  "Pedágio BR-381 - 6 (Santo Antônio do Amparo)/MG",
         "rodovia":  "BR-381",
-        "concessionaria":  "Autopista FernÃ£o Dias",
+        "concessionaria":  "Autopista Fernão Dias",
         "lat":  -21.000367,
         "lng":  -44.966967,
         "tarifaPorEixo":  1.85,
         "tarifaMoto":  0
     },
     {
-        "nome":  "PedÃ¡gio BR-381 - 7 (CarmÃ³polis de Minas)/MG",
+        "nome":  "Pedágio BR-381 - 7 (Carmópolis de Minas)/MG",
         "rodovia":  "BR-381",
-        "concessionaria":  "Autopista FernÃ£o Dias",
+        "concessionaria":  "Autopista Fernão Dias",
         "lat":  -20.591486,
         "lng":  -44.701506,
         "tarifaPorEixo":  1.85,
         "tarifaMoto":  0
     },
     {
-        "nome":  "PedÃ¡gio BR-381 - 8 (ItatiaiuÃ§u)/MG",
+        "nome":  "Pedágio BR-381 - 8 (Itatiaiuçu)/MG",
         "rodovia":  "BR-381",
-        "concessionaria":  "Autopista FernÃ£o Dias",
+        "concessionaria":  "Autopista Fernão Dias",
         "lat":  -20.268346,
         "lng":  -44.423711,
         "tarifaPorEixo":  1.85,
         "tarifaMoto":  0
     },
     {
-        "nome":  "PedÃ¡gio BR-101 - Casimiro de Abreu/RJ",
+        "nome":  "Pedágio BR-101 - Casimiro de Abreu/RJ",
         "rodovia":  "BR-101",
         "concessionaria":  "Autopista Fluminense (Arteris)",
         "lat":  -22.476441,
@@ -108,7 +108,7 @@
         "tarifaMoto":  3.75
     },
     {
-        "nome":  "PedÃ¡gio BR-101 - Conselheiro Josino/RJ",
+        "nome":  "Pedágio BR-101 - Conselheiro Josino/RJ",
         "rodovia":  "BR-101",
         "concessionaria":  "Autopista Fluminense (Arteris)",
         "lat":  -21.552594,
@@ -117,7 +117,7 @@
         "tarifaMoto":  3.75
     },
     {
-        "nome":  "PedÃ¡gio BR-101 - Rio Bonito/RJ",
+        "nome":  "Pedágio BR-101 - Rio Bonito/RJ",
         "rodovia":  "BR-101",
         "concessionaria":  "Autopista Fluminense (Arteris)",
         "lat":  -22.687469,
@@ -126,7 +126,7 @@
         "tarifaMoto":  3.75
     },
     {
-        "nome":  "PedÃ¡gio BR-101 - SÃ£o GonÃ§alo/RJ",
+        "nome":  "Pedágio BR-101 - São Gonçalo/RJ",
         "rodovia":  "BR-101",
         "concessionaria":  "Autopista Fluminense (Arteris)",
         "lat":  -22.774713,
@@ -135,7 +135,7 @@
         "tarifaMoto":  3.75
     },
     {
-        "nome":  "PedÃ¡gio BR-101 - Serrinha/RJ",
+        "nome":  "Pedágio BR-101 - Serrinha/RJ",
         "rodovia":  "BR-101",
         "concessionaria":  "Autopista Fluminense (Arteris)",
         "lat":  -22.04975,
@@ -144,7 +144,7 @@
         "tarifaMoto":  3.75
     },
     {
-        "nome":  "PedÃ¡gio BR-376 - P1/PR",
+        "nome":  "Pedágio BR-376 - P1/PR",
         "rodovia":  "BR-376",
         "concessionaria":  "Autopista Litoral Sul",
         "lat":  -25.747708,
@@ -152,7 +152,7 @@
         "tarifaPorEixo":  2.85
     },
     {
-        "nome":  "PedÃ¡gio BR-101 - P2/SC",
+        "nome":  "Pedágio BR-101 - P2/SC",
         "rodovia":  "BR-101",
         "concessionaria":  "Autopista Litoral Sul",
         "lat":  -25.991898,
@@ -160,7 +160,7 @@
         "tarifaPorEixo":  2.85
     },
     {
-        "nome":  "PedÃ¡gio BR-101 - P3/SC",
+        "nome":  "Pedágio BR-101 - P3/SC",
         "rodovia":  "BR-101",
         "concessionaria":  "Autopista Litoral Sul",
         "lat":  -26.591635,
@@ -168,7 +168,7 @@
         "tarifaPorEixo":  2.85
     },
     {
-        "nome":  "PedÃ¡gio BR-101 - P4/SC",
+        "nome":  "Pedágio BR-101 - P4/SC",
         "rodovia":  "BR-101",
         "concessionaria":  "Autopista Litoral Sul",
         "lat":  -27.185065,
@@ -176,7 +176,7 @@
         "tarifaPorEixo":  2.85
     },
     {
-        "nome":  "PedÃ¡gio BR-101 - P5/SC",
+        "nome":  "Pedágio BR-101 - P5/SC",
         "rodovia":  "BR-101",
         "concessionaria":  "Autopista Litoral Sul",
         "lat":  -27.885105,
@@ -184,7 +184,7 @@
         "tarifaPorEixo":  2.85
     },
     {
-        "nome":  "PedÃ¡gio BR-116 - CORREIA PINTO/SC",
+        "nome":  "Pedágio BR-116 - CORREIA PINTO/SC",
         "rodovia":  "BR-116",
         "concessionaria":  "Autopista Planalto Sul",
         "lat":  -27.010584,
@@ -192,7 +192,7 @@
         "tarifaPorEixo":  4.35
     },
     {
-        "nome":  "PedÃ¡gio BR-116 - FAZENDA RIO GRANDE/PR",
+        "nome":  "Pedágio BR-116 - FAZENDA RIO GRANDE/PR",
         "rodovia":  "BR-116",
         "concessionaria":  "Autopista Planalto Sul",
         "lat":  -25.713458,
@@ -200,7 +200,7 @@
         "tarifaPorEixo":  4.35
     },
     {
-        "nome":  "PedÃ¡gio BR-116 - MONTE CASTELO/SC",
+        "nome":  "Pedágio BR-116 - MONTE CASTELO/SC",
         "rodovia":  "BR-116",
         "concessionaria":  "Autopista Planalto Sul",
         "lat":  -26.570363,
@@ -208,7 +208,7 @@
         "tarifaPorEixo":  4.35
     },
     {
-        "nome":  "PedÃ¡gio BR-116 - RIO NEGRO/PR",
+        "nome":  "Pedágio BR-116 - RIO NEGRO/PR",
         "rodovia":  "BR-116",
         "concessionaria":  "Autopista Planalto Sul",
         "lat":  -26.07058,
@@ -216,7 +216,7 @@
         "tarifaPorEixo":  4.35
     },
     {
-        "nome":  "PedÃ¡gio BR-116 - SANTA CECÃLIA/SC",
+        "nome":  "Pedágio BR-116 - SANTA CECÍLIA/SC",
         "rodovia":  "BR-116",
         "concessionaria":  "Autopista Planalto Sul",
         "lat":  -27.010584,
@@ -224,279 +224,279 @@
         "tarifaPorEixo":  4.35
     },
     {
-        "nome":  "PedÃ¡gio BR-116 - SÃ£o LourenÃ§o da Serra/SP",
+        "nome":  "Pedágio BR-116 - São Lourenço da Serra/SP",
         "rodovia":  "BR-116",
-        "concessionaria":  "Autopista RÃ©gis Bittencourt",
+        "concessionaria":  "Autopista Régis Bittencourt",
         "lat":  -23.787647,
         "lng":  -46.913922,
         "tarifaPorEixo":  2.15
     },
     {
-        "nome":  "PedÃ¡gio BR-116 - Miracatu/SP",
+        "nome":  "Pedágio BR-116 - Miracatu/SP",
         "rodovia":  "BR-116",
-        "concessionaria":  "Autopista RÃ©gis Bittencourt",
+        "concessionaria":  "Autopista Régis Bittencourt",
         "lat":  -24.157869,
         "lng":  -47.32628,
         "tarifaPorEixo":  2.15
     },
     {
-        "nome":  "PedÃ¡gio BR-116 - JuquiÃ¡/SP",
+        "nome":  "Pedágio BR-116 - Juquiá/SP",
         "rodovia":  "BR-116",
-        "concessionaria":  "Autopista RÃ©gis Bittencourt",
+        "concessionaria":  "Autopista Régis Bittencourt",
         "lat":  -24.389325,
         "lng":  -47.722391,
         "tarifaPorEixo":  2.15
     },
     {
-        "nome":  "PedÃ¡gio BR-116 - Cajati/SP",
+        "nome":  "Pedágio BR-116 - Cajati/SP",
         "rodovia":  "BR-116",
-        "concessionaria":  "Autopista RÃ©gis Bittencourt",
+        "concessionaria":  "Autopista Régis Bittencourt",
         "lat":  -24.722483,
         "lng":  -48.08258,
         "tarifaPorEixo":  2.15
     },
     {
-        "nome":  "PedÃ¡gio BR-116 - Barra do Turvo/SP",
+        "nome":  "Pedágio BR-116 - Barra do Turvo/SP",
         "rodovia":  "BR-116",
-        "concessionaria":  "Autopista RÃ©gis Bittencourt",
+        "concessionaria":  "Autopista Régis Bittencourt",
         "lat":  -24.964044,
         "lng":  -48.412,
         "tarifaPorEixo":  2.15
     },
     {
-        "nome":  "PedÃ¡gio BR-116 - Campina Grande do Sul/PR",
+        "nome":  "Pedágio BR-116 - Campina Grande do Sul/PR",
         "rodovia":  "BR-116",
-        "concessionaria":  "Autopista RÃ©gis Bittencourt",
+        "concessionaria":  "Autopista Régis Bittencourt",
         "lat":  -25.289252,
         "lng":  -48.933841,
         "tarifaPorEixo":  2.15
     },
     {
-        "nome":  "PedÃ¡gio BR-60 - P1 ALEXÃ‚NIA/GO",
+        "nome":  "Pedágio BR-60 - P1 ALEXÂNIA/GO",
         "rodovia":  "BR-60",
         "concessionaria":  "Concebra",
         "lat":  -16.115707,
         "lng":  -48.58924
     },
     {
-        "nome":  "PedÃ¡gio BR-262 - P10 PERDIZES/MG",
+        "nome":  "Pedágio BR-262 - P10 PERDIZES/MG",
         "rodovia":  "BR-262",
         "concessionaria":  "Concebra",
         "lat":  -19.617614,
         "lng":  -47.346547
     },
     {
-        "nome":  "PedÃ¡gio BR-262 - P11 CAMPO FLORIDO/MG",
+        "nome":  "Pedágio BR-262 - P11 CAMPO FLORIDO/MG",
         "rodovia":  "BR-262",
         "concessionaria":  "Concebra",
         "lat":  -19.776951,
         "lng":  -48.458219
     },
     {
-        "nome":  "PedÃ¡gio BR-60 - P2 GOIANÃPOLIS/GO",
+        "nome":  "Pedágio BR-60 - P2 GOIANÁPOLIS/GO",
         "rodovia":  "BR-60",
         "concessionaria":  "Concebra",
         "lat":  -16.438631,
         "lng":  -49.019137
     },
     {
-        "nome":  "PedÃ¡gio BR-153 - P3 PROF JAMIL/GO",
+        "nome":  "Pedágio BR-153 - P3 PROF JAMIL/GO",
         "rodovia":  "BR-153",
         "concessionaria":  "Concebra",
         "lat":  -17.16318,
         "lng":  -49.212582
     },
     {
-        "nome":  "PedÃ¡gio BR-153 - P4 ITUMBIARA/GO",
+        "nome":  "Pedágio BR-153 - P4 ITUMBIARA/GO",
         "rodovia":  "BR-153",
         "concessionaria":  "Concebra",
         "lat":  -18.268544,
         "lng":  -49.245811
     },
     {
-        "nome":  "PedÃ¡gio BR-153 - P5 PRATA/MG",
+        "nome":  "Pedágio BR-153 - P5 PRATA/MG",
         "rodovia":  "BR-153",
         "concessionaria":  "Concebra",
         "lat":  -19.471586,
         "lng":  -48.871046
     },
     {
-        "nome":  "PedÃ¡gio BR-153 - P6 FRONTEIRA/MG",
+        "nome":  "Pedágio BR-153 - P6 FRONTEIRA/MG",
         "rodovia":  "BR-153",
         "concessionaria":  "Concebra",
         "lat":  -20.142521,
         "lng":  -49.110488
     },
     {
-        "nome":  "PedÃ¡gio BR-262 - P7 FLORESTAL/MG",
+        "nome":  "Pedágio BR-262 - P7 FLORESTAL/MG",
         "rodovia":  "BR-262",
         "concessionaria":  "Concebra",
         "lat":  -19.909615,
         "lng":  -44.506725
     },
     {
-        "nome":  "PedÃ¡gio BR-262 - P8 LUZ/MG",
+        "nome":  "Pedágio BR-262 - P8 LUZ/MG",
         "rodovia":  "BR-262",
         "concessionaria":  "Concebra",
         "lat":  -19.788259,
         "lng":  -45.58463
     },
     {
-        "nome":  "PedÃ¡gio BR-262 - P9 CAMPOS ALTOS/MG",
+        "nome":  "Pedágio BR-262 - P9 CAMPOS ALTOS/MG",
         "rodovia":  "BR-262",
         "concessionaria":  "Concebra",
         "lat":  -19.647341,
         "lng":  -46.240088
     },
     {
-        "nome":  "PedÃ¡gio BR-40 - P1/RJ",
+        "nome":  "Pedágio BR-40 - P1/RJ",
         "rodovia":  "BR-40",
         "concessionaria":  "Concer",
         "lat":  -22.609965,
         "lng":  -43.285552
     },
     {
-        "nome":  "PedÃ¡gio BR-40 - P2/RJ",
+        "nome":  "Pedágio BR-40 - P2/RJ",
         "rodovia":  "BR-40",
         "concessionaria":  "Concer",
         "lat":  -22.284389,
         "lng":  -43.120269
     },
     {
-        "nome":  "PedÃ¡gio BR-40 - P3/MG",
+        "nome":  "Pedágio BR-40 - P3/MG",
         "rodovia":  "BR-40",
         "concessionaria":  "Concer",
         "lat":  -21.928252,
         "lng":  -43.316282
     },
     {
-        "nome":  "PedÃ¡gio BR-163 - P1 - ClaÃºdia/MT",
+        "nome":  "Pedágio BR-163 - P1 - Claúdia/MT",
         "rodovia":  "BR-163",
         "concessionaria":  "Via Brasil BR-163",
         "lat":  -11.339218,
         "lng":  -55.331222
     },
     {
-        "nome":  "PedÃ¡gio BR-163 - P2 - GuarantÃ£ do Norte/MT",
+        "nome":  "Pedágio BR-163 - P2 - Guarantã do Norte/MT",
         "rodovia":  "BR-163",
         "concessionaria":  "Via Brasil BR-163",
         "lat":  -9.756473,
         "lng":  -54.89443
     },
     {
-        "nome":  "PedÃ¡gio BR-163 - P3 - TrairÃ£o/PA",
+        "nome":  "Pedágio BR-163 - P3 - Trairão/PA",
         "rodovia":  "BR-163",
         "concessionaria":  "Via Brasil BR-163",
         "lat":  -4.620594,
         "lng":  -55.951381
     },
     {
-        "nome":  "PedÃ¡gio BR-364 - P3/MT",
+        "nome":  "Pedágio BR-364 - P3/MT",
         "rodovia":  "BR-364",
         "concessionaria":  "CRO (Nova 364)",
         "lat":  -15.81,
         "lng":  -55.31
     },
     {
-        "nome":  "PedÃ¡gio BR-163 - P1/MT",
+        "nome":  "Pedágio BR-163 - P1/MT",
         "rodovia":  "BR-163",
         "concessionaria":  "CRO (Nova 364)",
         "lat":  -17.219391,
         "lng":  -54.758685
     },
     {
-        "nome":  "PedÃ¡gio BR-364 - P2/MT",
+        "nome":  "Pedágio BR-364 - P2/MT",
         "rodovia":  "BR-364",
         "concessionaria":  "CRO (Nova 364)",
         "lat":  -16.393565,
         "lng":  -54.714281
     },
     {
-        "nome":  "PedÃ¡gio BR-364 - P4/MT",
+        "nome":  "Pedágio BR-364 - P4/MT",
         "rodovia":  "BR-364",
         "concessionaria":  "CRO (Nova 364)",
         "lat":  -15.702041,
         "lng":  -55.829527
     },
     {
-        "nome":  "PedÃ¡gio BR-364 - P5/MT",
+        "nome":  "Pedágio BR-364 - P5/MT",
         "rodovia":  "BR-364",
         "concessionaria":  "CRO (Nova 364)",
         "lat":  -15.349875,
         "lng":  -56.415628
     },
     {
-        "nome":  "PedÃ¡gio BR-364 - P6/MT",
+        "nome":  "Pedágio BR-364 - P6/MT",
         "rodovia":  "BR-364",
         "concessionaria":  "CRO (Nova 364)",
         "lat":  -14.599728,
         "lng":  -56.240858
     },
     {
-        "nome":  "PedÃ¡gio BR-163 - P7/MT",
+        "nome":  "Pedágio BR-163 - P7/MT",
         "rodovia":  "BR-163",
         "concessionaria":  "CRO (Nova 364)",
         "lat":  -13.91952,
         "lng":  -56.093419
     },
     {
-        "nome":  "PedÃ¡gio BR-163 - P8/MT",
+        "nome":  "Pedágio BR-163 - P8/MT",
         "rodovia":  "BR-163",
         "concessionaria":  "CRO (Nova 364)",
         "lat":  -13.26599,
         "lng":  -56.022777
     },
     {
-        "nome":  "PedÃ¡gio BR-163 - P9/MT",
+        "nome":  "Pedágio BR-163 - P9/MT",
         "rodovia":  "BR-163",
         "concessionaria":  "CRO (Nova 364)",
         "lat":  -12.441635,
         "lng":  -55.653798
     },
     {
-        "nome":  "PedÃ¡gio BR-50 - ARAGUARI I/MG",
+        "nome":  "Pedágio BR-50 - ARAGUARI I/MG",
         "rodovia":  "BR-50",
         "concessionaria":  "Eco050",
         "lat":  -18.537594,
         "lng":  -48.045546
     },
     {
-        "nome":  "PedÃ¡gio BR-50 - ARAGUARI II/MG",
+        "nome":  "Pedágio BR-50 - ARAGUARI II/MG",
         "rodovia":  "BR-50",
         "concessionaria":  "Eco050",
         "lat":  -18.749143,
         "lng":  -48.234378
     },
     {
-        "nome":  "PedÃ¡gio BR-50 - CAMPO ALEGRE/GO",
+        "nome":  "Pedágio BR-50 - CAMPO ALEGRE/GO",
         "rodovia":  "BR-50",
         "concessionaria":  "Eco050",
         "lat":  -17.771615,
         "lng":  -47.749429
     },
     {
-        "nome":  "PedÃ¡gio BR-50 - DELTA/MG",
+        "nome":  "Pedágio BR-50 - DELTA/MG",
         "rodovia":  "BR-50",
         "concessionaria":  "Eco050",
         "lat":  -19.914722,
         "lng":  -47.829868
     },
     {
-        "nome":  "PedÃ¡gio BR-50 - IPAMERI/GO",
+        "nome":  "Pedágio BR-50 - IPAMERI/GO",
         "rodovia":  "BR-50",
         "concessionaria":  "Eco050",
         "lat":  -17.121987,
         "lng":  -47.721537
     },
     {
-        "nome":  "PedÃ¡gio BR-50 - UBERABA/MG",
+        "nome":  "Pedágio BR-50 - UBERABA/MG",
         "rodovia":  "BR-50",
         "concessionaria":  "Eco050",
         "lat":  -19.180063,
         "lng":  -48.157641
     },
     {
-        "nome":  "PedÃ¡gio BR-101 - P1 - Pedro CanÃ¡rio/ES",
+        "nome":  "Pedágio BR-101 - P1 - Pedro Canário/ES",
         "rodovia":  "BR-101",
         "concessionaria":  "Eco101 (Ecovias Capixaba)",
         "lat":  -18.184679,
@@ -505,7 +505,7 @@
         "tarifaMoto":  0
     },
     {
-        "nome":  "PedÃ¡gio BR-101 - P2 - SÃ£o Mateus/ES",
+        "nome":  "Pedágio BR-101 - P2 - São Mateus/ES",
         "rodovia":  "BR-101",
         "concessionaria":  "Eco101 (Ecovias Capixaba)",
         "lat":  -18.863978,
@@ -514,7 +514,7 @@
         "tarifaMoto":  0
     },
     {
-        "nome":  "PedÃ¡gio BR-101 - P3 - Aracruz/ES",
+        "nome":  "Pedágio BR-101 - P3 - Aracruz/ES",
         "rodovia":  "BR-101",
         "concessionaria":  "Eco101 (Ecovias Capixaba)",
         "lat":  -19.5631,
@@ -523,7 +523,7 @@
         "tarifaMoto":  0
     },
     {
-        "nome":  "PedÃ¡gio BR-101 - P4 - Serra/ES",
+        "nome":  "Pedágio BR-101 - P4 - Serra/ES",
         "rodovia":  "BR-101",
         "concessionaria":  "Eco101 (Ecovias Capixaba)",
         "lat":  -20.032507,
@@ -532,7 +532,7 @@
         "tarifaMoto":  0
     },
     {
-        "nome":  "PedÃ¡gio BR-101 - P5 - Guarapari/ES",
+        "nome":  "Pedágio BR-101 - P5 - Guarapari/ES",
         "rodovia":  "BR-101",
         "concessionaria":  "Eco101 (Ecovias Capixaba)",
         "lat":  -20.519316,
@@ -541,7 +541,7 @@
         "tarifaMoto":  0
     },
     {
-        "nome":  "PedÃ¡gio BR-101 - P6 - Itapemirim/ES",
+        "nome":  "Pedágio BR-101 - P6 - Itapemirim/ES",
         "rodovia":  "BR-101",
         "concessionaria":  "Eco101 (Ecovias Capixaba)",
         "lat":  -20.878542,
@@ -550,7 +550,7 @@
         "tarifaMoto":  0
     },
     {
-        "nome":  "PedÃ¡gio BR-101 - P7 - Mimoso do Sul/ES",
+        "nome":  "Pedágio BR-101 - P7 - Mimoso do Sul/ES",
         "rodovia":  "BR-101",
         "concessionaria":  "Eco101 (Ecovias Capixaba)",
         "lat":  -21.158397,
@@ -559,9 +559,9 @@
         "tarifaMoto":  0
     },
     {
-        "nome":  "PedÃ¡gio BR-101 - NITEROÃ-1/RJ",
+        "nome":  "Pedágio BR-101 - NITEROÍ-1/RJ",
         "rodovia":  "BR-101",
-        "concessionaria":  "Ecoponte (Ponte Rio-NiterÃ³i)",
+        "concessionaria":  "Ecoponte (Ponte Rio-Niterói)",
         "lat":  -22.877944,
         "lng":  -43.115734,
         "tarifaPorEixo":  3.3,
@@ -571,539 +571,539 @@
         "cobraApenasIndo":  true
     },
     {
-        "nome":  "PedÃ¡gio BR-116 - P01 Eng. Pierre Berman/RJ",
+        "nome":  "Pedágio BR-116 - P01 Eng. Pierre Berman/RJ",
         "rodovia":  "BR-116",
         "concessionaria":  "EcoRioMinas",
         "lat":  -22.647307,
         "lng":  -43.187968
     },
     {
-        "nome":  "PedÃ¡gio BR-116 - P02 Santa Guilhermina/RJ",
+        "nome":  "Pedágio BR-116 - P02 Santa Guilhermina/RJ",
         "rodovia":  "BR-116",
         "concessionaria":  "EcoRioMinas",
         "lat":  -22.657363,
         "lng":  -43.086196
     },
     {
-        "nome":  "PedÃ¡gio BR-116 - P03 Santo Aleixo/RJ",
+        "nome":  "Pedágio BR-116 - P03 Santo Aleixo/RJ",
         "rodovia":  "BR-116",
         "concessionaria":  "EcoRioMinas",
         "lat":  -22.610815,
         "lng":  -43.032112
     },
     {
-        "nome":  "PedÃ¡gio BR-116 - P04 ViÃºva GraÃ§a/RJ",
+        "nome":  "Pedágio BR-116 - P04 Viúva Graça/RJ",
         "rodovia":  "BR-116",
         "concessionaria":  "EcoRioMinas",
         "lat":  -22.716277,
         "lng":  -43.716858
     },
     {
-        "nome":  "PedÃ¡gio BR-116 - P05 ViÃºva GraÃ§a (B)/RJ",
+        "nome":  "Pedágio BR-116 - P05 Viúva Graça (B)/RJ",
         "rodovia":  "BR-116",
         "concessionaria":  "EcoRioMinas",
         "lat":  -22.715213,
         "lng":  -43.730252
     },
     {
-        "nome":  "PedÃ¡gio BR-392 - PraÃ§a CapÃ£o Seco/RS",
+        "nome":  "Pedágio BR-392 - Praça Capão Seco/RS",
         "rodovia":  "BR-392",
         "concessionaria":  "Ecosul",
         "lat":  -31.851958,
         "lng":  -52.326177
     },
     {
-        "nome":  "PedÃ¡gio BR-116 - PraÃ§a Cristal/RS",
+        "nome":  "Pedágio BR-116 - Praça Cristal/RS",
         "rodovia":  "BR-116",
         "concessionaria":  "Ecosul",
         "lat":  -31.026386,
         "lng":  -52.04943
     },
     {
-        "nome":  "PedÃ¡gio BR-392 - PraÃ§a GlÃ³ria/RS",
+        "nome":  "Pedágio BR-392 - Praça Glória/RS",
         "rodovia":  "BR-392",
         "concessionaria":  "Ecosul",
         "lat":  -31.449786,
         "lng":  -52.640644
     },
     {
-        "nome":  "PedÃ¡gio BR-116 - PraÃ§a PavÃ£o/RS",
+        "nome":  "Pedágio BR-116 - Praça Pavão/RS",
         "rodovia":  "BR-116",
         "concessionaria":  "Ecosul",
         "lat":  -31.820075,
         "lng":  -52.526711
     },
     {
-        "nome":  "PedÃ¡gio BR-116 - PraÃ§a Retiro/RS",
+        "nome":  "Pedágio BR-116 - Praça Retiro/RS",
         "rodovia":  "BR-116",
         "concessionaria":  "Ecosul",
         "lat":  -31.625261,
         "lng":  -52.318116
     },
     {
-        "nome":  "PedÃ¡gio BR-153 - P1 - AlianÃ§a do Tocantins/TO",
+        "nome":  "Pedágio BR-153 - P1 - Aliança do Tocantins/TO",
         "rodovia":  "BR-153",
         "concessionaria":  "Ecovias do Araguaia",
         "lat":  -11.4461,
         "lng":  -48.990283
     },
     {
-        "nome":  "PedÃ¡gio BR-153 - P2 - Alvorada/TO",
+        "nome":  "Pedágio BR-153 - P2 - Alvorada/TO",
         "rodovia":  "BR-153",
         "concessionaria":  "Ecovias do Araguaia",
         "lat":  -12.344989,
         "lng":  -49.151967
     },
     {
-        "nome":  "PedÃ¡gio BR-153 - P3 - Porangatu/GO",
+        "nome":  "Pedágio BR-153 - P3 - Porangatu/GO",
         "rodovia":  "BR-153",
         "concessionaria":  "Ecovias do Araguaia",
         "lat":  -12.943414,
         "lng":  -49.133122
     },
     {
-        "nome":  "PedÃ¡gio BR-153 - P4 - Estrela do Norte/GO",
+        "nome":  "Pedágio BR-153 - P4 - Estrela do Norte/GO",
         "rodovia":  "BR-153",
         "concessionaria":  "Ecovias do Araguaia",
         "lat":  -13.791358,
         "lng":  -49.034842
     },
     {
-        "nome":  "PedÃ¡gio BR-153 - P5 - Campinorte/GO",
+        "nome":  "Pedágio BR-153 - P5 - Campinorte/GO",
         "rodovia":  "BR-153",
         "concessionaria":  "Ecovias do Araguaia",
         "lat":  -14.372969,
         "lng":  -49.158264
     },
     {
-        "nome":  "PedÃ¡gio BR-153 - P6 - Hidrolina/GO",
+        "nome":  "Pedágio BR-153 - P6 - Hidrolina/GO",
         "rodovia":  "BR-153",
         "concessionaria":  "Ecovias do Araguaia",
         "lat":  -14.799372,
         "lng":  -49.284164
     },
     {
-        "nome":  "PedÃ¡gio BR-153 - P7 - JaraguÃ¡/GO",
+        "nome":  "Pedágio BR-153 - P7 - Jaraguá/GO",
         "rodovia":  "BR-153",
         "concessionaria":  "Ecovias do Araguaia",
         "lat":  -15.827072,
         "lng":  -49.281722
     },
     {
-        "nome":  "PedÃ¡gio BR-80 - P8 - Santa Rita do Novo Destino/GO",
+        "nome":  "Pedágio BR-80 - P8 - Santa Rita do Novo Destino/GO",
         "rodovia":  "BR-80",
         "concessionaria":  "Ecovias do Araguaia",
         "lat":  -14.814189,
         "lng":  -49.042442
     },
     {
-        "nome":  "PedÃ¡gio BR-414 - P9 - CorumbÃ¡ de GoiÃ¡s/GO",
+        "nome":  "Pedágio BR-414 - P9 - Corumbá de Goiás/GO",
         "rodovia":  "BR-414",
         "concessionaria":  "Ecovias do Araguaia",
         "lat":  -16.001028,
         "lng":  -48.840289
     },
     {
-        "nome":  "PedÃ¡gio BR-365 - P1 - UBERLÃ‚NDIA/MG",
+        "nome":  "Pedágio BR-365 - P1 - UBERLÂNDIA/MG",
         "rodovia":  "BR-365",
         "concessionaria":  "Ecovias do Cerrado",
         "lat":  -18.879714,
         "lng":  -48.500378
     },
     {
-        "nome":  "PedÃ¡gio BR-365 - P2 - MONTE ALEGRE/MG",
+        "nome":  "Pedágio BR-365 - P2 - MONTE ALEGRE/MG",
         "rodovia":  "BR-365",
         "concessionaria":  "Ecovias do Cerrado",
         "lat":  -18.961722,
         "lng":  -49.604914
     },
     {
-        "nome":  "PedÃ¡gio BR-365 - P3 - ITUIUTABA/MG",
+        "nome":  "Pedágio BR-365 - P3 - ITUIUTABA/MG",
         "rodovia":  "BR-365",
         "concessionaria":  "Ecovias do Cerrado",
         "lat":  -18.961722,
         "lng":  -49.604914
     },
     {
-        "nome":  "PedÃ¡gio BR-365 - P4 - SANTA VITÃ“RIA/MG",
+        "nome":  "Pedágio BR-365 - P4 - SANTA VITÓRIA/MG",
         "rodovia":  "BR-365",
         "concessionaria":  "Ecovias do Cerrado",
         "lat":  -18.912533,
         "lng":  -50.224138
     },
     {
-        "nome":  "PedÃ¡gio BR-364 - P5 - PARANAIGUARA/GO",
+        "nome":  "Pedágio BR-364 - P5 - PARANAIGUARA/GO",
         "rodovia":  "BR-364",
         "concessionaria":  "Ecovias do Cerrado",
         "lat":  -18.888286,
         "lng":  -50.742164
     },
     {
-        "nome":  "PedÃ¡gio BR-364 - P6 - CACHOEIRA ALTA/GO",
+        "nome":  "Pedágio BR-364 - P6 - CACHOEIRA ALTA/GO",
         "rodovia":  "BR-364",
         "concessionaria":  "Ecovias do Cerrado",
         "lat":  -18.48085,
         "lng":  -51.079022
     },
     {
-        "nome":  "PedÃ¡gio BR-364 - P7 - JATAÃ/GO",
+        "nome":  "Pedágio BR-364 - P7 - JATAÍ/GO",
         "rodovia":  "BR-364",
         "concessionaria":  "Ecovias do Cerrado",
         "lat":  -18.101683,
         "lng":  -51.489928
     },
     {
-        "nome":  "PedÃ¡gio BR-101 - Free Flow ItaguaÃ­/RJ",
+        "nome":  "Pedágio BR-101 - Free Flow Itaguaí/RJ",
         "rodovia":  "BR-101",
         "concessionaria":  "CCR RioSP (Nova Dutra)",
         "lat":  -22.91,
         "lng":  -43.89
     },
     {
-        "nome":  "PedÃ¡gio BR-101 - Free Flow Paraty/RJ",
+        "nome":  "Pedágio BR-101 - Free Flow Paraty/RJ",
         "rodovia":  "BR-101",
         "concessionaria":  "CCR RioSP (Nova Dutra)",
         "lat":  -23.05,
         "lng":  -44.58
     },
     {
-        "nome":  "PedÃ¡gio BR-101 - Free Flow Mangaratiba/RJ",
+        "nome":  "Pedágio BR-101 - Free Flow Mangaratiba/RJ",
         "rodovia":  "BR-101",
         "concessionaria":  "CCR RioSP (Nova Dutra)",
         "lat":  -23.00632,
         "lng":  -44.099135
     },
     {
-        "nome":  "PedÃ¡gio BR-116 - Guararema Sul/SP",
+        "nome":  "Pedágio BR-116 - Guararema Sul/SP",
         "rodovia":  "BR-116",
         "concessionaria":  "CCR RioSP (Nova Dutra)",
         "lat":  -23.34,
         "lng":  -46.15
     },
     {
-        "nome":  "PedÃ¡gio BR-116 - ArujÃ¡ Rodoanel/SP",
+        "nome":  "Pedágio BR-116 - Arujá Rodoanel/SP",
         "rodovia":  "BR-116",
         "concessionaria":  "CCR RioSP (Nova Dutra)",
         "lat":  -23.42,
         "lng":  -46.37
     },
     {
-        "nome":  "PedÃ¡gio BR-116 - Guararema Norte/SP",
+        "nome":  "Pedágio BR-116 - Guararema Norte/SP",
         "rodovia":  "BR-116",
         "concessionaria":  "CCR RioSP (Nova Dutra)",
         "lat":  -23.35,
         "lng":  -46.16
     },
     {
-        "nome":  "PedÃ¡gio BR-116 - ArujÃ¡ Norte/SP",
+        "nome":  "Pedágio BR-116 - Arujá Norte/SP",
         "rodovia":  "BR-116",
         "concessionaria":  "CCR RioSP (Nova Dutra)",
         "lat":  -23.41,
         "lng":  -46.36
     },
     {
-        "nome":  "PedÃ¡gio BR-116 - ArujÃ¡ Sul/SP",
+        "nome":  "Pedágio BR-116 - Arujá Sul/SP",
         "rodovia":  "BR-116",
         "concessionaria":  "CCR RioSP (Nova Dutra)",
         "lat":  -23.41,
         "lng":  -46.36
     },
     {
-        "nome":  "PedÃ¡gio BR-116 - Itatiaia Norte/RJ",
+        "nome":  "Pedágio BR-116 - Itatiaia Norte/RJ",
         "rodovia":  "BR-116",
         "concessionaria":  "CCR RioSP (Nova Dutra)",
         "lat":  -22.49,
         "lng":  -44.57
     },
     {
-        "nome":  "PedÃ¡gio BR-116 - Itatiaia Sul/RJ",
+        "nome":  "Pedágio BR-116 - Itatiaia Sul/RJ",
         "rodovia":  "BR-116",
         "concessionaria":  "CCR RioSP (Nova Dutra)",
         "lat":  -22.49,
         "lng":  -44.57
     },
     {
-        "nome":  "PedÃ¡gio BR-116 - JacareÃ­ Norte/SP",
+        "nome":  "Pedágio BR-116 - Jacareí Norte/SP",
         "rodovia":  "BR-116",
         "concessionaria":  "CCR RioSP (Nova Dutra)",
         "lat":  -23.3,
         "lng":  -46.01
     },
     {
-        "nome":  "PedÃ¡gio BR-116 - JacareÃ­ Sul/SP",
+        "nome":  "Pedágio BR-116 - Jacareí Sul/SP",
         "rodovia":  "BR-116",
         "concessionaria":  "CCR RioSP (Nova Dutra)",
         "lat":  -23.3,
         "lng":  -46.01
     },
     {
-        "nome":  "PedÃ¡gio BR-116 - Moreira CÃ©sar Norte/SP",
+        "nome":  "Pedágio BR-116 - Moreira César Norte/SP",
         "rodovia":  "BR-116",
         "concessionaria":  "CCR RioSP (Nova Dutra)",
         "lat":  -22.93,
         "lng":  -45.36
     },
     {
-        "nome":  "PedÃ¡gio BR-116 - Moreira CÃ©sar Sul/SP",
+        "nome":  "Pedágio BR-116 - Moreira César Sul/SP",
         "rodovia":  "BR-116",
         "concessionaria":  "CCR RioSP (Nova Dutra)",
         "lat":  -22.93,
         "lng":  -45.36
     },
     {
-        "nome":  "PedÃ¡gio BR-116 - ViÃºva GraÃ§a Norte/RJ",
+        "nome":  "Pedágio BR-116 - Viúva Graça Norte/RJ",
         "rodovia":  "BR-116",
         "concessionaria":  "CCR RioSP (Nova Dutra)",
         "lat":  -22.716155,
         "lng":  -43.716697
     },
     {
-        "nome":  "PedÃ¡gio BR-116 - Viuvinha Norte/RJ",
+        "nome":  "Pedágio BR-116 - Viuvinha Norte/RJ",
         "rodovia":  "BR-116",
         "concessionaria":  "CCR RioSP (Nova Dutra)",
         "lat":  -22.715133,
         "lng":  -43.730239
     },
     {
-        "nome":  "PedÃ¡gio BR-163 - P1-Mundo Novo/MS",
+        "nome":  "Pedágio BR-163 - P1-Mundo Novo/MS",
         "rodovia":  "BR-163",
         "concessionaria":  "MSVia",
         "lat":  -23.865169,
         "lng":  -54.329788
     },
     {
-        "nome":  "PedÃ¡gio BR-163 - P2-Itaquirai/MS",
+        "nome":  "Pedágio BR-163 - P2-Itaquirai/MS",
         "rodovia":  "BR-163",
         "concessionaria":  "MSVia",
         "lat":  -23.167432,
         "lng":  -54.19897
     },
     {
-        "nome":  "PedÃ¡gio BR-163 - P3-CaarapÃ³/MS",
+        "nome":  "Pedágio BR-163 - P3-Caarapó/MS",
         "rodovia":  "BR-163",
         "concessionaria":  "MSVia",
         "lat":  -22.476042,
         "lng":  -54.860799
     },
     {
-        "nome":  "PedÃ¡gio BR-163 - P4-Rio Brilhante/MS",
+        "nome":  "Pedágio BR-163 - P4-Rio Brilhante/MS",
         "rodovia":  "BR-163",
         "concessionaria":  "MSVia",
         "lat":  -21.865146,
         "lng":  -54.528504
     },
     {
-        "nome":  "PedÃ¡gio BR-163 - P5-Campo Grande/MS",
+        "nome":  "Pedágio BR-163 - P5-Campo Grande/MS",
         "rodovia":  "BR-163",
         "concessionaria":  "MSVia",
         "lat":  -20.882783,
         "lng":  -54.504644
     },
     {
-        "nome":  "PedÃ¡gio BR-163 - P6-Jaraguari/MS",
+        "nome":  "Pedágio BR-163 - P6-Jaraguari/MS",
         "rodovia":  "BR-163",
         "concessionaria":  "MSVia",
         "lat":  -20.04078,
         "lng":  -54.412778
     },
     {
-        "nome":  "PedÃ¡gio BR-163 - P7-SÃ£o Gabriel/MS",
+        "nome":  "Pedágio BR-163 - P7-São Gabriel/MS",
         "rodovia":  "BR-163",
         "concessionaria":  "MSVia",
         "lat":  -19.473376,
         "lng":  -54.496991
     },
     {
-        "nome":  "PedÃ¡gio BR-163 - P8-Rio Verde/MS",
+        "nome":  "Pedágio BR-163 - P8-Rio Verde/MS",
         "rodovia":  "BR-163",
         "concessionaria":  "MSVia",
         "lat":  -18.722782,
         "lng":  -54.814951
     },
     {
-        "nome":  "PedÃ¡gio BR-163 - P9-Sonora/MS",
+        "nome":  "Pedágio BR-163 - P9-Sonora/MS",
         "rodovia":  "BR-163",
         "concessionaria":  "MSVia",
         "lat":  -17.766671,
         "lng":  -54.750815
     },
     {
-        "nome":  "PedÃ¡gio BR-393 - BARRA DA PIRAI/RJ",
+        "nome":  "Pedágio BR-393 - BARRA DA PIRAI/RJ",
         "rodovia":  "BR-393",
-        "concessionaria":  "Rodovia do AÃ§o",
+        "concessionaria":  "Rodovia do Aço",
         "lat":  -22.485435,
         "lng":  -43.919084
     },
     {
-        "nome":  "PedÃ¡gio BR-393 - PARAÃBA DO SUL/RJ",
+        "nome":  "Pedágio BR-393 - PARAÍBA DO SUL/RJ",
         "rodovia":  "BR-393",
-        "concessionaria":  "Rodovia do AÃ§o",
+        "concessionaria":  "Rodovia do Aço",
         "lat":  -22.208911,
         "lng":  -43.382139
     },
     {
-        "nome":  "PedÃ¡gio BR-393 - SAPUCAIA/RJ",
+        "nome":  "Pedágio BR-393 - SAPUCAIA/RJ",
         "rodovia":  "BR-393",
-        "concessionaria":  "Rodovia do AÃ§o",
+        "concessionaria":  "Rodovia do Aço",
         "lat":  -21.962326,
         "lng":  -42.861675
     },
     {
-        "nome":  "PedÃ¡gio BR-153 - P 01/SP",
+        "nome":  "Pedágio BR-153 - P 01/SP",
         "rodovia":  "BR-153",
         "concessionaria":  "Transbrasiliana",
         "lat":  -20.588611,
         "lng":  -49.318055
     },
     {
-        "nome":  "PedÃ¡gio BR-153 - P 02/SP",
+        "nome":  "Pedágio BR-153 - P 02/SP",
         "rodovia":  "BR-153",
         "concessionaria":  "Transbrasiliana",
         "lat":  -20.9975,
         "lng":  -49.628333
     },
     {
-        "nome":  "PedÃ¡gio BR-153 - P 03/SP",
+        "nome":  "Pedágio BR-153 - P 03/SP",
         "rodovia":  "BR-153",
         "concessionaria":  "Transbrasiliana",
         "lat":  -21.710555,
         "lng":  -49.808611
     },
     {
-        "nome":  "PedÃ¡gio BR-153 - P 04/SP",
+        "nome":  "Pedágio BR-153 - P 04/SP",
         "rodovia":  "BR-153",
         "concessionaria":  "Transbrasiliana",
         "lat":  -22.336311,
         "lng":  -49.898833
     },
     {
-        "nome":  "PedÃ¡gio BR-40 - P1 - Cristalina/GO",
+        "nome":  "Pedágio BR-40 - P1 - Cristalina/GO",
         "rodovia":  "BR-40",
         "concessionaria":  "Via 040",
         "lat":  -16.7389,
         "lng":  -47.61754
     },
     {
-        "nome":  "PedÃ¡gio BR-40 - P10 - Lafaiete/MG",
+        "nome":  "Pedágio BR-40 - P10 - Lafaiete/MG",
         "rodovia":  "BR-40",
         "concessionaria":  "Via 040",
         "lat":  -20.76702,
         "lng":  -43.80668
     },
     {
-        "nome":  "PedÃ¡gio BR-40 - P11 - Barbacena/MG",
+        "nome":  "Pedágio BR-40 - P11 - Barbacena/MG",
         "rodovia":  "BR-40",
         "concessionaria":  "Via 040",
         "lat":  -21.26271,
         "lng":  -43.66224
     },
     {
-        "nome":  "PedÃ¡gio BR-40 - P2 - Paracatu/MG",
+        "nome":  "Pedágio BR-40 - P2 - Paracatu/MG",
         "rodovia":  "BR-40",
         "concessionaria":  "Via 040",
         "lat":  -17.09831,
         "lng":  -47.02624
     },
     {
-        "nome":  "PedÃ¡gio BR-40 - P3 - Lagoa Grande/MG",
+        "nome":  "Pedágio BR-40 - P3 - Lagoa Grande/MG",
         "rodovia":  "BR-40",
         "concessionaria":  "Via 040",
         "lat":  -17.50598,
         "lng":  -46.56465
     },
     {
-        "nome":  "PedÃ¡gio BR-40 - P4 - JoÃ£o Pinheiro/MG",
+        "nome":  "Pedágio BR-40 - P4 - João Pinheiro/MG",
         "rodovia":  "BR-40",
         "concessionaria":  "Via 040",
         "lat":  -17.94577,
         "lng":  -46.03425
     },
     {
-        "nome":  "PedÃ¡gio BR-40 - P5 - SÃ£o GonÃ§alo do AbaetÃ©/MG",
+        "nome":  "Pedágio BR-40 - P5 - São Gonçalo do Abaeté/MG",
         "rodovia":  "BR-40",
         "concessionaria":  "Via 040",
         "lat":  -18.13265,
         "lng":  -45.40817
     },
     {
-        "nome":  "PedÃ¡gio BR-40 - P6 - FelixlÃ¢ndia/MG",
+        "nome":  "Pedágio BR-40 - P6 - Felixlândia/MG",
         "rodovia":  "BR-40",
         "concessionaria":  "Via 040",
         "lat":  -18.5654,
         "lng":  -45.02116
     },
     {
-        "nome":  "PedÃ¡gio BR-40 - P7 - Curvelo/MG",
+        "nome":  "Pedágio BR-40 - P7 - Curvelo/MG",
         "rodovia":  "BR-40",
         "concessionaria":  "Via 040",
         "lat":  -19.0793,
         "lng":  -44.65495
     },
     {
-        "nome":  "PedÃ¡gio BR-40 - P8 - Capim Branco/MG",
+        "nome":  "Pedágio BR-40 - P8 - Capim Branco/MG",
         "rodovia":  "BR-40",
         "concessionaria":  "Via 040",
         "lat":  -19.60121,
         "lng":  -44.22196
     },
     {
-        "nome":  "PedÃ¡gio BR-40 - P9 - Itabirito/MG",
+        "nome":  "Pedágio BR-40 - P9 - Itabirito/MG",
         "rodovia":  "BR-40",
         "concessionaria":  "Via 040",
         "lat":  -20.27288,
         "lng":  -43.95112
     },
     {
-        "nome":  "PedÃ¡gio BR-324 - PraÃ§a 1/BA",
+        "nome":  "Pedágio BR-324 - Praça 1/BA",
         "rodovia":  "BR-324",
         "concessionaria":  "Via Bahia",
         "lat":  -12.751276,
         "lng":  -38.43154
     },
     {
-        "nome":  "PedÃ¡gio BR-324 - PraÃ§a 2/BA",
+        "nome":  "Pedágio BR-324 - Praça 2/BA",
         "rodovia":  "BR-324",
         "concessionaria":  "Via Bahia",
         "lat":  -12.451647,
         "lng":  -38.708421
     },
     {
-        "nome":  "PedÃ¡gio BR-116 - PraÃ§a 3/BA",
+        "nome":  "Pedágio BR-116 - Praça 3/BA",
         "rodovia":  "BR-116",
         "concessionaria":  "Via Bahia",
         "lat":  -12.531931,
         "lng":  -39.41502
     },
     {
-        "nome":  "PedÃ¡gio BR-116 - PraÃ§a 4/BA",
+        "nome":  "Pedágio BR-116 - Praça 4/BA",
         "rodovia":  "BR-116",
         "concessionaria":  "Via Bahia",
         "lat":  -13.008714,
         "lng":  -39.957042
     },
     {
-        "nome":  "PedÃ¡gio BR-116 - PraÃ§a 5/BA",
+        "nome":  "Pedágio BR-116 - Praça 5/BA",
         "rodovia":  "BR-116",
         "concessionaria":  "Via Bahia",
         "lat":  -14.055969,
         "lng":  -40.20445
     },
     {
-        "nome":  "PedÃ¡gio BR-116 - PraÃ§a 6/BA",
+        "nome":  "Pedágio BR-116 - Praça 6/BA",
         "rodovia":  "BR-116",
         "concessionaria":  "Via Bahia",
         "lat":  -14.646178,
         "lng":  -40.455782
     },
     {
-        "nome":  "PedÃ¡gio BR-116 - PraÃ§a 7/BA",
+        "nome":  "Pedágio BR-116 - Praça 7/BA",
         "rodovia":  "BR-116",
         "concessionaria":  "Via Bahia",
         "lat":  -15.232323,
         "lng":  -41.100949
     },
     {
-        "nome":  "PedÃ¡gio BR-101 - P1-Laguna/SC",
+        "nome":  "Pedágio BR-101 - P1-Laguna/SC",
         "rodovia":  "BR-101",
         "concessionaria":  "Via Costeira",
         "lat":  -28.350722,
@@ -1112,7 +1112,7 @@
         "tarifaMoto":  0
     },
     {
-        "nome":  "PedÃ¡gio BR-101 - P2-TubarÃ£o/SC",
+        "nome":  "Pedágio BR-101 - P2-Tubarão/SC",
         "rodovia":  "BR-101",
         "concessionaria":  "Via Costeira",
         "lat":  -28.554278,
@@ -1121,7 +1121,7 @@
         "tarifaMoto":  0
     },
     {
-        "nome":  "PedÃ¡gio BR-101 - P3-AraranguÃ¡/SC",
+        "nome":  "Pedágio BR-101 - P3-Araranguá/SC",
         "rodovia":  "BR-101",
         "concessionaria":  "Via Costeira",
         "lat":  -28.89774,
@@ -1130,7 +1130,7 @@
         "tarifaMoto":  0
     },
     {
-        "nome":  "PedÃ¡gio BR-101 - P4-SÃ£o JoÃ£o do Sul/SC",
+        "nome":  "Pedágio BR-101 - P4-São João do Sul/SC",
         "rodovia":  "BR-101",
         "concessionaria":  "Via Costeira",
         "lat":  -29.243667,
@@ -1139,49 +1139,49 @@
         "tarifaMoto":  0
     },
     {
-        "nome":  "PedÃ¡gio BR-101 - P1-TrÃªs Cachoeiras/RS",
+        "nome":  "Pedágio BR-101 - P1-Três Cachoeiras/RS",
         "rodovia":  "BR-101",
         "concessionaria":  "Via Sul",
         "lat":  -29.520461,
         "lng":  -49.996581
     },
     {
-        "nome":  "PedÃ¡gio BR-386 - P4-Montenegro/RS",
+        "nome":  "Pedágio BR-386 - P4-Montenegro/RS",
         "rodovia":  "BR-386",
         "concessionaria":  "Via Sul",
         "lat":  -29.81976,
         "lng":  -51.360405
     },
     {
-        "nome":  "PedÃ¡gio BR-386 - P5-Paverama/RS",
+        "nome":  "Pedágio BR-386 - P5-Paverama/RS",
         "rodovia":  "BR-386",
         "concessionaria":  "Via Sul",
         "lat":  -29.626833,
         "lng":  -51.775773
     },
     {
-        "nome":  "PedÃ¡gio BR-386 - P6-Fontoura Xavier/RS",
+        "nome":  "Pedágio BR-386 - P6-Fontoura Xavier/RS",
         "rodovia":  "BR-386",
         "concessionaria":  "Via Sul",
         "lat":  -28.905316,
         "lng":  -52.396797
     },
     {
-        "nome":  "PedÃ¡gio BR-386 - P7-Victor Graeff/RS",
+        "nome":  "Pedágio BR-386 - P7-Victor Graeff/RS",
         "rodovia":  "BR-386",
         "concessionaria":  "Via Sul",
         "lat":  -28.502039,
         "lng":  -52.644709
     },
     {
-        "nome":  "PedÃ¡gio BR-290 - P2-Santo AntÃ´nio da Patrulha/RS",
+        "nome":  "Pedágio BR-290 - P2-Santo Antônio da Patrulha/RS",
         "rodovia":  "BR-290",
         "concessionaria":  "Via Sul",
         "lat":  -29.885897,
         "lng":  -50.448964
     },
     {
-        "nome":  "PedÃ¡gio BR-290 - P3-Gravatai/RS",
+        "nome":  "Pedágio BR-290 - P3-Gravatai/RS",
         "rodovia":  "BR-290",
         "concessionaria":  "Via Sul",
         "lat":  -29.955029,
@@ -2502,6 +2502,16 @@
         "lat":  -23.5118500,
         "lng":  -46.8014038,
         "tarifaPorEixo":  2,
+        "tarifaMoto":  0
+    },
+    {
+        "nome":  "Pedágio Via Lagos - Boa Esperança/RJ",
+        "rodovia":  "RJ-124",
+        "concessionaria":  "CCR ViaLagos",
+        "lat":  -22.7951419,
+        "lng":  -42.4414468,
+        "tarifaPorEixo":  9.2,
+        "tarifaPorEixoFimDeSemana":  15.3,
         "tarifaMoto":  0
     }
 ]

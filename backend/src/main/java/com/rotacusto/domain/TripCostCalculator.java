@@ -1,5 +1,6 @@
 package com.rotacusto.domain;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import com.rotacusto.domain.cost.FoodStopCostCalculator;
@@ -17,10 +18,11 @@ public final class TripCostCalculator {
     }
 
     public static TripCostBreakdown calculate(double distanciaKm, double duracaoMin, VehicleProfile profile,
-            List<TollPlaza> praçasCruzadas, double foodStopIntervalHours, double foodStopAverageCost) {
+            List<TollPlaza> praçasCruzadas, double foodStopIntervalHours, double foodStopAverageCost,
+            LocalDate dataViagem) {
         double custoCombustivel = FuelCostCalculator.calculate(distanciaKm, profile);
         double custoDesgaste = WearCostCalculator.calculate(distanciaKm, profile);
-        double custoPedagio = TollCostCalculator.calculate(praçasCruzadas, profile);
+        double custoPedagio = TollCostCalculator.calculate(praçasCruzadas, profile, dataViagem);
         double custoLanche = FoodStopCostCalculator.calculate(duracaoMin, foodStopIntervalHours, foodStopAverageCost);
         double total = custoCombustivel + custoDesgaste + custoPedagio + custoLanche;
 
