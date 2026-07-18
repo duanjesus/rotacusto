@@ -123,14 +123,63 @@ import com.rotacusto.repository.TollPlazaRepository;
  *       GeoDER (mapa interativo) tem malha viária geral em KML/Shapefile,
  *       mas nenhum dataset específico de praça de pedágio com tarifa foi
  *       encontrado. Baixa prioridade dado que a rede está sendo desativada.</li>
- *   <li><b>Rio Grande do Sul</b>: único outro estado com um dataset
- *       explicitamente dedicado a "PRAÇAS DE PEDÁGIO RODOVIÁRIO DO RIO
- *       GRANDE DO SUL" (DAER-RS, serviço WFS/i3Geo em
- *       {@code i3geo.daer.rs.gov.br}) — mas os servidores do DAER-RS não
- *       responderam (connection refused/timeout) nas tentativas desta
- *       sessão, tanto via fetch de página quanto requisição direta ao WFS.
- *       Dado real existe, só não foi possível baixar agora — candidato
- *       natural pra uma sessão futura quando o servidor estiver acessível.</li>
+ *   <li><b>Rio Grande do Sul (21 praças novas + 7 enriquecidas)</b>: o
+ *       servidor original do dado (DAER-RS, WFS/i3Geo em
+ *       {@code i3geo.daer.rs.gov.br}/{@code mapa.daer.rs.gov.br}) continuou
+ *       recusando conexão numa sessão posterior — mas o MESMO dataset está
+ *       publicado por um serviço diferente, a IEDE/RS (Infraestrutura
+ *       Estadual de Dados Espaciais), um FeatureServer ArcGIS público em
+ *       {@code iede.rs.gov.br/server/rest/services/DAER/pracas_pedagios/
+ *       FeatureServer/0} — respondeu HTTP 200 e devolveu GeoJSON com 33
+ *       praças, coordenada exata, rodovia/km, concessão e até um
+ *       {@code url_tarifa} por concessão apontando pra página oficial de
+ *       tarifas. Lição: quando um serviço de dado geoespacial governamental
+ *       está fora do ar, procurar o MESMO dataset publicado num portal
+ *       estadual de infraestrutura de dados espaciais (IDE) antes de
+ *       desistir — é comum o mesmo dado existir em mais de um serviço.
+ *       <p>Das 33 praças do dataset, só 21 são genuinamente ESTADUAIS
+ *       (prefixo de rodovia ERS-/RSC-): 10 EGR, 6 CSG, 5 Sacyr. As outras
+ *       12 (ECOSUL, 5; CCR ViaSul, 7) rodam em rodovia FEDERAL (prefixo
+ *       BRS-/BR-101/116/290/386/392) e já existiam no dataset federal da
+ *       ANTT processado nesta mesma sessão — confirmado por nome/coordenada
+ *       antes de adicionar, pra não duplicar praça.
+ *       <ul>
+ *         <li><b>CSG</b> (6 praças, ERS-122/240/446): pedágio "free-flow"
+ *             (pórtico eletrônico, sem cabine física) mas com tarifa FIXA
+ *             por pórtico — diferente do free-flow paulista, que cobra por
+ *             km rodado e por isso ficou sem tarifa curada. Confirmado por
+ *             2 fontes independentes e consistentes entre si (artigo do
+ *             reajuste de fev/2025 + notícia do reajuste de abr/2026, delta
+ *             de R$0,10-0,30 batendo entre as duas). Valores 2026: São
+ *             Sebastião do Caí R$13,30, Antônio Prado R$9,20, Ipê R$9,30,
+ *             Capela de Santana R$9,70, Farroupilha R$11,50, Carlos Barbosa
+ *             R$10,60 (preço total carro 2 eixos, dividido por 2 na
+ *             curadoria, mesma convenção de sempre).</li>
+ *         <li><b>Sacyr/Rota de Santa Maria</b> (5 praças, RSC-287): tarifa
+ *             ÚNICA confirmada pro trecho inteiro — R$5,40/carro (2026),
+ *             R$2,70/eixo, moto R$2,70 (tarifa direta, não dividida).</li>
+ *         <li><b>EGR</b> (10 praças, ERS-235/115/239/474/130/040/135/453):
+ *             tarifa varia MUITO por praça (ex.: Gramado R$7,10 vs Coxilha
+ *             R$4,40 em dado de 2024) e a tabela oficial só existe em
+ *             IMAGEM no site da EGR (não extraível por texto), sem fonte em
+ *             texto pra confirmar valor 2026 por praça — deixado sem
+ *             tarifa curada de propósito, mesmo critério da EcoRioMinas.</li>
+ *         <li><b>CCR ViaSul (agora "Motiva")</b>: JÁ EXISTIA no dataset
+ *             federal (concessão "Via Sul", 7 praças BR-101/290/386, sem
+ *             tarifa) — enriquecida agora com o valor uniforme confirmado
+ *             por múltiplas notícias locais consistentes e datadas:
+ *             R$6,60/carro = R$3,30/eixo, vigente desde 26/06/2026.</li>
+ *         <li><b>Ecosul</b>: JÁ EXISTIA no dataset federal (5 praças
+ *             BR-116/392), mantida SEM tarifa curada de propósito — as
+ *             fontes encontradas eram genuinamente conflitantes (R$12,30
+ *             num portal da ANTT vs R$19,60→R$22,20 em notícias datadas) e
+ *             a própria ANTT confirmou que o reajuste pra R$22,20 foi
+ *             aprovado mas está "sem impacto imediato para os usuários",
+ *             com o contrato de concessão previsto pra terminar em
+ *             março/2026 (o dataset é de julho/2026 — a concessão pode já
+ *             ter encerrado). Preferir deixar sem tarifa a arriscar um
+ *             valor errado ou de uma concessão extinta.</li>
+ *       </ul></li>
  *   <li><b>Minas Gerais, Bahia, Santa Catarina, Goiás e demais</b>: sem
  *       rede de pedágio ESTADUAL relevante identificada — os pedágios
  *       nesses estados são predominantemente em rodovias FEDERAIS (BR-xxx),

@@ -137,8 +137,9 @@ class SeedersIntegrationTest {
         // ativa e tarifa confirmada — dataset tem coordenada+tarifa+sentido
         // reais direto na descrição do KMZ, ao contrário do federal que só
         // tem localização) + 1 Via Lagos (RJ-124, tarifa por dia da semana)
-        // — ver TollPlazaSeeder.
-        assertEquals(311, tollPlazaRepository.count());
+        // + 21 estaduais RS (IEDE/DAER — 6 CSG free-flow, 5 Sacyr, 10 EGR
+        // sem tarifa curada) — ver TollPlazaSeeder.
+        assertEquals(332, tollPlazaRepository.count());
         var todasPracas = tollPlazaRepository.findAll();
 
         assertTrue(todasPracas.stream()
@@ -216,5 +217,52 @@ class SeedersIntegrationTest {
         assertEquals(15.30, viaLagos.getTarifaPorEixoFimDeSemana(), 0.001,
                 "Via Lagos fim de semana: R$30,60/carro = R$15,30/eixo");
         assertEquals(0.0, viaLagos.getTarifaMoto(), 0.001, "moto é isenta na Via Lagos");
+
+        // Estadual RS (IEDE/DAER, servidor i3geo original inacessível na sessão
+        // anterior, achado num FeatureServer ArcGIS alternativo do mesmo dado):
+        // CSG opera pedágio free-flow (sem cabine física) mas com tarifa FIXA por
+        // pórtico (não por km) — diferente do free-flow paulista, que é por km e
+        // por isso ficou sem tarifa curada. Confirmado por 2 fontes independentes
+        // (artigo do reajuste de fev/2025 + notícia do reajuste de abr/2026).
+        var csgPlazas = todasPracas.stream().filter(p -> p.getConcessionaria().equals("CSG")).toList();
+        assertEquals(6, csgPlazas.size(), "CSG deveria ter 6 praças free-flow");
+        assertTrue(csgPlazas.stream().allMatch(p -> p.getTarifaPorEixo() != null),
+                "todas as praças CSG deveriam ter tarifa curada (fixa por pórtico)");
+
+        // Sacyr/Rota de Santa Maria (RSC-287): tarifa uniforme confirmada nas 5
+        // praças, R$5,40/carro = R$2,70/eixo, moto R$2,70 (tarifa direta, não
+        // dividida por eixo).
+        var sacyrPlazas = todasPracas.stream().filter(p -> p.getConcessionaria().equals("Sacyr")).toList();
+        assertEquals(5, sacyrPlazas.size(), "Sacyr deveria ter 5 praças");
+        assertTrue(sacyrPlazas.stream().allMatch(p -> p.getTarifaPorEixo() != null && p.getTarifaPorEixo() == 2.7),
+                "Sacyr deveria ter tarifa uniforme de R$2,70/eixo em todas as praças");
+        assertTrue(sacyrPlazas.stream().allMatch(p -> p.getTarifaMoto() != null && p.getTarifaMoto() == 2.7),
+                "Sacyr deveria ter tarifa de moto de R$2,70 em todas as praças");
+
+        // EGR (Empresa Gaúcha de Rodovias): tarifa varia bastante por praça
+        // (ex.: Gramado R$7,10 vs Coxilha R$4,40 em 2024) e só está publicada em
+        // imagem no site oficial, sem tabela em texto pra confirmar valores 2026
+        // — deixado sem tarifa curada de propósito, mesmo critério de EcoRioMinas.
+        var egrPlazas = todasPracas.stream().filter(p -> p.getConcessionaria().equals("EGR")).toList();
+        assertEquals(10, egrPlazas.size(), "EGR deveria ter 10 praças");
+        assertTrue(egrPlazas.stream().allMatch(p -> p.getTarifaPorEixo() == null),
+                "EGR tem tarifa variável e não confirmada por praça — não deveria ter tarifa curada");
+
+        // Via Sul (Motiva, ex-CCR — BR-101/BR-290/BR-386): já existia no dataset
+        // federal sem tarifa; enriquecida agora com o valor uniforme confirmado
+        // (R$6,60/carro = R$3,30/eixo, vigente desde 26/06/2026).
+        var viaSulPlazas = todasPracas.stream().filter(p -> p.getConcessionaria().equals("Via Sul")).toList();
+        assertEquals(7, viaSulPlazas.size(), "Via Sul deveria ter 7 praças");
+        assertTrue(viaSulPlazas.stream().allMatch(p -> p.getTarifaPorEixo() != null && p.getTarifaPorEixo() == 3.3),
+                "Via Sul deveria ter tarifa uniforme de R$3,30/eixo em todas as praças");
+
+        // Ecosul (BR-116/BR-392): contrato de concessão previsto pra terminar em
+        // março/2026 e reajuste pra R$22,20 aprovado mas "sem impacto imediato"
+        // (ANTT) — dado real mas genuinamente ambíguo/desatualizado, mantido sem
+        // tarifa curada em vez de arriscar um valor errado ou de concessão extinta.
+        var ecosulPlazas = todasPracas.stream().filter(p -> p.getConcessionaria().equals("Ecosul")).toList();
+        assertEquals(5, ecosulPlazas.size(), "Ecosul deveria continuar com 5 praças (sem duplicar)");
+        assertTrue(ecosulPlazas.stream().allMatch(p -> p.getTarifaPorEixo() == null),
+                "Ecosul deveria continuar sem tarifa curada (situação contratual ambígua)");
     }
 }

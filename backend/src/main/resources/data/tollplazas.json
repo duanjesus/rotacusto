@@ -1143,49 +1143,56 @@
         "rodovia":  "BR-101",
         "concessionaria":  "Via Sul",
         "lat":  -29.520461,
-        "lng":  -49.996581
+        "lng":  -49.996581,
+        "tarifaPorEixo":  3.3
     },
     {
         "nome":  "Pedágio BR-386 - P4-Montenegro/RS",
         "rodovia":  "BR-386",
         "concessionaria":  "Via Sul",
         "lat":  -29.81976,
-        "lng":  -51.360405
+        "lng":  -51.360405,
+        "tarifaPorEixo":  3.3
     },
     {
         "nome":  "Pedágio BR-386 - P5-Paverama/RS",
         "rodovia":  "BR-386",
         "concessionaria":  "Via Sul",
         "lat":  -29.626833,
-        "lng":  -51.775773
+        "lng":  -51.775773,
+        "tarifaPorEixo":  3.3
     },
     {
         "nome":  "Pedágio BR-386 - P6-Fontoura Xavier/RS",
         "rodovia":  "BR-386",
         "concessionaria":  "Via Sul",
         "lat":  -28.905316,
-        "lng":  -52.396797
+        "lng":  -52.396797,
+        "tarifaPorEixo":  3.3
     },
     {
         "nome":  "Pedágio BR-386 - P7-Victor Graeff/RS",
         "rodovia":  "BR-386",
         "concessionaria":  "Via Sul",
         "lat":  -28.502039,
-        "lng":  -52.644709
+        "lng":  -52.644709,
+        "tarifaPorEixo":  3.3
     },
     {
         "nome":  "Pedágio BR-290 - P2-Santo Antônio da Patrulha/RS",
         "rodovia":  "BR-290",
         "concessionaria":  "Via Sul",
         "lat":  -29.885897,
-        "lng":  -50.448964
+        "lng":  -50.448964,
+        "tarifaPorEixo":  3.3
     },
     {
         "nome":  "Pedágio BR-290 - P3-Gravatai/RS",
         "rodovia":  "BR-290",
         "concessionaria":  "Via Sul",
         "lat":  -29.955029,
-        "lng":  -51.031282
+        "lng":  -51.031282,
+        "tarifaPorEixo":  3.3
     },
     {
         "nome":  "Pedágio SP348 - Campo Limpo (Autoban)",
@@ -1290,8 +1297,8 @@
         "nome":  "Pedágio SP348 - Sumaré (Autoban)",
         "rodovia":  "SP348",
         "concessionaria":  "Autoban (CCR)",
-        "lat":  -22.8574060,
-        "lng":  -47.3005130,
+        "lat":  -22.857406,
+        "lng":  -47.300513,
         "tarifaPorEixo":  6.05,
         "tarifaMoto":  0
     },
@@ -1299,7 +1306,7 @@
         "nome":  "Pedágio SP348 - Limeira A (Autoban)",
         "rodovia":  "SP348",
         "concessionaria":  "Autoban (CCR)",
-        "lat":  -22.5558470,
+        "lat":  -22.555847,
         "lng":  -47.4604863,
         "tarifaPorEixo":  4.6,
         "tarifaMoto":  0
@@ -1408,7 +1415,7 @@
         "rodovia":  "SP065",
         "concessionaria":  "Rota das Bandeiras (CCR)",
         "lat":  -23.198603,
-        "lng":  -46.1816850,
+        "lng":  -46.181685,
         "tarifaPorEixo":  6.65,
         "tarifaMoto":  6.65
     },
@@ -1417,7 +1424,7 @@
         "rodovia":  "SP065",
         "concessionaria":  "Rota das Bandeiras (CCR)",
         "lat":  -23.198629,
-        "lng":  -46.1796100,
+        "lng":  -46.17961,
         "tarifaPorEixo":  6.65,
         "tarifaMoto":  6.65
     },
@@ -1426,7 +1433,7 @@
         "rodovia":  "SP065",
         "concessionaria":  "Rota das Bandeiras (CCR)",
         "lat":  -23.094658,
-        "lng":  -46.6264120,
+        "lng":  -46.626412,
         "tarifaPorEixo":  5.3,
         "tarifaMoto":  5.3
     },
@@ -1435,7 +1442,7 @@
         "rodovia":  "SP360",
         "concessionaria":  "Rota das Bandeiras (CCR)",
         "lat":  -23.077185,
-        "lng":  -46.8411220,
+        "lng":  -46.841122,
         "tarifaPorEixo":  3.05,
         "tarifaMoto":  3.05
     },
@@ -1470,8 +1477,8 @@
         "nome":  "Pedágio SP332 - Paulínia A N/S (Rota das Bandeiras)",
         "rodovia":  "SP332",
         "concessionaria":  "Rota das Bandeiras (CCR)",
-        "lat":  -22.6900170,
-        "lng":  -47.1547890,
+        "lat":  -22.690017,
+        "lng":  -47.154789,
         "tarifaPorEixo":  6,
         "tarifaMoto":  6
     },
@@ -1560,7 +1567,7 @@
         "nome":  "Pedágio SP075 - Indaiatuba (Colinas)",
         "rodovia":  "SP075",
         "concessionaria":  "Colinas (EcoRodovias)",
-        "lat":  -23.0633420,
+        "lat":  -23.063342,
         "lng":  -47.1573158,
         "tarifaPorEixo":  9.7
     },
@@ -1648,7 +1655,7 @@
         "nome":  "Pedágio SP-270 - Palmital (Cart)",
         "rodovia":  "SP-270",
         "concessionaria":  "Cart",
-        "lat":  -22.7697660,
+        "lat":  -22.769766,
         "lng":  -50.14523,
         "tarifaPorEixo":  6.1
     },
@@ -1664,7 +1671,7 @@
         "nome":  "Pedágio SP-270 - Rancharia (Cart)",
         "rodovia":  "SP-270",
         "concessionaria":  "Cart",
-        "lat":  -22.4352610,
+        "lat":  -22.435261,
         "lng":  -51.00838,
         "tarifaPorEixo":  5.2
     },
@@ -1768,8 +1775,8 @@
         "nome":  "Pedágio SP127 - praça (SPVias)",
         "rodovia":  "SP127",
         "concessionaria":  "SPVias (CCR)",
-        "lat":  -23.4352000,
-        "lng":  -47.9388000,
+        "lat":  -23.4352,
+        "lng":  -47.9388,
         "tarifaPorEixo":  7.95,
         "tarifaMoto":  0
     },
@@ -1777,8 +1784,8 @@
         "nome":  "Pedágio SP127 - praça (SPVias)",
         "rodovia":  "SP127",
         "concessionaria":  "SPVias (CCR)",
-        "lat":  -23.4710000,
-        "lng":  -47.9681000,
+        "lat":  -23.471,
+        "lng":  -47.9681,
         "tarifaPorEixo":  7.95,
         "tarifaMoto":  0
     },
@@ -1895,7 +1902,7 @@
         "rodovia":  "SP258",
         "concessionaria":  "SPVias (CCR)",
         "lat":  -23.9388747,
-        "lng":  -48.5741250,
+        "lng":  -48.574125,
         "tarifaPorEixo":  7.7,
         "tarifaMoto":  0
     },
@@ -1976,7 +1983,7 @@
         "rodovia":  "SP300",
         "concessionaria":  "Rodovias do Tietê (EcoRodovias)",
         "lat":  -22.6773578,
-        "lng":  -48.6876230,
+        "lng":  -48.687623,
         "tarifaPorEixo":  4.3,
         "tarifaMoto":  4.3
     },
@@ -2094,7 +2101,7 @@
         "nome":  "Pedágio N/D - praça (Rodoanel)",
         "rodovia":  "N/D",
         "concessionaria":  "Rodoanel (SPMAR/CCR)",
-        "lat":  -23.4528070,
+        "lat":  -23.452807,
         "lng":  -46.7857751,
         "tarifaPorEixo":  1.75,
         "tarifaMoto":  0
@@ -2112,7 +2119,7 @@
         "nome":  "Pedágio N/D - praça (Rodoanel)",
         "rodovia":  "N/D",
         "concessionaria":  "Rodoanel (SPMAR/CCR)",
-        "lat":  -23.4468980,
+        "lat":  -23.446898,
         "lng":  -46.7815911,
         "tarifaPorEixo":  1.75,
         "tarifaMoto":  0
@@ -2139,7 +2146,7 @@
         "nome":  "Pedágio N/D - praça (Rodoanel)",
         "rodovia":  "N/D",
         "concessionaria":  "Rodoanel (SPMAR/CCR)",
-        "lat":  -23.5646850,
+        "lat":  -23.564685,
         "lng":  -46.8186082,
         "tarifaPorEixo":  1.75,
         "tarifaMoto":  0
@@ -2175,7 +2182,7 @@
         "nome":  "Pedágio N/D - praça (Rodoanel)",
         "rodovia":  "N/D",
         "concessionaria":  "Rodoanel (SPMAR/CCR)",
-        "lat":  -23.5999320,
+        "lat":  -23.599932,
         "lng":  -46.8114347,
         "tarifaPorEixo":  1.75,
         "tarifaMoto":  0
@@ -2265,7 +2272,7 @@
         "nome":  "Pedágio SP-021 - praça (SPMar)",
         "rodovia":  "SP-021",
         "concessionaria":  "SPMar (CCR)",
-        "lat":  -23.4580960,
+        "lat":  -23.458096,
         "lng":  -46.3438703,
         "tarifaPorEixo":  2.05,
         "tarifaMoto":  2.05
@@ -2373,7 +2380,7 @@
         "nome":  "Pedágio SP-310 - praça (Noroeste Paulista)",
         "rodovia":  "SP-310",
         "concessionaria":  "Rota Noroeste Paulista",
-        "lat":  -21.0683070,
+        "lat":  -21.068307,
         "lng":  -49.1045396,
         "tarifaPorEixo":  9.5,
         "tarifaMoto":  9.5
@@ -2445,7 +2452,7 @@
         "nome":  "Pedágio SP270 - praça (Rota Sorocabana)",
         "rodovia":  "SP270",
         "concessionaria":  "Rota Sorocabana",
-        "lat":  -23.5105760,
+        "lat":  -23.510576,
         "lng":  -47.5633055,
         "tarifaPorEixo":  2.1,
         "tarifaMoto":  0
@@ -2454,7 +2461,7 @@
         "nome":  "Pedágio SP270 - praça (Rota Sorocabana)",
         "rodovia":  "SP270",
         "concessionaria":  "Rota Sorocabana",
-        "lat":  -23.5105760,
+        "lat":  -23.510576,
         "lng":  -47.5633055,
         "tarifaPorEixo":  2.1,
         "tarifaMoto":  0
@@ -2499,7 +2506,7 @@
         "nome":  "Pedágio SP280 - Osasco (Raposo Castello)",
         "rodovia":  "SP280",
         "concessionaria":  "Raposo Tavares/Castello Branco (ViaOeste)",
-        "lat":  -23.5118500,
+        "lat":  -23.51185,
         "lng":  -46.8014038,
         "tarifaPorEixo":  2,
         "tarifaMoto":  0
@@ -2513,5 +2520,168 @@
         "tarifaPorEixo":  9.2,
         "tarifaPorEixoFimDeSemana":  15.3,
         "tarifaMoto":  0
+    },
+    {
+        "nome":  "Pedágio Free Flow CSG - São Sebastião do Caí/RS",
+        "rodovia":  "ERS-122",
+        "concessionaria":  "CSG",
+        "lat":  -29.63950638,
+        "lng":  -51.29295862,
+        "tarifaPorEixo":  6.65
+    },
+    {
+        "nome":  "Pedágio Free Flow CSG - Antônio Prado/RS",
+        "rodovia":  "ERS-122",
+        "concessionaria":  "CSG",
+        "lat":  -28.93845548,
+        "lng":  -51.18805337,
+        "tarifaPorEixo":  4.6
+    },
+    {
+        "nome":  "Pedágio Free Flow CSG - Ipê/RS",
+        "rodovia":  "ERS-122",
+        "concessionaria":  "CSG",
+        "lat":  -28.66790579,
+        "lng":  -51.17296717,
+        "tarifaPorEixo":  4.65
+    },
+    {
+        "nome":  "Pedágio Free Flow CSG - Capela de Santana/RS",
+        "rodovia":  "ERS-240",
+        "concessionaria":  "CSG",
+        "lat":  -29.67400341,
+        "lng":  -51.41697773,
+        "tarifaPorEixo":  4.85
+    },
+    {
+        "nome":  "Pedágio Free Flow CSG - Farroupilha/RS",
+        "rodovia":  "ERS-122",
+        "concessionaria":  "CSG",
+        "lat":  -29.32292321,
+        "lng":  -51.34714366,
+        "tarifaPorEixo":  5.75
+    },
+    {
+        "nome":  "Pedágio Free Flow CSG - Carlos Barbosa/RS",
+        "rodovia":  "ERS-446",
+        "concessionaria":  "CSG",
+        "lat":  -29.33575335,
+        "lng":  -51.41579865,
+        "tarifaPorEixo":  5.3
+    },
+    {
+        "nome":  "Pedágio Rota de Santa Maria - Taquari/RS",
+        "rodovia":  "RSC-287",
+        "concessionaria":  "Sacyr",
+        "lat":  -29.70504513,
+        "lng":  -51.90103527,
+        "tarifaPorEixo":  2.7,
+        "tarifaMoto":  2.7
+    },
+    {
+        "nome":  "Pedágio Rota de Santa Maria - Venâncio Aires/RS",
+        "rodovia":  "RSC-287",
+        "concessionaria":  "Sacyr",
+        "lat":  -29.66774162,
+        "lng":  -52.27790172,
+        "tarifaPorEixo":  2.7,
+        "tarifaMoto":  2.7
+    },
+    {
+        "nome":  "Pedágio Rota de Santa Maria - Candelária/RS",
+        "rodovia":  "RSC-287",
+        "concessionaria":  "Sacyr",
+        "lat":  -29.68076177,
+        "lng":  -52.71525844,
+        "tarifaPorEixo":  2.7,
+        "tarifaMoto":  2.7
+    },
+    {
+        "nome":  "Pedágio Rota de Santa Maria - Paraíso do Sul/RS",
+        "rodovia":  "RSC-287",
+        "concessionaria":  "Sacyr",
+        "lat":  -29.74877303,
+        "lng":  -53.06745174,
+        "tarifaPorEixo":  2.7,
+        "tarifaMoto":  2.7
+    },
+    {
+        "nome":  "Pedágio Rota de Santa Maria - Santa Maria/RS",
+        "rodovia":  "RSC-287",
+        "concessionaria":  "Sacyr",
+        "lat":  -29.72399201,
+        "lng":  -53.58907272,
+        "tarifaPorEixo":  2.7,
+        "tarifaMoto":  2.7
+    },
+    {
+        "nome":  "Pedágio EGR - Gramado/RS",
+        "rodovia":  "ERS-235",
+        "concessionaria":  "EGR",
+        "lat":  -29.39061805,
+        "lng":  -50.93679448
+    },
+    {
+        "nome":  "Pedágio EGR - Três Coroas/RS",
+        "rodovia":  "ERS-115",
+        "concessionaria":  "EGR",
+        "lat":  -29.48515996,
+        "lng":  -50.80226465
+    },
+    {
+        "nome":  "Pedágio EGR - Campo Bom/RS",
+        "rodovia":  "ERS-239",
+        "concessionaria":  "EGR",
+        "lat":  -29.65655645,
+        "lng":  -51.07849927
+    },
+    {
+        "nome":  "Pedágio EGR - Santo Antônio da Patrulha/RS",
+        "rodovia":  "ERS-474",
+        "concessionaria":  "EGR",
+        "lat":  -29.73209823,
+        "lng":  -50.59204774
+    },
+    {
+        "nome":  "Pedágio EGR - Encantado/RS",
+        "rodovia":  "ERS-130",
+        "concessionaria":  "EGR",
+        "lat":  -29.2849202,
+        "lng":  -51.89968027
+    },
+    {
+        "nome":  "Pedágio EGR - Viamão/RS",
+        "rodovia":  "ERS-040",
+        "concessionaria":  "EGR",
+        "lat":  -30.1107231,
+        "lng":  -50.94209857
+    },
+    {
+        "nome":  "Pedágio EGR - São Francisco de Paula/RS",
+        "rodovia":  "ERS-235",
+        "concessionaria":  "EGR",
+        "lat":  -29.32359275,
+        "lng":  -50.73293086
+    },
+    {
+        "nome":  "Pedágio EGR - Coxilha/RS",
+        "rodovia":  "ERS-135",
+        "concessionaria":  "EGR",
+        "lat":  -28.16210326,
+        "lng":  -52.30721994
+    },
+    {
+        "nome":  "Pedágio EGR - Boa Vista do Sul/RS",
+        "rodovia":  "RSC-453",
+        "concessionaria":  "EGR",
+        "lat":  -29.33488698,
+        "lng":  -51.65013894
+    },
+    {
+        "nome":  "Pedágio EGR - Cruzeiro do Sul/RS",
+        "rodovia":  "RSC-453",
+        "concessionaria":  "EGR",
+        "lat":  -29.51927417,
+        "lng":  -52.07330745
     }
 ]

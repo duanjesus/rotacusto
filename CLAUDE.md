@@ -171,15 +171,49 @@ resource for this dataset, only KMZ + a PDF data dictionary.
   unaccented form found real data in just 2 files until the accent was added to the
   character class.
 - **State-by-state survey completed — most states genuinely have no state-level toll
-  network to cover**, not just unresearched: São Paulo (done, 151 plazas) and Rio de
-  Janeiro (done except one plaza, below) are the country's two biggest state networks.
-  Paraná has one too but its DER is actively *shutting down* state tolls, and no
-  toll-specific open dataset was found there. Rio Grande do Sul has a real, dedicated
-  toll-plaza dataset (DAER, WFS/i3Geo service) but its government servers refused every
-  connection attempt this session (timeouts/connection-refused, not a licensing issue) —
-  a natural candidate to revisit later. Minas Gerais, Bahia, Santa Catarina, Goiás, and
-  the rest have no meaningful state toll network at all — their tolls are on federal
-  (BR-xxx) highways, already covered by the ANTT dataset above.
+  network to cover**, not just unresearched: São Paulo (done, 151 plazas), Rio de
+  Janeiro (done except one plaza, below), and now Rio Grande do Sul (done, below) are
+  the state networks with real data. Paraná has one too but its DER is actively
+  *shutting down* state tolls, and no toll-specific open dataset was found there. Minas
+  Gerais, Bahia, Santa Catarina, Goiás, and the rest have no meaningful state toll
+  network at all — their tolls are on federal (BR-xxx) highways, already covered by the
+  ANTT dataset above.
+- **Rio Grande do Sul (21 new plazas + 7 enriched)**: the original DAER server
+  (`i3geo.daer.rs.gov.br`) kept refusing every connection across sessions, but the same
+  dataset turned out to be published by a *different* government service — IEDE/RS
+  (Infraestrutura Estadual de Dados Espaciais), a public ArcGIS FeatureServer at
+  `iede.rs.gov.br/server/rest/services/DAER/pracas_pedagios/FeatureServer/0` that
+  answers HTTP 200 and returns clean GeoJSON (33 plazas, exact coordinates, highway/km,
+  concession, and a `url_tarifa` link per concession). Lesson: when a government
+  geospatial service is down, look for the same dataset republished on a state spatial
+  data infrastructure (IDE) portal before giving up — it's common for the same data to
+  live in more than one service. Of the 33 plazas, only 21 are genuinely state-level
+  (ERS-/RSC- highway prefix): 10 EGR, 6 CSG, 5 Sacyr. The other 12 (ECOSUL 5, CCR ViaSul
+  7) run on federal highways (BR-101/116/290/386/392) and were **already** in the
+  federal ANTT dataset — confirmed by name/coordinate before adding anything, to avoid
+  duplicating a plaza.
+  - **CSG** (6 plazas, ERS-122/240/446): "free-flow" tolling (electronic gantry, no
+    physical booth) but with a **fixed price per gantry**, unlike São Paulo's free-flow
+    plazas which bill per km driven and were left uncurated for that reason. Confirmed
+    by two independent, mutually consistent sources (the Feb/2025 adjustment article and
+    the Apr/2026 one, whose deltas match).
+  - **Sacyr/Rota de Santa Maria** (5 plazas, RSC-287): single confirmed uniform tariff
+    across the whole stretch, R$5.40/car (2026), moto R$2.70 flat.
+  - **EGR** (10 plazas): tariff varies a lot per plaza (e.g. Gramado R$7.10 vs. Coxilha
+    R$4.40 in 2024 data) and the only official table is published as an **image**, not
+    extractable text, with no 2026 text source found — left uncurated on purpose, same
+    treatment as EcoRioMinas.
+  - **CCR ViaSul (now "Motiva")**: already existed in the federal dataset (concession
+    "Via Sul", 7 plazas, no tariff) — enriched with the confirmed uniform value from
+    multiple consistent, dated local news sources: R$6.60/car = R$3.30/axle, effective
+    2026-06-26.
+  - **Ecosul**: already existed (5 plazas, BR-116/392), left uncurated on purpose — the
+    sources found were genuinely conflicting (R$12.30 on one ANTT portal page vs.
+    R$19.60→R$22.20 in dated news), and ANTT itself confirmed the R$22.20 adjustment was
+    approved but has "no immediate impact for users," with the concession contract due
+    to end March 2026 (this data is from July 2026 — the concession may have already
+    ended). Preferred leaving it uncurated over guessing a possibly-wrong or
+    possibly-defunct number.
 - **RJ-124 (Via Lagos) now has real weekday/weekend pricing**: the only toll found in
   this entire effort with genuine day-of-week variation (R$18.40 total/car Mon–Fri vs.
   R$30.60 weekends and holidays, moto exempt). `TollPlaza` gained a nullable
@@ -197,9 +231,10 @@ resource for this dataset, only KMZ + a PDF data dictionary.
 
 See `TollPlazaSeeder`'s Javadoc for the full per-concession sourcing (dates, confirmed
 values, and the complete state-by-state survey) and `SeedersIntegrationTest` for the
-regression assertions (311-row count, EcoRioMinas correctly uncurated, Fernão Dias and
-Autoban correctly curated at the halved rate, Ecoponte still direction-constrained,
-Itaboraí still bidirectional, Via Lagos's weekday/weekend/moto values).
+regression assertions (332-row count, EcoRioMinas and EGR and Ecosul correctly
+uncurated, Fernão Dias/Autoban/CSG/Sacyr/Via Sul correctly curated at the halved rate,
+Ecoponte still direction-constrained, Itaboraí still bidirectional, Via Lagos's
+weekday/weekend/moto values).
 
 ## Navigation (turn-by-turn, voice, rerouting)
 
