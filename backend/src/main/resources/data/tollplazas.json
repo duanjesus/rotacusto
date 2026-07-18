@@ -276,224 +276,288 @@
         "rodovia":  "BR-60",
         "concessionaria":  "Concebra",
         "lat":  -16.115707,
-        "lng":  -48.58924
+        "lng":  -48.58924,
+        "tarifaPorEixo":  3.7,
+        "tarifaMoto":  3.7
     },
     {
         "nome":  "Pedágio BR-262 - P10 PERDIZES/MG",
         "rodovia":  "BR-262",
-        "concessionaria":  "Concebra",
+        "concessionaria":  "Way-262",
         "lat":  -19.617614,
-        "lng":  -47.346547
+        "lng":  -47.346547,
+        "tarifaPorEixo":  5.15,
+        "tarifaMoto":  0
     },
     {
         "nome":  "Pedágio BR-262 - P11 CAMPO FLORIDO/MG",
         "rodovia":  "BR-262",
-        "concessionaria":  "Concebra",
+        "concessionaria":  "Way-153",
         "lat":  -19.776951,
-        "lng":  -48.458219
+        "lng":  -48.458219,
+        "tarifaPorEixo":  7.1,
+        "tarifaMoto":  0
     },
     {
         "nome":  "Pedágio BR-60 - P2 GOIANÁPOLIS/GO",
         "rodovia":  "BR-60",
         "concessionaria":  "Concebra",
         "lat":  -16.438631,
-        "lng":  -49.019137
+        "lng":  -49.019137,
+        "tarifaPorEixo":  2.7,
+        "tarifaMoto":  2.7
     },
     {
         "nome":  "Pedágio BR-153 - P3 PROF JAMIL/GO",
         "rodovia":  "BR-153",
-        "concessionaria":  "Concebra",
+        "concessionaria":  "Way-153",
         "lat":  -17.16318,
-        "lng":  -49.212582
+        "lng":  -49.212582,
+        "tarifaPorEixo":  7.8,
+        "tarifaMoto":  0
     },
     {
         "nome":  "Pedágio BR-153 - P4 ITUMBIARA/GO",
         "rodovia":  "BR-153",
-        "concessionaria":  "Concebra",
+        "concessionaria":  "Way-153",
         "lat":  -18.268544,
-        "lng":  -49.245811
+        "lng":  -49.245811,
+        "tarifaPorEixo":  7.45,
+        "tarifaMoto":  0
     },
     {
         "nome":  "Pedágio BR-153 - P5 PRATA/MG",
         "rodovia":  "BR-153",
-        "concessionaria":  "Concebra",
+        "concessionaria":  "Way-153",
         "lat":  -19.471586,
-        "lng":  -48.871046
+        "lng":  -48.871046,
+        "tarifaPorEixo":  6.6,
+        "tarifaMoto":  0
     },
     {
         "nome":  "Pedágio BR-153 - P6 FRONTEIRA/MG",
         "rodovia":  "BR-153",
-        "concessionaria":  "Concebra",
+        "concessionaria":  "Way-153",
         "lat":  -20.142521,
-        "lng":  -49.110488
+        "lng":  -49.110488,
+        "tarifaPorEixo":  6,
+        "tarifaMoto":  0
     },
     {
         "nome":  "Pedágio BR-262 - P7 FLORESTAL/MG",
         "rodovia":  "BR-262",
-        "concessionaria":  "Concebra",
+        "concessionaria":  "Way-262",
         "lat":  -19.909615,
-        "lng":  -44.506725
+        "lng":  -44.506725,
+        "tarifaPorEixo":  5.15,
+        "tarifaMoto":  0
     },
     {
         "nome":  "Pedágio BR-262 - P8 LUZ/MG",
         "rodovia":  "BR-262",
-        "concessionaria":  "Concebra",
+        "concessionaria":  "Way-262",
         "lat":  -19.788259,
-        "lng":  -45.58463
+        "lng":  -45.58463,
+        "tarifaPorEixo":  5.2,
+        "tarifaMoto":  0
     },
     {
         "nome":  "Pedágio BR-262 - P9 CAMPOS ALTOS/MG",
         "rodovia":  "BR-262",
-        "concessionaria":  "Concebra",
+        "concessionaria":  "Way-262",
         "lat":  -19.647341,
-        "lng":  -46.240088
+        "lng":  -46.240088,
+        "tarifaPorEixo":  5,
+        "tarifaMoto":  0
     },
     {
         "nome":  "Pedágio BR-40 - P1/RJ",
         "rodovia":  "BR-40",
-        "concessionaria":  "Concer",
+        "concessionaria":  "Elovias",
         "lat":  -22.609965,
-        "lng":  -43.285552
+        "lng":  -43.285552,
+        "tarifaPorEixo":  10.5,
+        "tarifaMoto":  0
     },
     {
         "nome":  "Pedágio BR-40 - P2/RJ",
         "rodovia":  "BR-40",
-        "concessionaria":  "Concer",
+        "concessionaria":  "Elovias",
         "lat":  -22.284389,
-        "lng":  -43.120269
+        "lng":  -43.120269,
+        "tarifaPorEixo":  10.5,
+        "tarifaMoto":  0
     },
     {
         "nome":  "Pedágio BR-40 - P3/MG",
         "rodovia":  "BR-40",
-        "concessionaria":  "Concer",
+        "concessionaria":  "Elovias",
         "lat":  -21.928252,
-        "lng":  -43.316282
+        "lng":  -43.316282,
+        "tarifaPorEixo":  10.5,
+        "tarifaMoto":  0
     },
     {
         "nome":  "Pedágio BR-163 - P1 - Claúdia/MT",
         "rodovia":  "BR-163",
         "concessionaria":  "Via Brasil BR-163",
         "lat":  -11.339218,
-        "lng":  -55.331222
+        "lng":  -55.331222,
+        "tarifaPorEixo":  5.4,
+        "tarifaMoto":  5.4
     },
     {
         "nome":  "Pedágio BR-163 - P2 - Guarantã do Norte/MT",
         "rodovia":  "BR-163",
         "concessionaria":  "Via Brasil BR-163",
         "lat":  -9.756473,
-        "lng":  -54.89443
+        "lng":  -54.89443,
+        "tarifaPorEixo":  5.4,
+        "tarifaMoto":  5.4
     },
     {
         "nome":  "Pedágio BR-163 - P3 - Trairão/PA",
         "rodovia":  "BR-163",
         "concessionaria":  "Via Brasil BR-163",
         "lat":  -4.620594,
-        "lng":  -55.951381
+        "lng":  -55.951381,
+        "tarifaPorEixo":  0,
+        "tarifaMoto":  0
     },
     {
         "nome":  "Pedágio BR-364 - P3/MT",
         "rodovia":  "BR-364",
-        "concessionaria":  "CRO (Nova 364)",
+        "concessionaria":  "Nova Rota do Oeste",
         "lat":  -15.81,
-        "lng":  -55.31
+        "lng":  -55.31,
+        "tarifaPorEixo":  3,
+        "tarifaMoto":  3
     },
     {
         "nome":  "Pedágio BR-163 - P1/MT",
         "rodovia":  "BR-163",
-        "concessionaria":  "CRO (Nova 364)",
+        "concessionaria":  "Nova Rota do Oeste",
         "lat":  -17.219391,
-        "lng":  -54.758685
+        "lng":  -54.758685,
+        "tarifaPorEixo":  3.3,
+        "tarifaMoto":  3.3
     },
     {
         "nome":  "Pedágio BR-364 - P2/MT",
         "rodovia":  "BR-364",
-        "concessionaria":  "CRO (Nova 364)",
+        "concessionaria":  "Nova Rota do Oeste",
         "lat":  -16.393565,
-        "lng":  -54.714281
+        "lng":  -54.714281,
+        "tarifaPorEixo":  3.75,
+        "tarifaMoto":  3.75
     },
     {
         "nome":  "Pedágio BR-364 - P4/MT",
         "rodovia":  "BR-364",
-        "concessionaria":  "CRO (Nova 364)",
+        "concessionaria":  "Nova Rota do Oeste",
         "lat":  -15.702041,
-        "lng":  -55.829527
+        "lng":  -55.829527,
+        "tarifaPorEixo":  3,
+        "tarifaMoto":  3
     },
     {
         "nome":  "Pedágio BR-364 - P5/MT",
         "rodovia":  "BR-364",
-        "concessionaria":  "CRO (Nova 364)",
+        "concessionaria":  "Nova Rota do Oeste",
         "lat":  -15.349875,
-        "lng":  -56.415628
+        "lng":  -56.415628,
+        "tarifaPorEixo":  4.05,
+        "tarifaMoto":  4
     },
     {
         "nome":  "Pedágio BR-364 - P6/MT",
         "rodovia":  "BR-364",
-        "concessionaria":  "CRO (Nova 364)",
+        "concessionaria":  "Nova Rota do Oeste",
         "lat":  -14.599728,
-        "lng":  -56.240858
+        "lng":  -56.240858,
+        "tarifaPorEixo":  3.35,
+        "tarifaMoto":  3.3
     },
     {
         "nome":  "Pedágio BR-163 - P7/MT",
         "rodovia":  "BR-163",
-        "concessionaria":  "CRO (Nova 364)",
+        "concessionaria":  "Nova Rota do Oeste",
         "lat":  -13.91952,
-        "lng":  -56.093419
+        "lng":  -56.093419,
+        "tarifaPorEixo":  2.7,
+        "tarifaMoto":  2.7
     },
     {
         "nome":  "Pedágio BR-163 - P8/MT",
         "rodovia":  "BR-163",
-        "concessionaria":  "CRO (Nova 364)",
+        "concessionaria":  "Nova Rota do Oeste",
         "lat":  -13.26599,
-        "lng":  -56.022777
+        "lng":  -56.022777,
+        "tarifaPorEixo":  3.55,
+        "tarifaMoto":  3.5
     },
     {
         "nome":  "Pedágio BR-163 - P9/MT",
         "rodovia":  "BR-163",
-        "concessionaria":  "CRO (Nova 364)",
+        "concessionaria":  "Nova Rota do Oeste",
         "lat":  -12.441635,
-        "lng":  -55.653798
+        "lng":  -55.653798,
+        "tarifaPorEixo":  5.2,
+        "tarifaMoto":  5.2
     },
     {
         "nome":  "Pedágio BR-50 - ARAGUARI I/MG",
         "rodovia":  "BR-50",
         "concessionaria":  "Eco050",
         "lat":  -18.537594,
-        "lng":  -48.045546
+        "lng":  -48.045546,
+        "tarifaPorEixo":  3.65,
+        "tarifaMoto":  3.65
     },
     {
         "nome":  "Pedágio BR-50 - ARAGUARI II/MG",
         "rodovia":  "BR-50",
         "concessionaria":  "Eco050",
         "lat":  -18.749143,
-        "lng":  -48.234378
+        "lng":  -48.234378,
+        "tarifaPorEixo":  2.75,
+        "tarifaMoto":  2.75
     },
     {
         "nome":  "Pedágio BR-50 - CAMPO ALEGRE/GO",
         "rodovia":  "BR-50",
         "concessionaria":  "Eco050",
         "lat":  -17.771615,
-        "lng":  -47.749429
+        "lng":  -47.749429,
+        "tarifaPorEixo":  4.8,
+        "tarifaMoto":  4.8
     },
     {
         "nome":  "Pedágio BR-50 - DELTA/MG",
         "rodovia":  "BR-50",
         "concessionaria":  "Eco050",
         "lat":  -19.914722,
-        "lng":  -47.829868
+        "lng":  -47.829868,
+        "tarifaPorEixo":  2.8,
+        "tarifaMoto":  2.8
     },
     {
         "nome":  "Pedágio BR-50 - IPAMERI/GO",
         "rodovia":  "BR-50",
         "concessionaria":  "Eco050",
         "lat":  -17.121987,
-        "lng":  -47.721537
+        "lng":  -47.721537,
+        "tarifaPorEixo":  4.45,
+        "tarifaMoto":  4.45
     },
     {
         "nome":  "Pedágio BR-50 - UBERABA/MG",
         "rodovia":  "BR-50",
         "concessionaria":  "Eco050",
         "lat":  -19.180063,
-        "lng":  -48.157641
+        "lng":  -48.157641,
+        "tarifaPorEixo":  3.95,
+        "tarifaMoto":  3.95
     },
     {
         "nome":  "Pedágio BR-101 - P1 - Pedro Canário/ES",
@@ -596,322 +660,378 @@
         "rodovia":  "BR-116",
         "concessionaria":  "EcoRioMinas",
         "lat":  -22.716277,
-        "lng":  -43.716858
+        "lng":  -43.716858,
+        "tarifaPorEixo":  8.6
     },
     {
         "nome":  "Pedágio BR-116 - P05 Viúva Graça (B)/RJ",
         "rodovia":  "BR-116",
         "concessionaria":  "EcoRioMinas",
         "lat":  -22.715213,
-        "lng":  -43.730252
+        "lng":  -43.730252,
+        "tarifaPorEixo":  8.6
     },
     {
         "nome":  "Pedágio BR-392 - Praça Capão Seco/RS",
         "rodovia":  "BR-392",
         "concessionaria":  "Ecosul",
         "lat":  -31.851958,
-        "lng":  -52.326177
+        "lng":  -52.326177,
+        "tarifaPorEixo":  0,
+        "tarifaMoto":  0
     },
     {
         "nome":  "Pedágio BR-116 - Praça Cristal/RS",
         "rodovia":  "BR-116",
         "concessionaria":  "Ecosul",
         "lat":  -31.026386,
-        "lng":  -52.04943
+        "lng":  -52.04943,
+        "tarifaPorEixo":  0,
+        "tarifaMoto":  0
     },
     {
         "nome":  "Pedágio BR-392 - Praça Glória/RS",
         "rodovia":  "BR-392",
         "concessionaria":  "Ecosul",
         "lat":  -31.449786,
-        "lng":  -52.640644
+        "lng":  -52.640644,
+        "tarifaPorEixo":  0,
+        "tarifaMoto":  0
     },
     {
         "nome":  "Pedágio BR-116 - Praça Pavão/RS",
         "rodovia":  "BR-116",
         "concessionaria":  "Ecosul",
         "lat":  -31.820075,
-        "lng":  -52.526711
+        "lng":  -52.526711,
+        "tarifaPorEixo":  0,
+        "tarifaMoto":  0
     },
     {
         "nome":  "Pedágio BR-116 - Praça Retiro/RS",
         "rodovia":  "BR-116",
         "concessionaria":  "Ecosul",
         "lat":  -31.625261,
-        "lng":  -52.318116
+        "lng":  -52.318116,
+        "tarifaPorEixo":  0,
+        "tarifaMoto":  0
     },
     {
         "nome":  "Pedágio BR-153 - P1 - Aliança do Tocantins/TO",
         "rodovia":  "BR-153",
         "concessionaria":  "Ecovias do Araguaia",
         "lat":  -11.4461,
-        "lng":  -48.990283
+        "lng":  -48.990283,
+        "tarifaPorEixo":  4.15
     },
     {
         "nome":  "Pedágio BR-153 - P2 - Alvorada/TO",
         "rodovia":  "BR-153",
         "concessionaria":  "Ecovias do Araguaia",
         "lat":  -12.344989,
-        "lng":  -49.151967
+        "lng":  -49.151967,
+        "tarifaPorEixo":  5.7
     },
     {
         "nome":  "Pedágio BR-153 - P3 - Porangatu/GO",
         "rodovia":  "BR-153",
         "concessionaria":  "Ecovias do Araguaia",
         "lat":  -12.943414,
-        "lng":  -49.133122
+        "lng":  -49.133122,
+        "tarifaPorEixo":  5.5
     },
     {
         "nome":  "Pedágio BR-153 - P4 - Estrela do Norte/GO",
         "rodovia":  "BR-153",
         "concessionaria":  "Ecovias do Araguaia",
         "lat":  -13.791358,
-        "lng":  -49.034842
+        "lng":  -49.034842,
+        "tarifaPorEixo":  5.3
     },
     {
         "nome":  "Pedágio BR-153 - P5 - Campinorte/GO",
         "rodovia":  "BR-153",
         "concessionaria":  "Ecovias do Araguaia",
         "lat":  -14.372969,
-        "lng":  -49.158264
+        "lng":  -49.158264,
+        "tarifaPorEixo":  6.55
     },
     {
         "nome":  "Pedágio BR-153 - P6 - Hidrolina/GO",
         "rodovia":  "BR-153",
         "concessionaria":  "Ecovias do Araguaia",
         "lat":  -14.799372,
-        "lng":  -49.284164
+        "lng":  -49.284164,
+        "tarifaPorEixo":  6.55
     },
     {
         "nome":  "Pedágio BR-153 - P7 - Jaraguá/GO",
         "rodovia":  "BR-153",
         "concessionaria":  "Ecovias do Araguaia",
         "lat":  -15.827072,
-        "lng":  -49.281722
+        "lng":  -49.281722,
+        "tarifaPorEixo":  7.1
     },
     {
         "nome":  "Pedágio BR-80 - P8 - Santa Rita do Novo Destino/GO",
         "rodovia":  "BR-80",
         "concessionaria":  "Ecovias do Araguaia",
         "lat":  -14.814189,
-        "lng":  -49.042442
+        "lng":  -49.042442,
+        "tarifaPorEixo":  6.55
     },
     {
         "nome":  "Pedágio BR-414 - P9 - Corumbá de Goiás/GO",
         "rodovia":  "BR-414",
         "concessionaria":  "Ecovias do Araguaia",
         "lat":  -16.001028,
-        "lng":  -48.840289
+        "lng":  -48.840289,
+        "tarifaPorEixo":  6.55
     },
     {
         "nome":  "Pedágio BR-365 - P1 - UBERLÂNDIA/MG",
         "rodovia":  "BR-365",
         "concessionaria":  "Ecovias do Cerrado",
         "lat":  -18.879714,
-        "lng":  -48.500378
+        "lng":  -48.500378,
+        "tarifaPorEixo":  2.95,
+        "tarifaMoto":  2.95
     },
     {
         "nome":  "Pedágio BR-365 - P2 - MONTE ALEGRE/MG",
         "rodovia":  "BR-365",
         "concessionaria":  "Ecovias do Cerrado",
         "lat":  -18.961722,
-        "lng":  -49.604914
+        "lng":  -49.604914,
+        "tarifaPorEixo":  2.95,
+        "tarifaMoto":  2.95
     },
     {
         "nome":  "Pedágio BR-365 - P3 - ITUIUTABA/MG",
         "rodovia":  "BR-365",
         "concessionaria":  "Ecovias do Cerrado",
         "lat":  -18.961722,
-        "lng":  -49.604914
+        "lng":  -49.604914,
+        "tarifaPorEixo":  2.95,
+        "tarifaMoto":  2.95
     },
     {
         "nome":  "Pedágio BR-365 - P4 - SANTA VITÓRIA/MG",
         "rodovia":  "BR-365",
         "concessionaria":  "Ecovias do Cerrado",
         "lat":  -18.912533,
-        "lng":  -50.224138
+        "lng":  -50.224138,
+        "tarifaPorEixo":  2.95,
+        "tarifaMoto":  2.95
     },
     {
         "nome":  "Pedágio BR-364 - P5 - PARANAIGUARA/GO",
         "rodovia":  "BR-364",
         "concessionaria":  "Ecovias do Cerrado",
         "lat":  -18.888286,
-        "lng":  -50.742164
+        "lng":  -50.742164,
+        "tarifaPorEixo":  2.95,
+        "tarifaMoto":  2.95
     },
     {
         "nome":  "Pedágio BR-364 - P6 - CACHOEIRA ALTA/GO",
         "rodovia":  "BR-364",
         "concessionaria":  "Ecovias do Cerrado",
         "lat":  -18.48085,
-        "lng":  -51.079022
+        "lng":  -51.079022,
+        "tarifaPorEixo":  2.95,
+        "tarifaMoto":  2.95
     },
     {
         "nome":  "Pedágio BR-364 - P7 - JATAÍ/GO",
         "rodovia":  "BR-364",
         "concessionaria":  "Ecovias do Cerrado",
         "lat":  -18.101683,
-        "lng":  -51.489928
+        "lng":  -51.489928,
+        "tarifaPorEixo":  2.95,
+        "tarifaMoto":  2.95
     },
     {
         "nome":  "Pedágio BR-101 - Free Flow Itaguaí/RJ",
         "rodovia":  "BR-101",
         "concessionaria":  "CCR RioSP (Nova Dutra)",
         "lat":  -22.91,
-        "lng":  -43.89
+        "lng":  -43.89,
+        "tarifaPorEixo":  2.4,
+        "tarifaPorEixoFimDeSemana":  3.95
     },
     {
         "nome":  "Pedágio BR-101 - Free Flow Paraty/RJ",
         "rodovia":  "BR-101",
         "concessionaria":  "CCR RioSP (Nova Dutra)",
         "lat":  -23.05,
-        "lng":  -44.58
+        "lng":  -44.58,
+        "tarifaPorEixo":  2.4,
+        "tarifaPorEixoFimDeSemana":  3.95
     },
     {
         "nome":  "Pedágio BR-101 - Free Flow Mangaratiba/RJ",
         "rodovia":  "BR-101",
         "concessionaria":  "CCR RioSP (Nova Dutra)",
         "lat":  -23.00632,
-        "lng":  -44.099135
+        "lng":  -44.099135,
+        "tarifaPorEixo":  2.4,
+        "tarifaPorEixoFimDeSemana":  3.95
     },
     {
         "nome":  "Pedágio BR-116 - Guararema Sul/SP",
         "rodovia":  "BR-116",
         "concessionaria":  "CCR RioSP (Nova Dutra)",
         "lat":  -23.34,
-        "lng":  -46.15
+        "lng":  -46.15,
+        "tarifaPorEixo":  2.25,
+        "tarifaMoto":  0
     },
     {
         "nome":  "Pedágio BR-116 - Arujá Rodoanel/SP",
         "rodovia":  "BR-116",
         "concessionaria":  "CCR RioSP (Nova Dutra)",
         "lat":  -23.42,
-        "lng":  -46.37
+        "lng":  -46.37,
+        "tarifaPorEixo":  2.25,
+        "tarifaMoto":  0
     },
     {
         "nome":  "Pedágio BR-116 - Guararema Norte/SP",
         "rodovia":  "BR-116",
         "concessionaria":  "CCR RioSP (Nova Dutra)",
         "lat":  -23.35,
-        "lng":  -46.16
+        "lng":  -46.16,
+        "tarifaPorEixo":  2.25,
+        "tarifaMoto":  0
     },
     {
         "nome":  "Pedágio BR-116 - Arujá Norte/SP",
         "rodovia":  "BR-116",
         "concessionaria":  "CCR RioSP (Nova Dutra)",
         "lat":  -23.41,
-        "lng":  -46.36
+        "lng":  -46.36,
+        "tarifaPorEixo":  2.25,
+        "tarifaMoto":  0
     },
     {
         "nome":  "Pedágio BR-116 - Arujá Sul/SP",
         "rodovia":  "BR-116",
         "concessionaria":  "CCR RioSP (Nova Dutra)",
         "lat":  -23.41,
-        "lng":  -46.36
+        "lng":  -46.36,
+        "tarifaPorEixo":  2.25,
+        "tarifaMoto":  0
     },
     {
         "nome":  "Pedágio BR-116 - Itatiaia Norte/RJ",
         "rodovia":  "BR-116",
         "concessionaria":  "CCR RioSP (Nova Dutra)",
         "lat":  -22.49,
-        "lng":  -44.57
+        "lng":  -44.57,
+        "tarifaPorEixo":  7.25,
+        "tarifaMoto":  0
     },
     {
         "nome":  "Pedágio BR-116 - Itatiaia Sul/RJ",
         "rodovia":  "BR-116",
         "concessionaria":  "CCR RioSP (Nova Dutra)",
         "lat":  -22.49,
-        "lng":  -44.57
+        "lng":  -44.57,
+        "tarifaPorEixo":  7.25,
+        "tarifaMoto":  0
     },
     {
         "nome":  "Pedágio BR-116 - Jacareí Norte/SP",
         "rodovia":  "BR-116",
         "concessionaria":  "CCR RioSP (Nova Dutra)",
         "lat":  -23.3,
-        "lng":  -46.01
+        "lng":  -46.01,
+        "tarifaPorEixo":  4.05,
+        "tarifaMoto":  0
     },
     {
         "nome":  "Pedágio BR-116 - Jacareí Sul/SP",
         "rodovia":  "BR-116",
         "concessionaria":  "CCR RioSP (Nova Dutra)",
         "lat":  -23.3,
-        "lng":  -46.01
+        "lng":  -46.01,
+        "tarifaPorEixo":  4.05,
+        "tarifaMoto":  0
     },
     {
         "nome":  "Pedágio BR-116 - Moreira César Norte/SP",
         "rodovia":  "BR-116",
         "concessionaria":  "CCR RioSP (Nova Dutra)",
         "lat":  -22.93,
-        "lng":  -45.36
+        "lng":  -45.36,
+        "tarifaPorEixo":  8.45,
+        "tarifaMoto":  0
     },
     {
         "nome":  "Pedágio BR-116 - Moreira César Sul/SP",
         "rodovia":  "BR-116",
         "concessionaria":  "CCR RioSP (Nova Dutra)",
         "lat":  -22.93,
-        "lng":  -45.36
-    },
-    {
-        "nome":  "Pedágio BR-116 - Viúva Graça Norte/RJ",
-        "rodovia":  "BR-116",
-        "concessionaria":  "CCR RioSP (Nova Dutra)",
-        "lat":  -22.716155,
-        "lng":  -43.716697
-    },
-    {
-        "nome":  "Pedágio BR-116 - Viuvinha Norte/RJ",
-        "rodovia":  "BR-116",
-        "concessionaria":  "CCR RioSP (Nova Dutra)",
-        "lat":  -22.715133,
-        "lng":  -43.730239
+        "lng":  -45.36,
+        "tarifaPorEixo":  8.45,
+        "tarifaMoto":  0
     },
     {
         "nome":  "Pedágio BR-163 - P1-Mundo Novo/MS",
         "rodovia":  "BR-163",
         "concessionaria":  "MSVia",
         "lat":  -23.865169,
-        "lng":  -54.329788
+        "lng":  -54.329788,
+        "tarifaPorEixo":  3.25
     },
     {
         "nome":  "Pedágio BR-163 - P2-Itaquirai/MS",
         "rodovia":  "BR-163",
         "concessionaria":  "MSVia",
         "lat":  -23.167432,
-        "lng":  -54.19897
+        "lng":  -54.19897,
+        "tarifaPorEixo":  4.45
     },
     {
         "nome":  "Pedágio BR-163 - P3-Caarapó/MS",
         "rodovia":  "BR-163",
         "concessionaria":  "MSVia",
         "lat":  -22.476042,
-        "lng":  -54.860799
+        "lng":  -54.860799,
+        "tarifaPorEixo":  4.45
     },
     {
         "nome":  "Pedágio BR-163 - P4-Rio Brilhante/MS",
         "rodovia":  "BR-163",
         "concessionaria":  "MSVia",
         "lat":  -21.865146,
-        "lng":  -54.528504
+        "lng":  -54.528504,
+        "tarifaPorEixo":  4.55
     },
     {
         "nome":  "Pedágio BR-163 - P5-Campo Grande/MS",
         "rodovia":  "BR-163",
         "concessionaria":  "MSVia",
         "lat":  -20.882783,
-        "lng":  -54.504644
+        "lng":  -54.504644,
+        "tarifaPorEixo":  5
     },
     {
         "nome":  "Pedágio BR-163 - P6-Jaraguari/MS",
         "rodovia":  "BR-163",
         "concessionaria":  "MSVia",
         "lat":  -20.04078,
-        "lng":  -54.412778
+        "lng":  -54.412778,
+        "tarifaPorEixo":  3.9
     },
     {
         "nome":  "Pedágio BR-163 - P7-São Gabriel/MS",
         "rodovia":  "BR-163",
         "concessionaria":  "MSVia",
         "lat":  -19.473376,
-        "lng":  -54.496991
+        "lng":  -54.496991,
+        "tarifaPorEixo":  3.75
     },
     {
         "nome":  "Pedágio BR-163 - P8-Rio Verde/MS",
@@ -925,182 +1045,233 @@
         "rodovia":  "BR-163",
         "concessionaria":  "MSVia",
         "lat":  -17.766671,
-        "lng":  -54.750815
+        "lng":  -54.750815,
+        "tarifaPorEixo":  3.7
     },
     {
         "nome":  "Pedágio BR-393 - BARRA DA PIRAI/RJ",
         "rodovia":  "BR-393",
         "concessionaria":  "Rodovia do Aço",
         "lat":  -22.485435,
-        "lng":  -43.919084
+        "lng":  -43.919084,
+        "tarifaPorEixo":  0,
+        "tarifaMoto":  0
     },
     {
         "nome":  "Pedágio BR-393 - PARAÍBA DO SUL/RJ",
         "rodovia":  "BR-393",
         "concessionaria":  "Rodovia do Aço",
         "lat":  -22.208911,
-        "lng":  -43.382139
+        "lng":  -43.382139,
+        "tarifaPorEixo":  0,
+        "tarifaMoto":  0
     },
     {
         "nome":  "Pedágio BR-393 - SAPUCAIA/RJ",
         "rodovia":  "BR-393",
         "concessionaria":  "Rodovia do Aço",
         "lat":  -21.962326,
-        "lng":  -42.861675
+        "lng":  -42.861675,
+        "tarifaPorEixo":  0,
+        "tarifaMoto":  0
     },
     {
         "nome":  "Pedágio BR-153 - P 01/SP",
         "rodovia":  "BR-153",
         "concessionaria":  "Transbrasiliana",
         "lat":  -20.588611,
-        "lng":  -49.318055
+        "lng":  -49.318055,
+        "tarifaPorEixo":  5.05,
+        "tarifaMoto":  5.05
     },
     {
         "nome":  "Pedágio BR-153 - P 02/SP",
         "rodovia":  "BR-153",
         "concessionaria":  "Transbrasiliana",
         "lat":  -20.9975,
-        "lng":  -49.628333
+        "lng":  -49.628333,
+        "tarifaPorEixo":  5.05,
+        "tarifaMoto":  5.05
     },
     {
         "nome":  "Pedágio BR-153 - P 03/SP",
         "rodovia":  "BR-153",
         "concessionaria":  "Transbrasiliana",
         "lat":  -21.710555,
-        "lng":  -49.808611
+        "lng":  -49.808611,
+        "tarifaPorEixo":  5.05,
+        "tarifaMoto":  5.05
     },
     {
         "nome":  "Pedágio BR-153 - P 04/SP",
         "rodovia":  "BR-153",
         "concessionaria":  "Transbrasiliana",
         "lat":  -22.336311,
-        "lng":  -49.898833
+        "lng":  -49.898833,
+        "tarifaPorEixo":  5.05,
+        "tarifaMoto":  5.05
     },
     {
         "nome":  "Pedágio BR-40 - P1 - Cristalina/GO",
         "rodovia":  "BR-40",
-        "concessionaria":  "Via 040",
+        "concessionaria":  "Via Cristais",
         "lat":  -16.7389,
-        "lng":  -47.61754
+        "lng":  -47.61754,
+        "tarifaPorEixo":  0,
+        "tarifaMoto":  0
     },
     {
         "nome":  "Pedágio BR-40 - P10 - Lafaiete/MG",
         "rodovia":  "BR-40",
-        "concessionaria":  "Via 040",
+        "concessionaria":  "EPR Via Mineira",
         "lat":  -20.76702,
-        "lng":  -43.80668
+        "lng":  -43.80668,
+        "tarifaPorEixo":  6.8,
+        "tarifaMoto":  0
     },
     {
         "nome":  "Pedágio BR-40 - P11 - Barbacena/MG",
         "rodovia":  "BR-40",
-        "concessionaria":  "Via 040",
+        "concessionaria":  "EPR Via Mineira",
         "lat":  -21.26271,
-        "lng":  -43.66224
+        "lng":  -43.66224,
+        "tarifaPorEixo":  6.8,
+        "tarifaMoto":  0
     },
     {
         "nome":  "Pedágio BR-40 - P2 - Paracatu/MG",
         "rodovia":  "BR-40",
-        "concessionaria":  "Via 040",
+        "concessionaria":  "Via Cristais",
         "lat":  -17.09831,
-        "lng":  -47.02624
+        "lng":  -47.02624,
+        "tarifaPorEixo":  5.65,
+        "tarifaMoto":  0
     },
     {
         "nome":  "Pedágio BR-40 - P3 - Lagoa Grande/MG",
         "rodovia":  "BR-40",
-        "concessionaria":  "Via 040",
+        "concessionaria":  "Via Cristais",
         "lat":  -17.50598,
-        "lng":  -46.56465
+        "lng":  -46.56465,
+        "tarifaPorEixo":  5.7,
+        "tarifaMoto":  0
     },
     {
         "nome":  "Pedágio BR-40 - P4 - João Pinheiro/MG",
         "rodovia":  "BR-40",
-        "concessionaria":  "Via 040",
+        "concessionaria":  "Via Cristais",
         "lat":  -17.94577,
-        "lng":  -46.03425
+        "lng":  -46.03425,
+        "tarifaPorEixo":  5.8,
+        "tarifaMoto":  0
     },
     {
         "nome":  "Pedágio BR-40 - P5 - São Gonçalo do Abaeté/MG",
         "rodovia":  "BR-40",
-        "concessionaria":  "Via 040",
+        "concessionaria":  "Via Cristais",
         "lat":  -18.13265,
-        "lng":  -45.40817
+        "lng":  -45.40817,
+        "tarifaPorEixo":  5.7,
+        "tarifaMoto":  0
     },
     {
         "nome":  "Pedágio BR-40 - P6 - Felixlândia/MG",
         "rodovia":  "BR-40",
-        "concessionaria":  "Via 040",
+        "concessionaria":  "Via Cristais",
         "lat":  -18.5654,
-        "lng":  -45.02116
+        "lng":  -45.02116,
+        "tarifaPorEixo":  5.75,
+        "tarifaMoto":  0
     },
     {
         "nome":  "Pedágio BR-40 - P7 - Curvelo/MG",
         "rodovia":  "BR-40",
-        "concessionaria":  "Via 040",
+        "concessionaria":  "Via Cristais",
         "lat":  -19.0793,
-        "lng":  -44.65495
+        "lng":  -44.65495,
+        "tarifaPorEixo":  5.85,
+        "tarifaMoto":  0
     },
     {
         "nome":  "Pedágio BR-40 - P8 - Capim Branco/MG",
         "rodovia":  "BR-40",
-        "concessionaria":  "Via 040",
+        "concessionaria":  "Via Cristais",
         "lat":  -19.60121,
-        "lng":  -44.22196
+        "lng":  -44.22196,
+        "tarifaPorEixo":  7.75,
+        "tarifaMoto":  0
     },
     {
         "nome":  "Pedágio BR-40 - P9 - Itabirito/MG",
         "rodovia":  "BR-40",
-        "concessionaria":  "Via 040",
+        "concessionaria":  "EPR Via Mineira",
         "lat":  -20.27288,
-        "lng":  -43.95112
+        "lng":  -43.95112,
+        "tarifaPorEixo":  6.8,
+        "tarifaMoto":  0
     },
     {
         "nome":  "Pedágio BR-324 - Praça 1/BA",
         "rodovia":  "BR-324",
         "concessionaria":  "Via Bahia",
         "lat":  -12.751276,
-        "lng":  -38.43154
+        "lng":  -38.43154,
+        "tarifaPorEixo":  0,
+        "tarifaMoto":  0
     },
     {
         "nome":  "Pedágio BR-324 - Praça 2/BA",
         "rodovia":  "BR-324",
         "concessionaria":  "Via Bahia",
         "lat":  -12.451647,
-        "lng":  -38.708421
+        "lng":  -38.708421,
+        "tarifaPorEixo":  0,
+        "tarifaMoto":  0
     },
     {
         "nome":  "Pedágio BR-116 - Praça 3/BA",
         "rodovia":  "BR-116",
         "concessionaria":  "Via Bahia",
         "lat":  -12.531931,
-        "lng":  -39.41502
+        "lng":  -39.41502,
+        "tarifaPorEixo":  0,
+        "tarifaMoto":  0
     },
     {
         "nome":  "Pedágio BR-116 - Praça 4/BA",
         "rodovia":  "BR-116",
         "concessionaria":  "Via Bahia",
         "lat":  -13.008714,
-        "lng":  -39.957042
+        "lng":  -39.957042,
+        "tarifaPorEixo":  0,
+        "tarifaMoto":  0
     },
     {
         "nome":  "Pedágio BR-116 - Praça 5/BA",
         "rodovia":  "BR-116",
         "concessionaria":  "Via Bahia",
         "lat":  -14.055969,
-        "lng":  -40.20445
+        "lng":  -40.20445,
+        "tarifaPorEixo":  0,
+        "tarifaMoto":  0
     },
     {
         "nome":  "Pedágio BR-116 - Praça 6/BA",
         "rodovia":  "BR-116",
         "concessionaria":  "Via Bahia",
         "lat":  -14.646178,
-        "lng":  -40.455782
+        "lng":  -40.455782,
+        "tarifaPorEixo":  0,
+        "tarifaMoto":  0
     },
     {
         "nome":  "Pedágio BR-116 - Praça 7/BA",
         "rodovia":  "BR-116",
         "concessionaria":  "Via Bahia",
         "lat":  -15.232323,
-        "lng":  -41.100949
+        "lng":  -41.100949,
+        "tarifaPorEixo":  0,
+        "tarifaMoto":  0
     },
     {
         "nome":  "Pedágio BR-101 - P1-Laguna/SC",

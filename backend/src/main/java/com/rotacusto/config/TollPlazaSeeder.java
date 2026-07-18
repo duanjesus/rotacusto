@@ -172,13 +172,13 @@ import com.rotacusto.repository.TollPlazaRepository;
  *         <li><b>Ecosul</b>: JÁ EXISTIA no dataset federal (5 praças
  *             BR-116/392), mantida SEM tarifa curada de propósito — as
  *             fontes encontradas eram genuinamente conflitantes (R$12,30
- *             num portal da ANTT vs R$19,60→R$22,20 em notícias datadas) e
- *             a própria ANTT confirmou que o reajuste pra R$22,20 foi
- *             aprovado mas está "sem impacto imediato para os usuários",
- *             com o contrato de concessão previsto pra terminar em
- *             março/2026 (o dataset é de julho/2026 — a concessão pode já
- *             ter encerrado). Preferir deixar sem tarifa a arriscar um
- *             valor errado ou de uma concessão extinta.</li>
+ *             num portal da ANTT vs R$19,60→R$22,20 em notícias datadas) —
+ *             {@code CONFIRMADO EM PESQUISA POSTERIOR}: a concessão
+ *             terminou de verdade às 23h59 de 03/03/2026, cancelas
+ *             liberadas desde 0h de 04/03/2026 (múltiplas notícias
+ *             datadas, DNIT administrando sem cobrança até nova concessão
+ *             em 2027) — tarifa curada como R$0,00 (zero de verdade, não
+ *             "sem dado").</li>
  *       </ul></li>
  *   <li><b>Minas Gerais, Bahia, Santa Catarina, Goiás e demais</b>: sem
  *       rede de pedágio ESTADUAL relevante identificada — os pedágios
@@ -187,6 +187,83 @@ import com.rotacusto.repository.TollPlazaRepository;
  *       tem nenhuma praça estadual em operação ainda (primeira prevista só
  *       pra 2026, rodovia Via Mar).</li>
  * </ul>
+ *
+ * <h2>Segunda rodada de curadoria federal — 14 concessões, ~103 praças
+ * (usuário pediu "resolver esses 118 pedágios" que tinham ficado sem
+ * tarifa na primeira passada)</h2>
+ * A primeira rodada federal só tentou UM valor por concessão; a maioria das
+ * concessões grandes/antigas tem tarifa DIFERENTE por praça, então ficaram
+ * sem tarifa curada em vez de arriscar um número errado. Nesta rodada,
+ * 4 agentes de pesquisa rodaram em paralelo (um por grupo de concessões),
+ * cada um buscando a tabela por-praça de cada concessionária (site oficial,
+ * página da ANTT, ou notícia do reajuste mais recente) em vez de um valor
+ * único — reduziu de 118 pra 14 praças sem tarifa em todo o dataset
+ * nacional (311 → 330, com 2 duplicatas removidas no processo).
+ *
+ * <p><b>Achado real, não esperado — 3 concessões federais com contrato
+ * ENCERRADO, DNIT operando sem cobrança</b>: além da Ecosul (RS) já citada
+ * acima, a mesma situação apareceu em <b>Rodovia do Aço</b> (BR-393/RJ,
+ * concessão da K-Infra extinta por caducidade — Decreto 12.479, efetivada
+ * em 10/06/2025, confirmado por nota oficial da ANTT) e <b>Via Bahia</b>
+ * (BR-116/324, contrato encerrado, pedágio suspenso desde 15/05/2025). As
+ * 3 concessões (15 praças) receberam tarifa curada de R$0,00 — não é "sem
+ * dado", é o valor real cobrado hoje (zero) enquanto o DNIT administra a
+ * via até a próxima concessão. Padrão a lembrar: concessão federal
+ * "sumida" das notícias recentes pode significar contrato extinto, não só
+ * falta de reajuste — vale checar antes de assumir que só falta pesquisar
+ * o preço.
+ *
+ * <p><b>Bug real de dado encontrado e corrigido: duplicata física</b>. O
+ * agente que pesquisou a CCR RioSP (Nova Dutra) notou que duas praças do
+ * dataset original ("Viúva Graça Norte/RJ" e "Viuvinha Norte/RJ", ambas
+ * sob CCR RioSP) tinham nome quase idêntico às praças P04/P05 da
+ * EcoRioMinas ("Viúva Graça"/"Viúva Graça (B)") — confirmado por
+ * coordenada que são a MESMA praça física (~20-30m de distância, dentro do
+ * raio de detecção do app), resíduo do parse original do KMZ da ANTT de
+ * antes da operação transferir de concessionária. As 2 entradas da CCR
+ * RioSP foram removidas — mantê-las causaria cobrança DUPLICADA numa rota
+ * que cruzasse esse ponto.
+ *
+ * <p><b>Concessões que trocaram de operador desde o parse original da
+ * ANTT</b> — renomeadas pro nome atual confirmado (afeta só o campo
+ * informativo {@code concessionaria}, não coordenada/tarifa): Concebra
+ * dividiu em <b>Way-153</b> (5 praças) e <b>Way-262</b> (4 praças) em
+ * 26/03/2026 (BR-060/Alexânia/Goianápolis ficou com nome antigo, confiança
+ * média, dado de fev/2024 sem confirmação de reajuste posterior); Via 040
+ * dividiu em <b>Via Cristais</b> (8 praças, trecho Brasília-BH) e
+ * <b>EPR Via Mineira</b> (3 praças, trecho BH-Juiz de Fora); CRO virou
+ * <b>Nova Rota do Oeste</b> (nome comercial atual, 9 praças MT — nome
+ * antigo "Nova 364" no dataset era coincidência de sigla com uma
+ * concessão DIFERENTE em Rondônia, confundida numa busca inicial);
+ * Concer virou <b>Elovias</b> em 03/11/2025 (3 praças, R$21,00 uniforme,
+ * confirmado por decisão do STF mantendo o reajuste em maio/2026).
+ *
+ * <p><b>Praças sem cobrança por não serem ponto de arrecadação real</b>
+ * (não é dado faltando, é R$0,00 confirmado): Via Brasil BR-163 P3
+ * (Trairão/PA) é isenta pra categoria 1 e moto por decisão explícita da
+ * ANTT; Via Cristais P1 (Cristalina/GO) é só o marco final do trecho, não
+ * uma cabine de cobrança.
+ *
+ * <p><b>3 praças de free-flow da CCR RioSP (Itaguaí/Paraty/Mangaratiba,
+ * BR-101/RJ) têm tarifa por dia da semana</b> — mesmo mecanismo já usado
+ * pra Via Lagos (RJ-124): R$4,80 dia útil / R$7,90 fim de semana e
+ * feriado, via {@code tarifaPorEixoFimDeSemana}.
+ *
+ * <p><b>Restam 14 praças genuinamente sem tarifa curada em todo o
+ * dataset</b>: EcoRioMinas P01-P03 (Pierre Berman/Santa Guilhermina/Santo
+ * Aleixo) estão DESATIVADAS de verdade — confirmado direto na página
+ * oficial da ANTT ("foram desativadas, sendo substituídas pelas praças P7
+ * Magé e P8 Guapimirim") — não têm tarifa porque não cobram mais, não
+ * porque falta pesquisar. MSVia P8 (Rio Verde/MS) ficou sem tarifa porque
+ * a única fonte encontrada tinha uma inconsistência matemática interna
+ * (percentual de reajuste citado não batia com o valor citado) — preferi
+ * não adivinhar qual dos dois números estava certo. EGR (10 praças, RS)
+ * continua sem tarifa — as imagens de tarifa no site oficial existem e
+ * foram lidas via visão computacional desta vez (não só "imagem
+ * ilegível"), mas o header HTTP confirma que são de maio/2022
+ * ({@code Last-Modified}), e a notícia mais recente encontrada sobre
+ * reajuste da EGR é de 2020 — dado real mas desatualizado demais pra
+ * confiar em 2026.
  */
 @Component
 public class TollPlazaSeeder implements CommandLineRunner {

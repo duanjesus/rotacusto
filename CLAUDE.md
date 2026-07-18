@@ -200,20 +200,19 @@ resource for this dataset, only KMZ + a PDF data dictionary.
   - **Sacyr/Rota de Santa Maria** (5 plazas, RSC-287): single confirmed uniform tariff
     across the whole stretch, R$5.40/car (2026), moto R$2.70 flat.
   - **EGR** (10 plazas): tariff varies a lot per plaza (e.g. Gramado R$7.10 vs. Coxilha
-    R$4.40 in 2024 data) and the only official table is published as an **image**, not
-    extractable text, with no 2026 text source found — left uncurated on purpose, same
-    treatment as EcoRioMinas.
+    R$4.40 in 2024 data). The official tariff images were actually read this round (via
+    vision, not just "unreadable image") — but the HTTP `Last-Modified` header on those
+    images is May 2022, and the newest EGR reajuste article found is from 2020, so the
+    numbers are real but too stale to trust for 2026. Left uncurated.
   - **CCR ViaSul (now "Motiva")**: already existed in the federal dataset (concession
     "Via Sul", 7 plazas, no tariff) — enriched with the confirmed uniform value from
     multiple consistent, dated local news sources: R$6.60/car = R$3.30/axle, effective
     2026-06-26.
-  - **Ecosul**: already existed (5 plazas, BR-116/392), left uncurated on purpose — the
-    sources found were genuinely conflicting (R$12.30 on one ANTT portal page vs.
-    R$19.60→R$22.20 in dated news), and ANTT itself confirmed the R$22.20 adjustment was
-    approved but has "no immediate impact for users," with the concession contract due
-    to end March 2026 (this data is from July 2026 — the concession may have already
-    ended). Preferred leaving it uncurated over guessing a possibly-wrong or
-    possibly-defunct number.
+  - **Ecosul**: already existed (5 plazas, BR-116/392) — **its concession contract
+    genuinely ended** at 23:59 on 2026-03-03, tollbooths released free from 0:00 the
+    next day, DNIT running the road with no toll collection until a new concession
+    starts in 2027 (confirmed by multiple dated, consistent news sources). Curated as
+    R$0.00 — a real confirmed value, not "no data."
 - **RJ-124 (Via Lagos) now has real weekday/weekend pricing**: the only toll found in
   this entire effort with genuine day-of-week variation (R$18.40 total/car Mon–Fri vs.
   R$30.60 weekends and holidays, moto exempt). `TollPlaza` gained a nullable
@@ -228,12 +227,52 @@ resource for this dataset, only KMZ + a PDF data dictionary.
   happens to run. **National holidays are not detected** — only Saturday/Sunday; a full
   Brazilian holiday calendar (fixed + movable/Easter-based dates) is disproportionate
   effort for the one toll plaza that needs it, documented as an accepted simplification.
+- **Second federal curation pass — 118 → 14 plazas left uncurated**: the first federal
+  pass only tried one price per concession, so most large/older concessions (where price
+  genuinely varies per plaza) were left uncurated rather than risk a wrong blanket
+  number. Ran 4 research subagents in parallel, one per group of concessions, each
+  looking for the actual **per-plaza** tariff table (official site, ANTT's per-concession
+  tariff page, or the latest reajuste article) instead of one number for the whole
+  concession — dropped uncurated plazas nationwide from 118 to 14.
+  - **3 more federal concessions turned out to have expired contracts**, same situation
+    as Ecosul above: **Rodovia do Aço** (BR-393/RJ, concession revoked by *caducidade*,
+    DNIT running it toll-free since 2025-06-10) and **Via Bahia** (BR-116/324, contract
+    ended, tolls suspended since 2025-05-15). All curated at R$0.00 — a real confirmed
+    value. Lesson: a federal concession that's gone quiet in recent news might mean the
+    contract ended, not just "nobody researched the new price" — worth checking before
+    assuming it just needs a price search.
+  - **A real duplicate-data bug found and fixed**: two plazas in the original dataset
+    ("Viúva Graça Norte/RJ" and "Viuvinha Norte/RJ", both under concession "CCR RioSP")
+    turned out to be the *same physical plaza* as EcoRioMinas's P04/P05 ("Viúva Graça" /
+    "Viúva Graça (B)") — confirmed by coordinates roughly 20-30m apart, a leftover from
+    the original ANTT KMZ parse predating the operational handover to EcoRioMinas.
+    Keeping both would double-charge a route crossing that point. Removed the 2 CCR
+    RioSP duplicates (311 → 330 net, after also adding the RS state batch).
+  - **Several concessions had genuinely changed operators** since the original ANTT
+    parse — renamed in the dataset (this only changes the informational
+    `concessionaria` string, not coordinates/pricing): Concebra split into **Way-153**
+    and **Way-262** (2026-03-26); Via 040 split into **Via Cristais** and **EPR Via
+    Mineira**; CRO is now branded **Nova Rota do Oeste** (the old "Nova 364" name in the
+    dataset was a coincidental match with an unrelated concession in Rondônia, a mixup
+    caught mid-research); Concer became **Elovias** (2025-11-03).
+  - **3 CCR RioSP free-flow plazas** (Itaguaí/Paraty/Mangaratiba, BR-101/RJ) turned out
+    to have the same weekday/weekend price split as Via Lagos — reused
+    `tarifaPorEixoFimDeSemana` rather than inventing a new mechanism: R$4.80 weekday /
+    R$7.90 weekend.
+  - **What's still uncurated (14 plazas)**: EcoRioMinas's P01-P03 are confirmed
+    genuinely deactivated (ANTT's own page: "foram desativadas, sendo substituídas
+    pelas praças P7 e P8") — no price because they don't charge anymore, not because of
+    missing research. MSVia's Rio Verde plaza had a source with an internally
+    inconsistent adjustment percentage vs. quoted price — left alone rather than
+    guessing which number was right. EGR (10 plazas, RS) stayed uncurated for the
+    reason above.
 
 See `TollPlazaSeeder`'s Javadoc for the full per-concession sourcing (dates, confirmed
 values, and the complete state-by-state survey) and `SeedersIntegrationTest` for the
-regression assertions (332-row count, EcoRioMinas and EGR and Ecosul correctly
-uncurated, Fernão Dias/Autoban/CSG/Sacyr/Via Sul correctly curated at the halved rate,
-Ecoponte still direction-constrained, Itaboraí still bidirectional, Via Lagos's
+regression assertions (330-row count, deactivated/expired-contract plazas correctly
+zeroed or left uncurated, Fernão Dias/Autoban/CSG/Sacyr/Via Sul/Nova Rota do
+Oeste/Ecovias do Cerrado/Transbrasiliana correctly curated at the halved rate, Ecoponte
+still direction-constrained, Itaboraí still bidirectional, Via Lagos's
 weekday/weekend/moto values).
 
 ## Navigation (turn-by-turn, voice, rerouting)

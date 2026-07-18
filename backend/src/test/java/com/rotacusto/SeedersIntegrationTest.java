@@ -138,8 +138,12 @@ class SeedersIntegrationTest {
         // reais direto na descrição do KMZ, ao contrário do federal que só
         // tem localização) + 1 Via Lagos (RJ-124, tarifa por dia da semana)
         // + 21 estaduais RS (IEDE/DAER — 6 CSG free-flow, 5 Sacyr, 10 EGR
-        // sem tarifa curada) — ver TollPlazaSeeder.
-        assertEquals(332, tollPlazaRepository.count());
+        // sem tarifa curada) - 2 duplicatas de "Viúva Graça" removidas
+        // (CCR RioSP tinha uma entrada residual do KMZ original na MESMA
+        // coordenada física da EcoRioMinas P04/P05, ~20-30m de distância —
+        // contaria o pedágio 2x numa rota que cruzasse ali) — ver
+        // TollPlazaSeeder.
+        assertEquals(330, tollPlazaRepository.count());
         var todasPracas = tollPlazaRepository.findAll();
 
         assertTrue(todasPracas.stream()
@@ -178,16 +182,47 @@ class SeedersIntegrationTest {
         assertTrue(pontePlazas.stream().allMatch(p -> p.getCobraApenasIndo() != null),
                 "praça da Ecoponte deveria ter restrição de sentido");
 
-        // Achado real verificando concessão por concessão: tarifa uniforme
-        // entre todas as praças da mesma concessão é a EXCEÇÃO, não a regra
-        // — concessões grandes (ex. EcoRioMinas) têm tarifa bem diferente por
-        // praça. Confirmamos que pelo menos uma concessão grande/variável
-        // ficou sem tarifa curada (não estimamos pra não inventar valor
-        // errado) e que pelo menos uma concessão pequena/uniforme foi curada.
+        // EcoRioMinas: P01-P03 (Pierre Berman, Santa Guilhermina, Santo
+        // Aleixo) foram DESATIVADAS de verdade (confirmado direto na página
+        // oficial da ANTT: "foram desativadas, sendo substituídas pelas
+        // praças P7 (Magé) e P8 (Guapimirim)") — continuam sem tarifa
+        // curada porque não são um valor "não pesquisado", são uma praça
+        // que fisicamente não cobra mais. P04/P05 (Viúva Graça/Viúva Graça
+        // B) seguem ativas e agora têm tarifa curada real.
         assertTrue(todasPracas.stream()
-                .filter(p -> p.getConcessionaria().equals("EcoRioMinas"))
+                .filter(p -> p.getConcessionaria().equals("EcoRioMinas")
+                        && (p.getNome().contains("P01") || p.getNome().contains("P02") || p.getNome().contains("P03")))
                 .allMatch(p -> p.getTarifaPorEixo() == null),
-                "EcoRioMinas tem tarifa variável por praça — não deveria ter tarifa curada uniforme");
+                "EcoRioMinas P01-P03 estão desativadas — não deveriam ter tarifa curada");
+        assertTrue(todasPracas.stream()
+                .filter(p -> p.getConcessionaria().equals("EcoRioMinas")
+                        && (p.getNome().contains("P04") || p.getNome().contains("P05")))
+                .allMatch(p -> p.getTarifaPorEixo() != null && p.getTarifaPorEixo() == 8.60),
+                "EcoRioMinas P04/P05 (Viúva Graça) têm tarifa uniforme confirmada: R$17,20/carro = R$8,60/eixo");
+
+        // Duplicata física removida: a entrada antiga da CCR RioSP em cima da
+        // MESMA coordenada da EcoRioMinas P04/P05 (~20-30m de distância,
+        // resíduo do KMZ original antes da operação transferir de
+        // concessionária) não deveria mais existir no dataset.
+        assertTrue(todasPracas.stream().noneMatch(p -> p.getNome().contains("Viúva Graça Norte")
+                        || p.getNome().contains("Viuvinha Norte")),
+                "as duplicatas de Viúva Graça sob CCR RioSP deveriam ter sido removidas");
+
+        // Concessões federais com contrato ENCERRADO e DNIT operando sem
+        // cobrança — tarifa real é R$0,00 (não "sem dado"), confirmado por
+        // comunicado oficial da ANTT em cada caso. Ecosul (RS, fim em
+        // 03/03/2026), Rodovia do Aço (BR-393/RJ, caducidade em 10/06/2025)
+        // e Via Bahia (BR-116/324, fim em 15/05/2025).
+        for (String concessaoExtinta : new String[] { "Ecosul", "Rodovia do Aço", "Via Bahia" }) {
+            var pracas = todasPracas.stream().filter(p -> p.getConcessionaria().equals(concessaoExtinta)).toList();
+            assertTrue(!pracas.isEmpty(), concessaoExtinta + " deveria ter praças no dataset");
+            assertTrue(pracas.stream().allMatch(p -> p.getTarifaPorEixo() != null && p.getTarifaPorEixo() == 0.0),
+                    concessaoExtinta + " deveria ter tarifa ZERO confirmada (concessão encerrada, DNIT sem cobrança)");
+        }
+
+        // Achado real verificando concessão por concessão: tarifa uniforme
+        // entre todas as praças da mesma concessão é a EXCEÇÃO, não a regra.
+        // Confirmamos que pelo menos uma concessão pequena/uniforme foi curada.
         assertTrue(todasPracas.stream()
                 .filter(p -> p.getConcessionaria().equals("Autopista Fernão Dias"))
                 // tarifaPorEixo é R$3,70/2 = R$1,85 — a fonte cota o preço TOTAL pra
@@ -255,14 +290,31 @@ class SeedersIntegrationTest {
         assertEquals(7, viaSulPlazas.size(), "Via Sul deveria ter 7 praças");
         assertTrue(viaSulPlazas.stream().allMatch(p -> p.getTarifaPorEixo() != null && p.getTarifaPorEixo() == 3.3),
                 "Via Sul deveria ter tarifa uniforme de R$3,30/eixo em todas as praças");
+        // Ecosul: ver bloco de "concessões extintas" acima — contrato terminou de
+        // verdade em 03/03/2026, tarifa real hoje é R$0,00, não "sem dado".
 
-        // Ecosul (BR-116/BR-392): contrato de concessão previsto pra terminar em
-        // março/2026 e reajuste pra R$22,20 aprovado mas "sem impacto imediato"
-        // (ANTT) — dado real mas genuinamente ambíguo/desatualizado, mantido sem
-        // tarifa curada em vez de arriscar um valor errado ou de concessão extinta.
-        var ecosulPlazas = todasPracas.stream().filter(p -> p.getConcessionaria().equals("Ecosul")).toList();
-        assertEquals(5, ecosulPlazas.size(), "Ecosul deveria continuar com 5 praças (sem duplicar)");
-        assertTrue(ecosulPlazas.stream().allMatch(p -> p.getTarifaPorEixo() == null),
-                "Ecosul deveria continuar sem tarifa curada (situação contratual ambígua)");
+        // Segunda rodada de curadoria federal: agente de pesquisa por concessão
+        // (14 concessões, ~103 praças que tinham ficado sem tarifa na primeira
+        // passada por variarem por praça) — reduziu de 118 pra 14 praças sem
+        // tarifa curada no dataset inteiro. Verificações de amostra por concessão:
+        assertTrue(todasPracas.stream()
+                .filter(p -> p.getConcessionaria().equals("Nova Rota do Oeste"))
+                .allMatch(p -> p.getTarifaPorEixo() != null),
+                "Nova Rota do Oeste (ex-CRO, BR-163/364 MT) deveria ter todas as 9 praças curadas");
+        assertTrue(todasPracas.stream()
+                .filter(p -> p.getConcessionaria().equals("Ecovias do Cerrado"))
+                .allMatch(p -> p.getTarifaPorEixo() != null && p.getTarifaPorEixo() == 2.95),
+                "Ecovias do Cerrado deveria ter tarifa uniforme de R$2,95/eixo (R$5,90/carro)");
+        assertTrue(todasPracas.stream()
+                .filter(p -> p.getConcessionaria().equals("Transbrasiliana"))
+                .allMatch(p -> p.getTarifaPorEixo() != null && p.getTarifaPorEixo() == 5.05),
+                "Transbrasiliana deveria ter tarifa uniforme de R$5,05/eixo (R$10,10/carro)");
+        // MSVia P8-Rio Verde: única praça de toda a segunda rodada mantida sem
+        // tarifa de propósito — a fonte encontrada tinha uma inconsistência
+        // matemática interna (percentual de reajuste não batia com o valor
+        // citado), preferi não adivinhar qual dos dois números estava certo.
+        assertTrue(todasPracas.stream()
+                .anyMatch(p -> p.getNome().contains("Rio Verde/MS") && p.getTarifaPorEixo() == null),
+                "MSVia P8-Rio Verde deveria continuar sem tarifa curada (fonte inconsistente)");
     }
 }
