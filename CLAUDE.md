@@ -99,35 +99,73 @@ consistently prefers fewer real numbers over more imprecise ones.
 
 ## Tolls
 
-`backend/src/main/resources/data/tollplazas-br101.json` is a small curated seed
-(coordinates + `tarifaPorEixo`, `tarifaMoto`) combined at runtime with **live OSM
-Overpass** queries (`TollService`, national coverage, but no real tariff — falls back to
-a configured default per axle). One entry is **directional** (`cobraApenasIndo` +
-`refLat`/`refLng`, compared against the route's bearing via `domain/geo/Bearing.java`)
-— the Rio-Niterói bridge only physically has toll booths on one carriageway. Toll cost
-is always `tarifaPorEixo × numeroEixos`, except motorcycles which use a separate
-`tarifaMoto` field when present.
+`backend/src/main/resources/data/tollplazas.json` is a **national curated seed** (159
+entries: 158 real federal toll plazas + 1 state plaza) combined at runtime with **live
+OSM Overpass** queries (`TollService`) — Overpass gives precise real-time coordinates
+for any toll booth in Brazil; the curated dataset only *enriches* name/concessionária/
+tariff when a coordinate match is found, never adds its own entry. `tarifaPorEixo` and
+`tarifaMoto` are both **nullable** on `TollPlaza` — a curated entry can have a real,
+confirmed location/direction without a confirmed price. When `tarifaPorEixo` is null,
+`TollService` substitutes the configured default rather than letting `null` reach
+`TollCostCalculator` (`tarifaPorEixo × numeroEixos` would NPE otherwise) — so an
+unpriced plaza still shows its **real name and concessionária** instead of the generic
+"Pedágio (OpenStreetMap)" fallback, just with an approximate default price.
 
-**Real-tariff/direction pass (user-reported imprecision)**: verified every curated entry
-against the concessionaires' current published tariffs and confirmed the Rio-Niterói
-bridge's one-way flag is correct (charged Rio→Niterói only, per EcoRodovias), but the
-**Itaboraí RJ-116 plaza was wrongly marked one-way** (`cobraApenasIndo: false`, "só na
-volta") — Rota 116's own tariff page states the toll is bidirectional
-("cobrança bidirecional"). Removing `refLat`/`refLng`/`cobraApenasIndo` from that entry
-makes it count in both directions, same as any toll with no direction constraint.
-Arteris Fluminense's five BR-101 RJ plazas (Rio Bonito, Casimiro de Abreu, Campos dos
-Goytacazes ×2, São Gonçalo) now charge one uniform tariff (R$7.50/car, R$3.75/moto since
-the 2025-06-27 readjustment) — the curated dataset previously had three different, all
-stale, per-plaza values. Marataízes/ES is now under **Ecovias Capixaba** (renamed from
-Eco101/Rodosol), R$5.20/car and **motorcycles exempt** — the old entry still said
-"Rodosol" and charged motorcycles. Rio Bonito's curated coordinate was also replaced
-with the exact point a live Overpass query found on a real route through it (the old
-"municipality center" guess was ~9km off — too far outside `curated-detection-radius-km`
-to enrich, so the plaza fell back to the generic unidentified/default tariff instead of
-its real name and price). Casimiro de Abreu's coordinate is still an approximate guess
-— refine with an official km marker before relying on it matching automatically. See
-`TollPlazaSeeder`'s Javadoc for the full sourcing per plaza and `SeedersIntegrationTest`
-for the regression assertion locking in the Itaboraí direction fix.
+**Scale of the national expansion**: the user asked to verify pricing/direction for
+every toll in Brazil, not just the RJ corridor already fixed. Researching each of the
+~400-1,800 toll points in Brazil individually (the method used for RJ) isn't feasible —
+instead, `TollPlazaSeeder` now loads from the **ANTT's own open-data KMZ**
+(`dados.antt.gov.br/dataset/praca-de-pedagio`), which lists every toll plaza on every
+federally-concessioned highway (23 concessions, 158 active plazas) with real
+coordinates, highway, km marker, municipality, and lane direction
+(Crescente/Decrescente/both). Parsed from KML (`Placemark` → HTML table embedded in a
+CDATA `description`) via a one-off PowerShell script — there's no clean CSV/JSON
+resource for this dataset, only KMZ + a PDF data dictionary.
+
+- **Direction is solved differently than before, and better**: earlier one-way plazas
+  (like the Rio-Niterói bridge) needed the bearing-based `cobraApenasIndo` +
+  `refLat`/`refLng` mechanism because only one approximate coordinate existed for a toll
+  that's physically only on one carriageway. The ANTT data gives each physical booth its
+  **own precise coordinate** — a divided highway's two carriageways are geographically
+  separate, so the existing tight `osm-detection-radius-km` (0.1km) naturally excludes a
+  route on the wrong carriageway without any bearing math. The `cobraApenasIndo`
+  mechanism is only still used for Ecoponte (Ponte Rio-Niterói), which really does have
+  just one physical booth for both direction's traffic patterns.
+- **Tariff is NOT uniform per concession as a rule — that was a lucky case, not the
+  norm**: researching one tariff per concession (~23 searches) was the plan, mirroring
+  what worked for Arteris Fluminense in the RJ fix. Turned out most larger/older
+  concessions charge **different prices at different plazas** (e.g., EcoRioMinas ranges
+  R$8.90–R$13.30 across 6 plazas; Nova Dutra/CCR RioSP ranges R$8.10–R$16.90 across 15).
+  Applying one blanket number to those would reintroduce the exact class of error this
+  work was meant to fix. Only concessions with an explicit uniform-tariff confirmation
+  got a curated price: Autopista Fernão Dias, Autopista Litoral Sul, Autopista Planalto
+  Sul, Autopista Régis Bittencourt, Autopista Fluminense (Arteris), Eco101/Ecovias
+  Capixaba, Via Costeira, Ecoponte — 43 of the 158 federal plazas. The rest (including
+  entire major concessions like Nova Dutra) keep their real coordinate/name but fall back
+  to the default tariff, which is the honest state given no reliable confirmed number.
+- **Brazilian toll tariffs are always quoted as the total price for a standard 2-axle
+  car**, never per-axle — a real bug caught only by testing live (not by unit tests,
+  since the seed data itself was wrong): the first version of this dataset stored that
+  total directly as `tarifaPorEixo`, doubling every price once `× numeroEixos` ran
+  (`TollCostCalculator`). Fixed by halving every confirmed car price before writing it as
+  `tarifaPorEixo`. `tarifaMoto` doesn't need this — motorcycle tariffs are charged flat,
+  not `× eixos`, so the quoted moto price is used directly.
+- **Itaboraí (RJ-116) and the Rio-Niterói bridge are state/non-federal-KMZ exceptions**,
+  fixed earlier this session: Itaboraí was wrongly marked one-way (`cobraApenasIndo:
+  false`, "só na volta") when Rota 116's own tariff page says "cobrança bidirecional" —
+  fixed by dropping the direction constraint entirely. The bridge's direction was already
+  correct (Rio→Niterói only, confirmed by EcoRodovias).
+- **Known gap, documented rather than guessed**: state highways (non-ANTT) have no
+  equivalent national open-data source — each state has its own regulator (São Paulo's
+  ARTESP has the country's largest toll network, then Rio de Janeiro, Minas Gerais,
+  Paraná, Rio Grande do Sul, etc.). Only Itaboraí (RJ-116) is covered so far. Routes on
+  state highways still work — they fall back to live Overpass + the default tariff, same
+  as any unrecognized toll.
+
+See `TollPlazaSeeder`'s Javadoc for the full per-concession sourcing (dates, confirmed
+values) and `SeedersIntegrationTest` for the regression assertions (159-row count,
+EcoRioMinas correctly uncurated, Fernão Dias correctly curated at the halved rate,
+Ecoponte still direction-constrained, Itaboraí still bidirectional).
 
 ## Navigation (turn-by-turn, voice, rerouting)
 

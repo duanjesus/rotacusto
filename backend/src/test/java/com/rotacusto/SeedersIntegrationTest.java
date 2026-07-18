@@ -132,15 +132,21 @@ class SeedersIntegrationTest {
 
     @Test
     void tollPlazaSeedDataIsLoadedOnStartup() {
-        assertEquals(6, tollPlazaRepository.count());
-        assertTrue(tollPlazaRepository.findAll().stream()
-                .anyMatch(p -> p.getCobraApenasIndo() != null),
-                "deveria ter pelo menos uma praça de sentido único cadastrada");
-
-        // Itaboraí (Rota 116) e Ponte Rio-Niterói (Ecovias Ponte) tinham
-        // tarifa estimada — corrigidas com valor real confirmado. Moto é
-        // ISENTA na Rota 116 (tarifaMoto=0,0, não confundir com "sem dado").
+        // 158 praças federais reais (dataset aberto da ANTT, todas as 23
+        // concessões de rodovia federal) + 1 estadual (Itaboraí, RJ-116, fora
+        // do escopo da ANTT) — ver TollPlazaSeeder.
+        assertEquals(159, tollPlazaRepository.count());
         var todasPracas = tollPlazaRepository.findAll();
+
+        assertTrue(todasPracas.stream()
+                .map(p -> p.getConcessionaria())
+                .distinct()
+                .count() >= 20,
+                "deveria ter praças de pelo menos 20 concessões federais distintas");
+
+        // Itaboraí (Rota 116, RJ-116) tinha tarifa estimada e sentido
+        // errado — corrigido com valor/sentido real confirmado. Moto é
+        // ISENTA (tarifaMoto=0,0, não confundir com "sem dado").
         assertTrue(todasPracas.stream().anyMatch(p -> p.getConcessionaria().equals("Rota 116")),
                 "deveria ter a praça real da Rota 116 (Itaboraí)");
         assertTrue(todasPracas.stream()
@@ -156,7 +162,34 @@ class SeedersIntegrationTest {
                 .filter(p -> p.getConcessionaria().equals("Rota 116"))
                 .allMatch(p -> p.getCobraApenasIndo() == null),
                 "praça da Rota 116 (Itaboraí) deveria cobrar nos dois sentidos, sem restrição de direção");
-        assertTrue(todasPracas.stream().anyMatch(p -> p.getConcessionaria().contains("Ecovias Ponte")),
-                "deveria ter a praça real da Ponte Rio-Niterói");
+
+        // Ponte Rio-Niterói continua sendo a única praça de sentido único de
+        // verdade no dataset (só existe fisicamente na pista sentido
+        // Niterói) — vem agora do dataset federal da ANTT (concessão
+        // "Ecoponte"), 1 única praça real.
+        var pontePlazas = todasPracas.stream()
+                .filter(p -> p.getConcessionaria().contains("Ecoponte"))
+                .toList();
+        assertEquals(1, pontePlazas.size(), "Ecoponte deveria ter exatamente 1 praça (só existe numa pista)");
+        assertTrue(pontePlazas.stream().allMatch(p -> p.getCobraApenasIndo() != null),
+                "praça da Ecoponte deveria ter restrição de sentido");
+
+        // Achado real verificando concessão por concessão: tarifa uniforme
+        // entre todas as praças da mesma concessão é a EXCEÇÃO, não a regra
+        // — concessões grandes (ex. EcoRioMinas) têm tarifa bem diferente por
+        // praça. Confirmamos que pelo menos uma concessão grande/variável
+        // ficou sem tarifa curada (não estimamos pra não inventar valor
+        // errado) e que pelo menos uma concessão pequena/uniforme foi curada.
+        assertTrue(todasPracas.stream()
+                .filter(p -> p.getConcessionaria().equals("EcoRioMinas"))
+                .allMatch(p -> p.getTarifaPorEixo() == null),
+                "EcoRioMinas tem tarifa variável por praça — não deveria ter tarifa curada uniforme");
+        assertTrue(todasPracas.stream()
+                .filter(p -> p.getConcessionaria().equals("Autopista Fernão Dias"))
+                // tarifaPorEixo é R$3,70/2 = R$1,85 — a fonte cota o preço TOTAL pra
+                // um carro de 2 eixos (convenção brasileira padrão pra "categoria 1"),
+                // não o valor por eixo que este app usa internamente.
+                .allMatch(p -> p.getTarifaPorEixo() != null && p.getTarifaPorEixo() == 1.85),
+                "Autopista Fernão Dias tem tarifa uniforme confirmada (R$3,70/carro = R$1,85/eixo)");
     }
 }

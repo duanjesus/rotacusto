@@ -30,8 +30,14 @@ public class TollPlaza {
     @Column(nullable = false)
     private Double lng;
 
-    /** Tarifa por eixo (R$). Carro (2 eixos) paga tarifaPorEixo * 2; caminhão/ônibus escalam pelo nº de eixos. */
-    @Column(name = "tarifa_por_eixo", nullable = false)
+    /**
+     * Tarifa por eixo (R$). Carro (2 eixos) paga tarifaPorEixo * 2; caminhão/ônibus
+     * escalam pelo nº de eixos. Nulo quando a praça tem localização/sentido reais
+     * (dataset nacional da ANTT) mas a tarifa não foi confirmada — nesse caso
+     * {@link com.rotacusto.service.TollService} usa a tarifa padrão em vez de
+     * propagar null (evitar isso quebraria {@link com.rotacusto.domain.cost.TollCostCalculator}).
+     */
+    @Column(name = "tarifa_por_eixo")
     private Double tarifaPorEixo;
 
     /** Tarifa fixa para moto, quando divulgada pela concessionária (categoria própria, não segue o eixo). */

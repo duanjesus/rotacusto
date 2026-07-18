@@ -82,6 +82,7 @@ public class TollService {
             return curated.stream()
                     .filter(p -> isCrossedBy(p.getLat(), p.getLng(), geometriaRota, curatedDetectionRadiusKm))
                     .filter(p -> passesDirectionConstraint(p, geometriaRota))
+                    .map(this::withDefaultTariffIfMissing)
                     .toList();
         }
 
@@ -111,8 +112,34 @@ public class TollService {
         p.setConcessionaria(curatedPlaza.getConcessionaria());
         p.setLat(osm.lat()); // usa a coordenada real e precisa do OSM
         p.setLng(osm.lon());
-        p.setTarifaPorEixo(curatedPlaza.getTarifaPorEixo());
-        p.setTarifaMoto(curatedPlaza.getTarifaMoto());
+        // Nem toda praça curada tem tarifa confirmada (dataset nacional da ANTT dá
+        // localização/sentido reais pra todas as praças federais, mas tarifa só foi
+        // confirmada por concessão quando não varia de praça pra praça — ver
+        // TollPlazaSeeder). Sem isso, tarifaPorEixo nulo quebraria TollCostCalculator
+        // (NPE no unboxing); cai pro padrão nacional em vez de propagar null, mas
+        // mantém o nome/concessionária reais (melhor que "não identificada").
+        p.setTarifaPorEixo(curatedPlaza.getTarifaPorEixo() != null ? curatedPlaza.getTarifaPorEixo() : defaultTarifaPorEixo);
+        p.setTarifaMoto(curatedPlaza.getTarifaMoto() != null ? curatedPlaza.getTarifaMoto() : defaultTarifaMoto);
+        p.setRefLat(curatedPlaza.getRefLat());
+        p.setRefLng(curatedPlaza.getRefLng());
+        p.setCobraApenasIndo(curatedPlaza.getCobraApenasIndo());
+        return p;
+    }
+
+    /** Mesma regra de fallback de {@link #enrichWithCuratedTariff}, usada no caminho em
+     * que o Overpass falhou e as próprias coordenadas curadas são usadas direto. */
+    private TollPlaza withDefaultTariffIfMissing(TollPlaza curatedPlaza) {
+        if (curatedPlaza.getTarifaPorEixo() != null) {
+            return curatedPlaza;
+        }
+        TollPlaza p = new TollPlaza();
+        p.setNome(curatedPlaza.getNome());
+        p.setRodovia(curatedPlaza.getRodovia());
+        p.setConcessionaria(curatedPlaza.getConcessionaria());
+        p.setLat(curatedPlaza.getLat());
+        p.setLng(curatedPlaza.getLng());
+        p.setTarifaPorEixo(defaultTarifaPorEixo);
+        p.setTarifaMoto(curatedPlaza.getTarifaMoto() != null ? curatedPlaza.getTarifaMoto() : defaultTarifaMoto);
         p.setRefLat(curatedPlaza.getRefLat());
         p.setRefLng(curatedPlaza.getRefLng());
         p.setCobraApenasIndo(curatedPlaza.getCobraApenasIndo());
