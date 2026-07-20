@@ -10,6 +10,7 @@ import org.springframework.web.client.RestClient;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.rotacusto.domain.AddressSuggestion;
+import com.rotacusto.util.EstadoUtils;
 
 /**
  * Client do Photon (photon.komoot.io), um geocoder sobre dados OpenStreetMap
@@ -58,7 +59,8 @@ public class PhotonClient {
             if (!seen.add(displayName + "|" + lat + "|" + lon)) {
                 continue; // mesmo lugar já retornado (Photon às vezes duplica)
             }
-            results.add(new AddressSuggestion(displayName, lat, lon));
+            String uf = EstadoUtils.siglaPorNomeCompleto(props.path("state").asText(null));
+            results.add(new AddressSuggestion(displayName, lat, lon, uf));
             if (results.size() >= limit) {
                 break;
             }

@@ -19,8 +19,8 @@ public final class TripCostCalculator {
 
     public static TripCostBreakdown calculate(double distanciaKm, double duracaoMin, VehicleProfile profile,
             List<TollPlaza> praçasCruzadas, double foodStopIntervalHours, double foodStopAverageCost,
-            LocalDate dataViagem) {
-        double custoCombustivel = FuelCostCalculator.calculate(distanciaKm, profile);
+            LocalDate dataViagem, List<RouteStep> passos) {
+        double custoCombustivel = FuelCostCalculator.calculate(distanciaKm, profile, passos);
         double custoDesgaste = WearCostCalculator.calculate(distanciaKm, profile);
         double custoPedagio = TollCostCalculator.calculate(praçasCruzadas, profile, dataViagem);
         double custoLanche = FoodStopCostCalculator.calculate(duracaoMin, foodStopIntervalHours, foodStopAverageCost);

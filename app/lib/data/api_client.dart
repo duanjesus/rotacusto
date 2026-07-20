@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart' show TargetPlatform, defaultTargetPlatform, kIsWeb;
 
 import '../domain/models/address_suggestion.dart';
+import '../domain/models/fuel_price.dart';
 import '../domain/models/road_alert.dart';
 import '../domain/models/road_alert_type.dart';
 import '../domain/models/traffic_report.dart';
@@ -82,6 +83,16 @@ class ApiClient {
     final response = await _dio.get('/geocoding/suggest', queryParameters: {'q': query});
     return (response.data as List<dynamic>)
         .map((json) => AddressSuggestion.fromJson(json as Map<String, dynamic>))
+        .toList();
+  }
+
+  /// Tabela inteira de preço médio de combustível por UF (ANP) — pequena o
+  /// bastante pra carregar uma vez e fazer lookup local, sem round-trip a
+  /// cada troca de Origem/veículo.
+  Future<List<FuelPrice>> fetchFuelPrices() async {
+    final response = await _dio.get('/fuel-prices');
+    return (response.data as List<dynamic>)
+        .map((json) => FuelPrice.fromJson(json as Map<String, dynamic>))
         .toList();
   }
 

@@ -97,6 +97,50 @@ docaminhoneiro.com` worked repeatedly; raw manufacturer PDFs consistently didn't
 source only gives an ambiguous range across multiple variants, skip it — this catalog
 consistently prefers fewer real numbers over more imprecise ones.
 
+## Fuel cost
+
+`domain/cost/FuelCostCalculator.calculate(distanciaKm, VehicleProfile, List<RouteStep>)` has
+two refinements on top of the basic `distância / consumo × preço` formula:
+
+- **Regional price suggestion**: `FuelPriceController` (`GET /api/fuel-prices`) serves a
+  small seeded table (`backend/src/main/resources/data/fuelprices.json`, 81 rows — 27 UFs ×
+  gasolina/etanol/diesel) extracted from ANP's real open weekly price survey. The Flutter app
+  loads this table once at startup and does the UF/combustível lookup locally — no round-trip
+  per keystroke. UF comes from `PhotonClient` (autocomplete only — it already parsed
+  `properties.state` from the Photon response just to build the display string; now also
+  converted via `EstadoUtils` and returned as a structured field). The regional price is only
+  ever a **suggested default** the user can freely overwrite — `HomeScreen` tracks whether the
+  price field still holds a value *the app itself* last wrote (`_ultimoPrecoSugerido`, compared
+  by string equality against the current field text) rather than using a separate
+  `onChanged`/dirty-flag listener, which sidesteps the classic Flutter footgun where
+  programmatically setting `TextEditingController.text` fires the widget's own `onChanged`.
+  Falls back to the old flat national average (`_precoPadraoPorCombustivel`) whenever UF or
+  regional data isn't available.
+  - **Extracting the ANP data was a real parsing exercise**: ANP's weekly `.xlsx`
+    (`resumo_semanal_lpc_<start>_<end>.xlsx`, "ESTADOS" sheet) is a real, genuinely open
+    dataset, but a naive regex-based `.xlsx` parser (an `.xlsx` is a zip of XML, same idea as
+    a KMZ) found only opaque numeric codes for state/product with no legend anywhere in the
+    file — turned out to be a parser bug, not a missing legend: the cells look like
+    `<c r="A10" s="1" t="s"><v>6</v></c>` (style attribute `s="1"` between `r=` and `t=`), and
+    a regex assuming `t="s"` immediately follows `r="..."` silently fails to match, falling
+    through to treat the shared-string *index* as a literal number. Fixed by extracting each
+    `<c ...>` tag's attributes as a block and pulling `r=`/`t=` out independent of order — after
+    that the sheet was fully labeled (`"ESTADO"`, `"PRODUTO"`, `"GASOLINA COMUM"`, etc.).
+    Lesson: never assume XML attribute order when parsing with regex, whatever the source.
+- **City/highway consumption blend**: `VehicleProfile` gained a nullable
+  `consumoCidadePorUnidade` (via a second, shorter constructor so the ~15 existing positional
+  test call sites didn't need touching), populated from `VehicleModel.consumoCidadeKmL` for
+  combustion vehicles only (`null` for `ELETRICO`, and for manually-specified profiles, which
+  only carry one `consumoPorUnidade`). `FuelCostCalculator` classifies each `RouteStep` by
+  average speed (`distanciaM/duracaoS`, `>= 60 km/h` → "rodovia", else "cidade" — a documented
+  approximation, since ORS doesn't tag road type per step) and sums the cost per bucket
+  separately. Falls back to the single-consumption formula whenever `passos` is empty or the
+  profile has no city consumption — every pre-existing call site and test keeps working
+  unchanged. Verified live: Copacabana→Guarapari (484.7 km, consumo cidade 11.0 / estrada
+  12.7 km/L) returned R$237.67, between the pure-highway (R$232.44) and pure-city (R$268.31)
+  bounds — implying ~70 km of the trip classified as urban, a plausible split for a route that
+  starts/ends in city streets either side of a long BR-101 stretch.
+
 ## Tolls
 
 `backend/src/main/resources/data/tollplazas.json` is a **national curated seed** (159

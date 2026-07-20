@@ -52,6 +52,16 @@ class _HomeScreenState extends State<HomeScreen> {
   final _origemController = TextEditingController(text: _origemPadrao);
   final _destinoController = TextEditingController(text: 'Guarapari, ES');
   final _precoController = TextEditingController(text: _precoPadraoPorCombustivel[TipoCombustivel.gasolina]);
+  // Preço regional (ANP) por UF/combustível — carregado uma vez em
+  // initState, tabela pequena o bastante pra guardar inteira e fazer lookup
+  // local. _ultimoPrecoSugerido rastreia o último valor que O PRÓPRIO app
+  // escreveu no campo: se o texto atual ainda bate com ele, o usuário nunca
+  // editou manualmente, então ainda é seguro sobrescrever com uma sugestão
+  // melhor (regional). Comparação de texto em vez de um listener/onChanged
+  // separado — evita o problema clássico de "minha própria escrita
+  // programática dispara meu próprio listener".
+  Map<String, Map<TipoCombustivel, double>> _precosRegionais = {};
+  String? _ultimoPrecoSugerido = _precoPadraoPorCombustivel[TipoCombustivel.gasolina];
 
   VehicleType _selectedTipo = VehicleType.carro;
   VehicleModelSummary? _selectedModelSummary;
@@ -116,6 +126,34 @@ class _HomeScreenState extends State<HomeScreen> {
     loadRecentDestinations().then((lista) {
       if (mounted) setState(() => _recentes = lista);
     });
+    // Preço regional de combustível: carga tolerante a falha, mesmo padrão
+    // das outras — se falhar, o app segue com a média nacional fixa de
+    // sempre, sem travar nada.
+    _apiClient.fetchFuelPrices().then((lista) {
+      if (!mounted) return;
+      final porUf = <String, Map<TipoCombustivel, double>>{};
+      for (final preco in lista) {
+        porUf.putIfAbsent(preco.uf, () => {})[preco.tipoCombustivel] = preco.precoMedio;
+      }
+      setState(() => _precosRegionais = porUf);
+    }).catchError((_) {});
+  }
+
+  /// Atualiza o preço sugerido no formulário — regional (ANP) se a UF da
+  /// Origem e o combustível do veículo forem conhecidos e a tabela tiver
+  /// entrada, senão cai na média nacional de sempre. Só escreve se o campo
+  /// ainda tem um valor sugerido (o usuário nunca editou manualmente).
+  void _atualizarPrecoSugerido() {
+    final aindaEhSugerido = _ultimoPrecoSugerido == null || _precoController.text == _ultimoPrecoSugerido;
+    if (!aindaEhSugerido) return;
+    final combustivel = _selectedVehicle?.tipoCombustivel;
+    if (combustivel == null) return;
+    final uf = _origemSelecionada?.uf;
+    final tabelaDaUf = uf != null ? _precosRegionais[uf] : null;
+    final precoRegional = tabelaDaUf != null ? tabelaDaUf[combustivel] : null;
+    final novoPreco = precoRegional?.toStringAsFixed(2) ?? _precoPadraoPorCombustivel[combustivel]!;
+    _precoController.text = novoPreco;
+    _ultimoPrecoSugerido = novoPreco;
   }
 
   @override
@@ -269,7 +307,7 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() {
       _selectedVehicle = v;
       if (combustivelMudou) {
-        _precoController.text = _precoPadraoPorCombustivel[v.tipoCombustivel]!;
+        _atualizarPrecoSugerido();
       }
     });
   }
@@ -638,7 +676,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 controller: _origemController,
                 label: 'Origem',
                 fetchSuggestions: _apiClient.suggestAddress,
-                onSelected: (s) => _origemSelecionada = s,
+                onSelected: (s) {
+                  _origemSelecionada = s;
+                  _atualizarPrecoSugerido();
+                },
                 onUseCurrentLocation: _usarLocalizacaoAtual,
               ),
               // Paradas ficam entre Origem e Destino (ordem real do

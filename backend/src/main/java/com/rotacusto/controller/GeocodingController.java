@@ -23,7 +23,7 @@ public class GeocodingController {
     @GetMapping("/suggest")
     public List<AddressSuggestionResponseDTO> suggest(@RequestParam String q) {
         return geocodingService.suggest(q).stream()
-                .map(s -> new AddressSuggestionResponseDTO(s.displayName(), s.lat(), s.lon()))
+                .map(s -> new AddressSuggestionResponseDTO(s.displayName(), s.lat(), s.lon(), s.uf()))
                 .toList();
     }
 }

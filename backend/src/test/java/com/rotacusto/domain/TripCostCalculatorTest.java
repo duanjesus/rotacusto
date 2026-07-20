@@ -24,7 +24,7 @@ class TripCostCalculatorTest {
         VehicleProfile profile = new VehicleProfile(VehicleType.CARRO, TipoCombustivel.GASOLINA, 10.0, 2, 0.35, 6.0);
 
         TripCostBreakdown breakdown = TripCostCalculator.calculate(500.0, 360.0, profile, List.of(),
-                NO_FOOD_STOP_INTERVAL, 25.0, UMA_TERCA_FEIRA);
+                NO_FOOD_STOP_INTERVAL, 25.0, UMA_TERCA_FEIRA, List.of());
 
         assertEquals(500.0, breakdown.distanciaKm(), 0.001);
         assertEquals(360.0, breakdown.duracaoMin(), 0.001);
@@ -45,7 +45,7 @@ class TripCostCalculatorTest {
         praca2.setTarifaPorEixo(4.5); // carro (2 eixos) -> R$ 9,00
 
         TripCostBreakdown breakdown = TripCostCalculator.calculate(500.0, 360.0, profile, List.of(praca1, praca2),
-                NO_FOOD_STOP_INTERVAL, 25.0, UMA_TERCA_FEIRA);
+                NO_FOOD_STOP_INTERVAL, 25.0, UMA_TERCA_FEIRA, List.of());
 
         assertEquals(19.0, breakdown.custoPedagio(), 0.001);
         assertEquals(300.0 + 175.0 + 19.0, breakdown.total(), 0.001);
@@ -57,7 +57,7 @@ class TripCostCalculatorTest {
 
         // 400 min = 6h40 de viagem, parada a cada 2h, R$ 30 por parada -> floor(6.67/2) = 3 paradas = R$ 90
         TripCostBreakdown breakdown = TripCostCalculator.calculate(500.0, 400.0, profile, List.of(), 2.0, 30.0,
-                UMA_TERCA_FEIRA);
+                UMA_TERCA_FEIRA, List.of());
 
         assertEquals(90.0, breakdown.custoLanche(), 0.001);
         assertEquals(300.0 + 175.0 + 90.0, breakdown.total(), 0.001);
@@ -72,7 +72,7 @@ class TripCostCalculatorTest {
 
         LocalDate umSabado = LocalDate.of(2026, 7, 18);
         TripCostBreakdown breakdown = TripCostCalculator.calculate(500.0, 360.0, profile, List.of(viaLagos),
-                NO_FOOD_STOP_INTERVAL, 25.0, umSabado);
+                NO_FOOD_STOP_INTERVAL, 25.0, umSabado, List.of());
 
         assertEquals(30.60, breakdown.custoPedagio(), 0.001);
     }

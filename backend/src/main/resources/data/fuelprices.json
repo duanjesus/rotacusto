@@ -1,0 +1,488 @@
+[
+    {
+        "uf": "AC",
+        "tipoCombustivel": "DIESEL",
+        "precoMedio": 9.27,
+        "semanaReferencia": "2026-07-18"
+    },
+    {
+        "uf": "AC",
+        "tipoCombustivel": "ETANOL",
+        "precoMedio": 6.39,
+        "semanaReferencia": "2026-07-18"
+    },
+    {
+        "uf": "AC",
+        "tipoCombustivel": "GASOLINA",
+        "precoMedio": 8.46,
+        "semanaReferencia": "2026-07-18"
+    },
+    {
+        "uf": "AL",
+        "tipoCombustivel": "DIESEL",
+        "precoMedio": 7.03,
+        "semanaReferencia": "2026-07-18"
+    },
+    {
+        "uf": "AL",
+        "tipoCombustivel": "ETANOL",
+        "precoMedio": 5.01,
+        "semanaReferencia": "2026-07-18"
+    },
+    {
+        "uf": "AL",
+        "tipoCombustivel": "GASOLINA",
+        "precoMedio": 6.73,
+        "semanaReferencia": "2026-07-18"
+    },
+    {
+        "uf": "AM",
+        "tipoCombustivel": "DIESEL",
+        "precoMedio": 7.25,
+        "semanaReferencia": "2026-07-18"
+    },
+    {
+        "uf": "AM",
+        "tipoCombustivel": "ETANOL",
+        "precoMedio": 5.19,
+        "semanaReferencia": "2026-07-18"
+    },
+    {
+        "uf": "AM",
+        "tipoCombustivel": "GASOLINA",
+        "precoMedio": 7.22,
+        "semanaReferencia": "2026-07-18"
+    },
+    {
+        "uf": "AP",
+        "tipoCombustivel": "DIESEL",
+        "precoMedio": 6.98,
+        "semanaReferencia": "2026-07-18"
+    },
+    {
+        "uf": "AP",
+        "tipoCombustivel": "ETANOL",
+        "precoMedio": 5.81,
+        "semanaReferencia": "2026-07-18"
+    },
+    {
+        "uf": "AP",
+        "tipoCombustivel": "GASOLINA",
+        "precoMedio": 6.48,
+        "semanaReferencia": "2026-07-18"
+    },
+    {
+        "uf": "BA",
+        "tipoCombustivel": "DIESEL",
+        "precoMedio": 7.25,
+        "semanaReferencia": "2026-07-18"
+    },
+    {
+        "uf": "BA",
+        "tipoCombustivel": "ETANOL",
+        "precoMedio": 4.78,
+        "semanaReferencia": "2026-07-18"
+    },
+    {
+        "uf": "BA",
+        "tipoCombustivel": "GASOLINA",
+        "precoMedio": 6.94,
+        "semanaReferencia": "2026-07-18"
+    },
+    {
+        "uf": "CE",
+        "tipoCombustivel": "DIESEL",
+        "precoMedio": 6.99,
+        "semanaReferencia": "2026-07-18"
+    },
+    {
+        "uf": "CE",
+        "tipoCombustivel": "ETANOL",
+        "precoMedio": 4.9,
+        "semanaReferencia": "2026-07-18"
+    },
+    {
+        "uf": "CE",
+        "tipoCombustivel": "GASOLINA",
+        "precoMedio": 6.75,
+        "semanaReferencia": "2026-07-18"
+    },
+    {
+        "uf": "DF",
+        "tipoCombustivel": "DIESEL",
+        "precoMedio": 6.97,
+        "semanaReferencia": "2026-07-18"
+    },
+    {
+        "uf": "DF",
+        "tipoCombustivel": "ETANOL",
+        "precoMedio": 4.11,
+        "semanaReferencia": "2026-07-18"
+    },
+    {
+        "uf": "DF",
+        "tipoCombustivel": "GASOLINA",
+        "precoMedio": 6.43,
+        "semanaReferencia": "2026-07-18"
+    },
+    {
+        "uf": "ES",
+        "tipoCombustivel": "DIESEL",
+        "precoMedio": 6.94,
+        "semanaReferencia": "2026-07-18"
+    },
+    {
+        "uf": "ES",
+        "tipoCombustivel": "ETANOL",
+        "precoMedio": 4.74,
+        "semanaReferencia": "2026-07-18"
+    },
+    {
+        "uf": "ES",
+        "tipoCombustivel": "GASOLINA",
+        "precoMedio": 6.62,
+        "semanaReferencia": "2026-07-18"
+    },
+    {
+        "uf": "GO",
+        "tipoCombustivel": "DIESEL",
+        "precoMedio": 6.76,
+        "semanaReferencia": "2026-07-18"
+    },
+    {
+        "uf": "GO",
+        "tipoCombustivel": "ETANOL",
+        "precoMedio": 4.29,
+        "semanaReferencia": "2026-07-18"
+    },
+    {
+        "uf": "GO",
+        "tipoCombustivel": "GASOLINA",
+        "precoMedio": 6.65,
+        "semanaReferencia": "2026-07-18"
+    },
+    {
+        "uf": "MA",
+        "tipoCombustivel": "DIESEL",
+        "precoMedio": 7.13,
+        "semanaReferencia": "2026-07-18"
+    },
+    {
+        "uf": "MA",
+        "tipoCombustivel": "ETANOL",
+        "precoMedio": 5.07,
+        "semanaReferencia": "2026-07-18"
+    },
+    {
+        "uf": "MA",
+        "tipoCombustivel": "GASOLINA",
+        "precoMedio": 6.79,
+        "semanaReferencia": "2026-07-18"
+    },
+    {
+        "uf": "MG",
+        "tipoCombustivel": "DIESEL",
+        "precoMedio": 6.79,
+        "semanaReferencia": "2026-07-18"
+    },
+    {
+        "uf": "MG",
+        "tipoCombustivel": "ETANOL",
+        "precoMedio": 4.06,
+        "semanaReferencia": "2026-07-18"
+    },
+    {
+        "uf": "MG",
+        "tipoCombustivel": "GASOLINA",
+        "precoMedio": 6.25,
+        "semanaReferencia": "2026-07-18"
+    },
+    {
+        "uf": "MS",
+        "tipoCombustivel": "DIESEL",
+        "precoMedio": 6.87,
+        "semanaReferencia": "2026-07-18"
+    },
+    {
+        "uf": "MS",
+        "tipoCombustivel": "ETANOL",
+        "precoMedio": 3.92,
+        "semanaReferencia": "2026-07-18"
+    },
+    {
+        "uf": "MS",
+        "tipoCombustivel": "GASOLINA",
+        "precoMedio": 6.45,
+        "semanaReferencia": "2026-07-18"
+    },
+    {
+        "uf": "MT",
+        "tipoCombustivel": "DIESEL",
+        "precoMedio": 6.95,
+        "semanaReferencia": "2026-07-18"
+    },
+    {
+        "uf": "MT",
+        "tipoCombustivel": "ETANOL",
+        "precoMedio": 3.75,
+        "semanaReferencia": "2026-07-18"
+    },
+    {
+        "uf": "MT",
+        "tipoCombustivel": "GASOLINA",
+        "precoMedio": 6.8,
+        "semanaReferencia": "2026-07-18"
+    },
+    {
+        "uf": "PA",
+        "tipoCombustivel": "DIESEL",
+        "precoMedio": 7.04,
+        "semanaReferencia": "2026-07-18"
+    },
+    {
+        "uf": "PA",
+        "tipoCombustivel": "ETANOL",
+        "precoMedio": 4.74,
+        "semanaReferencia": "2026-07-18"
+    },
+    {
+        "uf": "PA",
+        "tipoCombustivel": "GASOLINA",
+        "precoMedio": 6.54,
+        "semanaReferencia": "2026-07-18"
+    },
+    {
+        "uf": "PB",
+        "tipoCombustivel": "DIESEL",
+        "precoMedio": 7.09,
+        "semanaReferencia": "2026-07-18"
+    },
+    {
+        "uf": "PB",
+        "tipoCombustivel": "ETANOL",
+        "precoMedio": 4.74,
+        "semanaReferencia": "2026-07-18"
+    },
+    {
+        "uf": "PB",
+        "tipoCombustivel": "GASOLINA",
+        "precoMedio": 6.48,
+        "semanaReferencia": "2026-07-18"
+    },
+    {
+        "uf": "PE",
+        "tipoCombustivel": "DIESEL",
+        "precoMedio": 6.88,
+        "semanaReferencia": "2026-07-18"
+    },
+    {
+        "uf": "PE",
+        "tipoCombustivel": "ETANOL",
+        "precoMedio": 5.11,
+        "semanaReferencia": "2026-07-18"
+    },
+    {
+        "uf": "PE",
+        "tipoCombustivel": "GASOLINA",
+        "precoMedio": 6.96,
+        "semanaReferencia": "2026-07-18"
+    },
+    {
+        "uf": "PI",
+        "tipoCombustivel": "DIESEL",
+        "precoMedio": 7.26,
+        "semanaReferencia": "2026-07-18"
+    },
+    {
+        "uf": "PI",
+        "tipoCombustivel": "ETANOL",
+        "precoMedio": 4.87,
+        "semanaReferencia": "2026-07-18"
+    },
+    {
+        "uf": "PI",
+        "tipoCombustivel": "GASOLINA",
+        "precoMedio": 6.89,
+        "semanaReferencia": "2026-07-18"
+    },
+    {
+        "uf": "PR",
+        "tipoCombustivel": "DIESEL",
+        "precoMedio": 6.81,
+        "semanaReferencia": "2026-07-18"
+    },
+    {
+        "uf": "PR",
+        "tipoCombustivel": "ETANOL",
+        "precoMedio": 4.21,
+        "semanaReferencia": "2026-07-18"
+    },
+    {
+        "uf": "PR",
+        "tipoCombustivel": "GASOLINA",
+        "precoMedio": 6.69,
+        "semanaReferencia": "2026-07-18"
+    },
+    {
+        "uf": "RJ",
+        "tipoCombustivel": "DIESEL",
+        "precoMedio": 7.1,
+        "semanaReferencia": "2026-07-18"
+    },
+    {
+        "uf": "RJ",
+        "tipoCombustivel": "ETANOL",
+        "precoMedio": 4.78,
+        "semanaReferencia": "2026-07-18"
+    },
+    {
+        "uf": "RJ",
+        "tipoCombustivel": "GASOLINA",
+        "precoMedio": 6.64,
+        "semanaReferencia": "2026-07-18"
+    },
+    {
+        "uf": "RN",
+        "tipoCombustivel": "DIESEL",
+        "precoMedio": 7.21,
+        "semanaReferencia": "2026-07-18"
+    },
+    {
+        "uf": "RN",
+        "tipoCombustivel": "ETANOL",
+        "precoMedio": 5.25,
+        "semanaReferencia": "2026-07-18"
+    },
+    {
+        "uf": "RN",
+        "tipoCombustivel": "GASOLINA",
+        "precoMedio": 6.9,
+        "semanaReferencia": "2026-07-18"
+    },
+    {
+        "uf": "RO",
+        "tipoCombustivel": "DIESEL",
+        "precoMedio": 7.31,
+        "semanaReferencia": "2026-07-18"
+    },
+    {
+        "uf": "RO",
+        "tipoCombustivel": "ETANOL",
+        "precoMedio": 5.51,
+        "semanaReferencia": "2026-07-18"
+    },
+    {
+        "uf": "RO",
+        "tipoCombustivel": "GASOLINA",
+        "precoMedio": 7.4,
+        "semanaReferencia": "2026-07-18"
+    },
+    {
+        "uf": "RR",
+        "tipoCombustivel": "DIESEL",
+        "precoMedio": 7.42,
+        "semanaReferencia": "2026-07-18"
+    },
+    {
+        "uf": "RR",
+        "tipoCombustivel": "ETANOL",
+        "precoMedio": 5.41,
+        "semanaReferencia": "2026-07-18"
+    },
+    {
+        "uf": "RR",
+        "tipoCombustivel": "GASOLINA",
+        "precoMedio": 7.57,
+        "semanaReferencia": "2026-07-18"
+    },
+    {
+        "uf": "RS",
+        "tipoCombustivel": "DIESEL",
+        "precoMedio": 6.65,
+        "semanaReferencia": "2026-07-18"
+    },
+    {
+        "uf": "RS",
+        "tipoCombustivel": "ETANOL",
+        "precoMedio": 4.6,
+        "semanaReferencia": "2026-07-18"
+    },
+    {
+        "uf": "RS",
+        "tipoCombustivel": "GASOLINA",
+        "precoMedio": 6.23,
+        "semanaReferencia": "2026-07-18"
+    },
+    {
+        "uf": "SC",
+        "tipoCombustivel": "DIESEL",
+        "precoMedio": 6.86,
+        "semanaReferencia": "2026-07-18"
+    },
+    {
+        "uf": "SC",
+        "tipoCombustivel": "ETANOL",
+        "precoMedio": 4.5,
+        "semanaReferencia": "2026-07-18"
+    },
+    {
+        "uf": "SC",
+        "tipoCombustivel": "GASOLINA",
+        "precoMedio": 6.49,
+        "semanaReferencia": "2026-07-18"
+    },
+    {
+        "uf": "SE",
+        "tipoCombustivel": "DIESEL",
+        "precoMedio": 6.84,
+        "semanaReferencia": "2026-07-18"
+    },
+    {
+        "uf": "SE",
+        "tipoCombustivel": "ETANOL",
+        "precoMedio": 5.53,
+        "semanaReferencia": "2026-07-18"
+    },
+    {
+        "uf": "SE",
+        "tipoCombustivel": "GASOLINA",
+        "precoMedio": 7.12,
+        "semanaReferencia": "2026-07-18"
+    },
+    {
+        "uf": "SP",
+        "tipoCombustivel": "DIESEL",
+        "precoMedio": 6.96,
+        "semanaReferencia": "2026-07-18"
+    },
+    {
+        "uf": "SP",
+        "tipoCombustivel": "ETANOL",
+        "precoMedio": 3.77,
+        "semanaReferencia": "2026-07-18"
+    },
+    {
+        "uf": "SP",
+        "tipoCombustivel": "GASOLINA",
+        "precoMedio": 6.43,
+        "semanaReferencia": "2026-07-18"
+    },
+    {
+        "uf": "TO",
+        "tipoCombustivel": "DIESEL",
+        "precoMedio": 6.96,
+        "semanaReferencia": "2026-07-18"
+    },
+    {
+        "uf": "TO",
+        "tipoCombustivel": "ETANOL",
+        "precoMedio": 5.05,
+        "semanaReferencia": "2026-07-18"
+    },
+    {
+        "uf": "TO",
+        "tipoCombustivel": "GASOLINA",
+        "precoMedio": 7.05,
+        "semanaReferencia": "2026-07-18"
+    }
+]

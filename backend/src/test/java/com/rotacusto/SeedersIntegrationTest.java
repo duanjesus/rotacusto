@@ -9,12 +9,14 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import com.rotacusto.entity.enums.TipoCombustivel;
 import com.rotacusto.entity.enums.VehicleType;
+import com.rotacusto.repository.FuelPriceRepository;
 import com.rotacusto.repository.TollPlazaRepository;
 import com.rotacusto.repository.VehicleModelRepository;
 
 /**
  * Sobe o contexto Spring completo (com H2 em memória) e confirma que os
- * seeders de catálogo de veículos e praças de pedágio carregam os dados.
+ * seeders de catálogo de veículos, praças de pedágio e preço de combustível
+ * carregam os dados.
  */
 @SpringBootTest
 class SeedersIntegrationTest {
@@ -24,6 +26,9 @@ class SeedersIntegrationTest {
 
     @Autowired
     private TollPlazaRepository tollPlazaRepository;
+
+    @Autowired
+    private FuelPriceRepository fuelPriceRepository;
 
     @Test
     void vehicleModelCatalogIsSeededOnStartup() {
@@ -316,5 +321,32 @@ class SeedersIntegrationTest {
         assertTrue(todasPracas.stream()
                 .anyMatch(p -> p.getNome().contains("Rio Verde/MS") && p.getTarifaPorEixo() == null),
                 "MSVia P8-Rio Verde deveria continuar sem tarifa curada (fonte inconsistente)");
+    }
+
+    @Test
+    void fuelPriceSeedDataIsLoadedOnStartup() {
+        // 27 UFs x 3 combustíveis (gasolina/etanol/diesel) — dado real extraído do
+        // Levantamento de Preços de Combustíveis da ANP (semana 12-18/07/2026),
+        // ver FuelPriceSeeder. GLP/GNV não entram (o app não modela esses
+        // combustíveis) nem ELETRICO (a ANP não pesquisa preço de recarga).
+        assertEquals(81, fuelPriceRepository.count());
+        var todosPrecos = fuelPriceRepository.findAll();
+
+        assertTrue(todosPrecos.stream().map(p -> p.getUf()).distinct().count() == 27,
+                "deveria ter preço pras 27 UFs (26 estados + DF)");
+        for (TipoCombustivel tipo : new TipoCombustivel[] { TipoCombustivel.GASOLINA, TipoCombustivel.ETANOL,
+                TipoCombustivel.DIESEL }) {
+            assertEquals(27, todosPrecos.stream().filter(p -> p.getTipoCombustivel() == tipo).count(),
+                    "deveria ter preço de " + tipo + " pras 27 UFs");
+        }
+
+        // São Paulo é notoriamente o estado com etanol mais barato do país (maior
+        // produtor) — checagem de sanidade de que o dado real bate com uma
+        // expectativa conhecida, não só "tem 81 linhas".
+        var etanolSp = todosPrecos.stream()
+                .filter(p -> p.getUf().equals("SP") && p.getTipoCombustivel() == TipoCombustivel.ETANOL)
+                .findFirst().orElseThrow();
+        assertTrue(etanolSp.getPrecoMedio() < 4.5,
+                "etanol em SP deveria ser notavelmente mais barato que a média nacional");
     }
 }
