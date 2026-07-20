@@ -123,7 +123,7 @@ public class TripEstimationService {
 
         LocalDate hoje = LocalDate.now();
         TripCostBreakdown breakdown = TripCostCalculator.calculate(route.distanciaKm(), route.duracaoMin(), profile,
-                praçasCruzadas, foodStopIntervalHours, foodStopAverageCost, hoje);
+                praçasCruzadas, foodStopIntervalHours, foodStopAverageCost, hoje, route.passos());
         Optional<OsmFuelStation> postoSugerido = eletrico ? Optional.empty()
                 : fuelStationService.suggestStop(postos, route.geometria());
 
