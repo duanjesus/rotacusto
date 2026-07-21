@@ -13,6 +13,7 @@ import 'package:permission_handler/permission_handler.dart';
 
 import '../../data/api_client.dart';
 import '../../data/device_id.dart';
+import '../../data/voice_mode_prefs.dart';
 import '../../domain/models/road_alert.dart';
 import '../../domain/models/road_alert_type.dart';
 import '../../domain/models/traffic_report.dart';
@@ -20,11 +21,15 @@ import '../../domain/models/traffic_severity.dart';
 import '../../domain/models/trip_cost_breakdown.dart';
 import '../../domain/navigation/deviation_detector.dart';
 import '../../domain/navigation/navigation_task_handler.dart';
+import '../../domain/navigation/radar_proximity.dart';
 import '../../domain/navigation/road_alert_proximity.dart';
 import '../../domain/navigation/route_progress.dart';
 import '../../domain/navigation/traffic_detector.dart';
+import '../../domain/navigation/traffic_report_proximity.dart';
+import '../../domain/navigation/voice_mode.dart';
 import '../widgets/road_alert_picker.dart';
 import '../widgets/trip_map.dart';
+import '../widgets/voice_mode_picker.dart';
 
 enum _NavStatus { carregando, semPermissao, semServico, ativo }
 
@@ -87,12 +92,18 @@ class _NavigationScreenState extends State<NavigationScreen> {
 
   bool get _recalculoHabilitado => widget.destino != null && widget.vehicleModelId != null;
 
+  // Modo de voz (Fase 12) — controla os pontos de fala nos dois ramos
+  // (Android via onReceiveData no NavigationTaskHandler, Windows direto aqui).
+  NavigationVoiceMode _modoVoz = navigationVoiceModeNotifier.value;
+
   // --- Só usados no ramo Windows/outras plataformas (sem serviço em segundo
   // plano) — no Android essa lógica vive inteira em NavigationTaskHandler. ---
   final FlutterTts _tts = FlutterTts();
   final DeviationDetector _detector = DeviationDetector();
   final RoadAlertProximityChecker _alertProximity = RoadAlertProximityChecker();
   final TrafficDetector _trafficDetector = TrafficDetector();
+  final TrafficReportProximityChecker _trafficReportProximity = TrafficReportProximityChecker();
+  final RadarProximityChecker _radarProximity = RadarProximityChecker();
   StreamSubscription<Position>? _positionSub;
   Timer? _roadAlertPollingTimer;
   Timer? _trafficPollingTimer;
@@ -102,6 +113,13 @@ class _NavigationScreenState extends State<NavigationScreen> {
   void initState() {
     super.initState();
     _tts.setLanguage('pt-BR');
+    // Modo salvo pode demorar um instante pra carregar (I/O local) — parte do
+    // valor em memória (default "tudo") e atualiza assim que resolver; na
+    // prática o carregamento termina bem antes da primeira fala, já que
+    // _iniciar() ainda tem permissão/serviço de localização pra resolver.
+    loadNavigationVoiceMode().then((_) {
+      if (mounted) setState(() => _modoVoz = navigationVoiceModeNotifier.value);
+    });
     _iniciar();
   }
 
@@ -201,6 +219,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
     if (widget.precoPorKWh != null) {
       await FlutterForegroundTask.saveData(key: kNavigationPrecoPorKWhKey, value: widget.precoPorKWh!);
     }
+    await FlutterForegroundTask.saveData(key: kNavigationVoiceModeKey, value: _modoVoz.name);
 
     FlutterForegroundTask.addTaskDataCallback(_onDadosDoServico);
     await FlutterForegroundTask.startService(
@@ -391,18 +410,39 @@ class _NavigationScreenState extends State<NavigationScreen> {
 
     if (progresso.currentStepIndex != null && progresso.currentStepIndex != _ultimoStepFalado) {
       _ultimoStepFalado = progresso.currentStepIndex;
-      _tts.speak(_breakdown.passosRota[progresso.currentStepIndex!].instrucao);
+      if (_modoVoz.falaInstrucaoDeVirada) {
+        _tts.speak(_breakdown.passosRota[progresso.currentStepIndex!].instrucao);
+      }
     }
 
     final alertaProximo = _alertProximity.checkProximity(atual, _alertasConhecidos);
     if (alertaProximo != null) {
-      _tts.speak(alertaProximo.tipo.vozTexto);
+      if (_modoVoz.falaAlertas) {
+        _tts.speak(alertaProximo.tipo.vozTexto);
+      }
       _mostrarAvisoDeAlerta(alertaProximo);
+    }
+
+    // Trânsito lento reportado por OUTROS usuários à frente (Fase 12) —
+    // mesmo princípio de _alertProximity, sobre _trafegoConhecido (polling).
+    final trafegoProximo = _trafficReportProximity.checkProximity(atual, _trafegoConhecido);
+    if (trafegoProximo != null && _modoVoz.falaAlertas) {
+      _tts.speak(trafegoProximo.severidade.vozTexto);
+    }
+
+    // Radar fixo à frente (Fase 12) — infraestrutura permanente, vem do
+    // próprio breakdown (sem polling separado).
+    final radarProximo = _radarProximity.checkProximity(atual, _breakdown.radaresNaRota);
+    if (radarProximo != null && _modoVoz.falaAlertas) {
+      _tts.speak('Atenção: radar de velocidade à frente');
     }
 
     // Detecção automática de trânsito lento (Fase 6.7) — mesma lógica do
     // NavigationTaskHandler (Android), reimplementada aqui (duplicação
-    // deliberada, ver Fase 6.3).
+    // deliberada, ver Fase 6.3). É um RELATO automático (POST), não uma
+    // fala — a fala de "trânsito lento à frente" acontece acima, via
+    // _trafficReportProximity, quando VOCÊ se aproxima de um relato de
+    // OUTRO usuário.
     if (progresso.currentStepIndex != null) {
       final passoAtual = _breakdown.passosRota[progresso.currentStepIndex!];
       final velocidadeEsperadaMps = passoAtual.duracaoS > 0 ? passoAtual.distanciaM / passoAtual.duracaoS : 0.0;
@@ -445,13 +485,45 @@ class _NavigationScreenState extends State<NavigationScreen> {
         _ultimoStepFalado = null;
         _recalculando = false;
       });
-      _tts.speak('Rota recalculada');
+      if (_modoVoz.falaAlertas) {
+        _tts.speak('Rota recalculada');
+      }
     } catch (_) {
       if (!mounted) return;
       setState(() => _recalculando = false);
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Não foi possível recalcular a rota. Tentando de novo se o desvio continuar.')),
       );
+    }
+  }
+
+  // --- Modo de voz (Fase 12) — ação de UI, funciona igual nas duas
+  // plataformas; a troca em si fica só aqui (não duplicada no
+  // NavigationTaskHandler), que só passa a RECEBER o novo modo via
+  // onReceiveData quando estiver rodando no Android. ---
+
+  void _abrirSeletorDeModoDeVoz() {
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) => VoiceModePicker(
+        modoAtual: _modoVoz,
+        onSelected: (modo) {
+          Navigator.of(context).pop();
+          _mudarModoDeVoz(modo);
+        },
+      ),
+    );
+  }
+
+  Future<void> _mudarModoDeVoz(NavigationVoiceMode modo) async {
+    setState(() => _modoVoz = modo);
+    await saveNavigationVoiceMode(modo);
+    if (_isAndroid) {
+      // Propaga ao vivo pro isolate de segundo plano — sem isso, o
+      // NavigationTaskHandler só pegaria o novo modo reiniciando a
+      // navegação (ele lê o valor salvo só uma vez, no onStart).
+      FlutterForegroundTask.sendDataToTask(modo.name);
     }
   }
 
@@ -500,6 +572,13 @@ class _NavigationScreenState extends State<NavigationScreen> {
           icon: const Icon(Icons.close_rounded),
           onPressed: () => Navigator.of(context).pop(),
         ),
+        actions: [
+          IconButton(
+            icon: Icon(_modoVoz.icon),
+            tooltip: _modoVoz.label,
+            onPressed: _abrirSeletorDeModoDeVoz,
+          ),
+        ],
         bottom: _recalculando
             ? const PreferredSize(
                 preferredSize: Size.fromHeight(3),

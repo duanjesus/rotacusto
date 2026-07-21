@@ -17,5 +17,6 @@ public record TripCostBreakdownDTO(
         List<RouteStepDTO> passosRota,
         List<CoordinateDTO> paradasNaRota,
         List<RoadAlertResponseDTO> alertasNaRota,
-        List<TrafficReportResponseDTO> trafegoNaRota) {
+        List<TrafficReportResponseDTO> trafegoNaRota,
+        List<RadarResponseDTO> radaresNaRota) {
 }

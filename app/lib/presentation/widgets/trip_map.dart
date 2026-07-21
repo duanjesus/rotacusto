@@ -163,6 +163,25 @@ class _TripMapState extends State<TripMap> {
                   ),
               ],
             ),
+          // Radares fixos (Fase 12) — infraestrutura permanente, vêm só do
+          // cálculo inicial (breakdown.radaresNaRota), sem polling ao vivo
+          // (ao contrário de alertas/trânsito, câmera de radar não some/muda
+          // durante a viagem).
+          if (breakdown != null && breakdown.radaresNaRota.isNotEmpty)
+            MarkerLayer(
+              markers: [
+                for (final r in breakdown.radaresNaRota)
+                  Marker(
+                    point: LatLng(r.lat, r.lon),
+                    width: 30,
+                    height: 30,
+                    child: const Tooltip(
+                      message: 'Radar de velocidade',
+                      child: Icon(Icons.camera_alt_rounded, color: Colors.indigo, size: 24),
+                    ),
+                  ),
+              ],
+            ),
           if (posicaoAtual != null)
             MarkerLayer(markers: [
               Marker(

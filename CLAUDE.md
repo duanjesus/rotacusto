@@ -355,6 +355,44 @@ weekday/weekend/moto values).
   unless `WidgetsFlutterBinding.ensureInitialized()` runs first in the isolate's
   `@pragma('vm:entry-point')` entry function.
 
+## Navigation voice modes + speed-camera radar (Fase 12)
+
+- `NavigationVoiceMode` (`app/lib/domain/navigation/voice_mode.dart`): `tudo` (everything
+  spoken, default — preserves pre-Fase-12 behavior), `apenasAlertas` (turn instruction
+  silenced, alerts/radar/traffic/reroute still spoken), `mudo` (nothing spoken). Two
+  getters (`falaInstrucaoDeVirada`, `falaAlertas`) are the only gate every `.speak(...)`
+  call site checks — visual feedback (SnackBar, notification text) is **never** gated,
+  only the TTS call itself.
+- Persisted via `app/lib/data/voice_mode_prefs.dart` (`ValueNotifier` + `shared_preferences`,
+  same shape as `auth_controller.dart`). Chosen from a bottom sheet
+  (`voice_mode_picker.dart`) opened from a new AppBar icon in `NavigationScreen` — no new
+  settings screen.
+- **Live mode switching on Android** works across the isolate boundary:
+  `NavigationScreen` calls `FlutterForegroundTask.sendDataToTask(modo.name)`;
+  `NavigationTaskHandler` overrides `onReceiveData(Object data)` (confirmed present in
+  `flutter_foreground_task` 10.0.0, unused anywhere else in the project until now) to
+  update its own `_modoVoz` field without restarting the service. The initial mode is
+  also written via `saveData(key: kNavigationVoiceModeKey, ...)` before `startService`,
+  since `onStart` only reads that value once.
+- Radar (speed camera) is **fixed OpenStreetMap infrastructure** (`highway=speed_camera`
+  via Overpass), not a user report — no expiration, no voting, no `/nearby` polling
+  endpoint like road alerts/traffic reports need. `RadarService` (backend) mirrors
+  `FuelStationService` almost exactly (bounding box + Haversine filter + try/catch →
+  empty list on Overpass failure). `radaresNaRota` rides along in the same
+  `TripCostBreakdownDTO` as everything else — a route recalculation naturally refreshes
+  it, same as tolls/fuel stations.
+- `RadarPoint` (frontend) has no id from the backend (just lat/lon, like
+  `OsmFuelStation`) — `RadarProximityChecker`'s "already announced" dedup set is keyed by
+  the coordinate string (`'$lat,$lon'`), not an int id like `RoadAlertProximityChecker`
+  uses.
+- "Slow traffic ahead" voice ties into the *existing* traffic-report polling
+  (`_trafegoConhecido`, populated since Fase 6.7) via a new
+  `TrafficReportProximityChecker` — **not** the automatic speed-based detector
+  (`traffic_detector.dart`, which stays silent and only auto-POSTs). The distinction
+  matters: the detector is "you are currently in slow traffic" (nothing useful to say),
+  while the proximity checker is "someone else reported slow traffic ahead of you" (worth
+  a heads-up).
+
 ## Road alerts (community-reported hazards)
 
 Anyone can report a hazard (pothole, police checkpoint, fog, broken-down car, accident,

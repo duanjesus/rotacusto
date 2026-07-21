@@ -13,9 +13,12 @@ import '../models/traffic_report.dart';
 import '../models/traffic_severity.dart';
 import '../models/trip_cost_breakdown.dart';
 import 'deviation_detector.dart';
+import 'radar_proximity.dart';
 import 'road_alert_proximity.dart';
 import 'route_progress.dart';
 import 'traffic_detector.dart';
+import 'traffic_report_proximity.dart';
+import 'voice_mode.dart';
 
 /// A cada quanto tempo o polling de alertas de trânsito ao vivo roda (Fase
 /// 6.6) — não a cada tick de GPS, custaria rede demais; alertas não mudam
@@ -34,6 +37,7 @@ const kNavigationDestinoKey = 'navigation_destino';
 const kNavigationVehicleModelIdKey = 'navigation_vehicleModelId';
 const kNavigationPrecoPorLitroKey = 'navigation_precoPorLitro';
 const kNavigationPrecoPorKWhKey = 'navigation_precoPorKWh';
+const kNavigationVoiceModeKey = 'navigation_voiceMode';
 
 /// Callback de entrada do isolate de segundo plano (Android, Fase 6.3) — tem
 /// que ser top-level e marcada `vm:entry-point` pro sistema conseguir
@@ -62,12 +66,15 @@ class NavigationTaskHandler extends TaskHandler {
   final DeviationDetector _detector = DeviationDetector();
   final RoadAlertProximityChecker _alertProximity = RoadAlertProximityChecker();
   final TrafficDetector _trafficDetector = TrafficDetector();
+  final TrafficReportProximityChecker _trafficReportProximity = TrafficReportProximityChecker();
+  final RadarProximityChecker _radarProximity = RadarProximityChecker();
 
   TripCostBreakdown? _breakdown;
   String? _destino;
   int? _vehicleModelId;
   double? _precoPorLitro;
   double? _precoPorKWh;
+  NavigationVoiceMode _modoVoz = NavigationVoiceMode.tudo;
 
   bool get _recalculoHabilitado => _destino != null && _vehicleModelId != null;
 
@@ -92,6 +99,10 @@ class NavigationTaskHandler extends TaskHandler {
     _vehicleModelId = await FlutterForegroundTask.getData<int>(key: kNavigationVehicleModelIdKey);
     _precoPorLitro = await FlutterForegroundTask.getData<double>(key: kNavigationPrecoPorLitroKey);
     _precoPorKWh = await FlutterForegroundTask.getData<double>(key: kNavigationPrecoPorKWhKey);
+    final modoSalvo = await FlutterForegroundTask.getData<String>(key: kNavigationVoiceModeKey);
+    if (modoSalvo != null) {
+      _modoVoz = NavigationVoiceMode.values.byName(modoSalvo);
+    }
 
     _positionSub = Geolocator.getPositionStream(
       locationSettings: const LocationSettings(accuracy: LocationAccuracy.high, distanceFilter: 5),
@@ -161,23 +172,46 @@ class NavigationTaskHandler extends TaskHandler {
     if (progresso.currentStepIndex != null && progresso.currentStepIndex != _ultimoStepFalado) {
       _ultimoStepFalado = progresso.currentStepIndex;
       final instrucao = breakdown.passosRota[progresso.currentStepIndex!].instrucao;
-      _tts.speak(instrucao);
+      // A notificação persistente sempre mostra a instrução atual — só a FALA
+      // é gateada pelo modo de voz (Fase 12).
+      if (_modoVoz.falaInstrucaoDeVirada) {
+        _tts.speak(instrucao);
+      }
       FlutterForegroundTask.updateService(notificationTitle: 'Navegando', notificationText: instrucao);
     }
 
     final alertaProximo = _alertProximity.checkProximity(atual, _alertasConhecidos);
     if (alertaProximo != null) {
-      _tts.speak(alertaProximo.tipo.vozTexto);
+      if (_modoVoz.falaAlertas) {
+        _tts.speak(alertaProximo.tipo.vozTexto);
+      }
       FlutterForegroundTask.sendDataToMain({
         'tipo': 'alerta_proximo',
         'alertaJson': jsonEncode(alertaProximo.toJson()),
       });
     }
 
+    // Trânsito lento reportado por OUTROS usuários à frente (Fase 12) — mesmo
+    // princípio de _alertProximity, mas sobre _trafegoConhecido (polling).
+    final trafegoProximo = _trafficReportProximity.checkProximity(atual, _trafegoConhecido);
+    if (trafegoProximo != null && _modoVoz.falaAlertas) {
+      _tts.speak(trafegoProximo.severidade.vozTexto);
+    }
+
+    // Radar fixo à frente (Fase 12) — infraestrutura permanente, vem do
+    // próprio breakdown (sem polling separado).
+    final radarProximo = _radarProximity.checkProximity(atual, breakdown.radaresNaRota);
+    if (radarProximo != null && _modoVoz.falaAlertas) {
+      _tts.speak('Atenção: radar de velocidade à frente');
+    }
+
     // Detecção automática de trânsito lento (Fase 6.7) — compara a
     // velocidade GPS ao vivo com a velocidade esperada do passo atual da
     // rota (distância ÷ duração, já calculado pelo ORS). Sem passo atual ou
-    // sem duração válida, não tem base de comparação.
+    // sem duração válida, não tem base de comparação. Isso é um RELATO
+    // automático (POST), não uma fala — a fala de "trânsito lento à frente"
+    // acontece acima, via _trafficReportProximity, quando VOCÊ se aproxima de
+    // um relato de OUTRO usuário.
     if (progresso.currentStepIndex != null) {
       final passoAtual = breakdown.passosRota[progresso.currentStepIndex!];
       final velocidadeEsperadaMps = passoAtual.duracaoS > 0 ? passoAtual.distanciaM / passoAtual.duracaoS : 0.0;
@@ -220,7 +254,9 @@ class NavigationTaskHandler extends TaskHandler {
       _breakdown = novoResultado;
       _ultimoStepFalado = null;
       _recalculando = false;
-      _tts.speak('Rota recalculada');
+      if (_modoVoz.falaAlertas) {
+        _tts.speak('Rota recalculada');
+      }
       FlutterForegroundTask.sendDataToMain({
         'tipo': 'rota_recalculada',
         'breakdownJson': jsonEncode(novoResultado.toJson()),
@@ -228,6 +264,17 @@ class NavigationTaskHandler extends TaskHandler {
     } catch (_) {
       _recalculando = false;
       FlutterForegroundTask.sendDataToMain({'tipo': 'recalculando', 'valor': false, 'erro': true});
+    }
+  }
+
+  /// Recebe a troca de modo de voz feita ao vivo pela UI (Fase 12) —
+  /// `FlutterForegroundTask.sendDataToTask(modo.name)` do lado de
+  /// `NavigationScreen`. Confirmado existir em
+  /// `flutter_foreground_task-10.0.0/lib/task_handler.dart`.
+  @override
+  void onReceiveData(Object data) {
+    if (data is String) {
+      _modoVoz = NavigationVoiceMode.values.byName(data);
     }
   }
 

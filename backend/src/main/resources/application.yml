@@ -88,3 +88,9 @@ rotacusto:
   traffic-reports:
     detection-radius-km: 0.3
     ttl-minutes: 15
+  # Radares fixos (câmeras de velocidade, Fase 12) — infraestrutura permanente via
+  # OpenStreetMap (highway=speed_camera), sem relato/expiração/voto. Raio apertado,
+  # mesmo motivo de fuel-stations/traffic-reports: é sobre um ponto específico numa
+  # pista, não uma área ampla.
+  radars:
+    detection-radius-km: 0.3

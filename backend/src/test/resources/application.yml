@@ -53,3 +53,5 @@ rotacusto:
   traffic-reports:
     detection-radius-km: 0.3
     ttl-minutes: 15
+  radars:
+    detection-radius-km: 0.3

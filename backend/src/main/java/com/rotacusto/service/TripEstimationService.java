@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import com.rotacusto.domain.Coordinates;
 import com.rotacusto.domain.OsmFuelStation;
+import com.rotacusto.domain.OsmSpeedCamera;
 import com.rotacusto.domain.RouteResult;
 import com.rotacusto.domain.TripCostBreakdown;
 import com.rotacusto.domain.TripCostCalculator;
@@ -20,6 +21,7 @@ import com.rotacusto.dto.request.TripEstimateRequestDTO;
 import com.rotacusto.dto.request.VehicleProfileRequestDTO;
 import com.rotacusto.dto.response.CoordinateDTO;
 import com.rotacusto.dto.response.FuelStationResponseDTO;
+import com.rotacusto.dto.response.RadarResponseDTO;
 import com.rotacusto.dto.response.RoadAlertResponseDTO;
 import com.rotacusto.dto.response.RouteStepDTO;
 import com.rotacusto.dto.response.TollPlazaResponseDTO;
@@ -41,12 +43,13 @@ public class TripEstimationService {
     private final FuelStationService fuelStationService;
     private final RoadAlertService roadAlertService;
     private final TrafficReportService trafficReportService;
+    private final RadarService radarService;
     private final double foodStopIntervalHours;
     private final double foodStopAverageCost;
 
     public TripEstimationService(GeocodingService geocodingService, RoutingService routingService,
             VehicleModelService vehicleModelService, TollService tollService, FuelStationService fuelStationService,
-            RoadAlertService roadAlertService, TrafficReportService trafficReportService,
+            RoadAlertService roadAlertService, TrafficReportService trafficReportService, RadarService radarService,
             @Value("${rotacusto.food-stop.interval-hours}") double foodStopIntervalHours,
             @Value("${rotacusto.food-stop.average-cost}") double foodStopAverageCost) {
         this.geocodingService = geocodingService;
@@ -56,6 +59,7 @@ public class TripEstimationService {
         this.fuelStationService = fuelStationService;
         this.roadAlertService = roadAlertService;
         this.trafficReportService = trafficReportService;
+        this.radarService = radarService;
         this.foodStopIntervalHours = foodStopIntervalHours;
         this.foodStopAverageCost = foodStopAverageCost;
     }
@@ -97,14 +101,15 @@ public class TripEstimationService {
 
     private TripCostBreakdownDTO buildBreakdownDTO(RouteResult route, VehicleProfile profile,
             List<Coordinates> paradas) {
-        // Pedágios, postos, alertas de trânsito e relatos de trânsito lento são
-        // quatro consultas independentes — rodar em paralelo corta o pior caso de
+        // Pedágios, postos, alertas de trânsito, relatos de trânsito lento e radares
+        // são cinco consultas independentes — rodar em paralelo corta o pior caso de
         // latência (cada uma já tem timeout/fallback próprio, mas em série os piores
         // casos somam). Postos de gasolina não fazem sentido pra elétrico (precisaria
         // de pontos de recarga, um recurso diferente, fora de escopo por enquanto).
         // Alertas/relatos de trânsito (Fases 6.6/6.7) são só consultas ao próprio
         // banco (sem serviço externo), bem mais rápidas que as outras duas, mas
-        // entram no mesmo padrão por consistência.
+        // entram no mesmo padrão por consistência. Radares (Fase 12) são infraestrutura
+        // fixa via Overpass, mesmo perfil de latência que postos/pedágio.
         boolean eletrico = profile.tipoCombustivel() == TipoCombustivel.ELETRICO;
         CompletableFuture<List<TollPlaza>> praçasFuture = CompletableFuture
                 .supplyAsync(() -> tollService.findCrossedPlazas(route.geometria()));
@@ -115,11 +120,14 @@ public class TripEstimationService {
                 .supplyAsync(() -> roadAlertService.findNearRoute(route.geometria()));
         CompletableFuture<List<TrafficReport>> trafegoFuture = CompletableFuture
                 .supplyAsync(() -> trafficReportService.findNearRoute(route.geometria()));
+        CompletableFuture<List<OsmSpeedCamera>> radaresFuture = CompletableFuture
+                .supplyAsync(() -> radarService.findCamerasNearRoute(route.geometria()));
 
         List<TollPlaza> praçasCruzadas = praçasFuture.join();
         List<OsmFuelStation> postos = postosFuture.join();
         List<RoadAlert> alertas = alertasFuture.join();
         List<TrafficReport> trafego = trafegoFuture.join();
+        List<OsmSpeedCamera> radares = radaresFuture.join();
 
         LocalDate hoje = LocalDate.now();
         TripCostBreakdown breakdown = TripCostCalculator.calculate(route.distanciaKm(), route.duracaoMin(), profile,
@@ -149,6 +157,9 @@ public class TripEstimationService {
                 .map(t -> new TrafficReportResponseDTO(t.getId(), t.getSeveridade(), t.getLat(), t.getLng(),
                         t.getCriadoEm(), t.getExpiraEm()))
                 .toList();
+        List<RadarResponseDTO> radaresDTO = radares.stream()
+                .map(r -> new RadarResponseDTO(r.lat(), r.lon()))
+                .toList();
 
         return new TripCostBreakdownDTO(
                 breakdown.distanciaKm(),
@@ -165,7 +176,8 @@ public class TripEstimationService {
                 passos,
                 paradasNaRota,
                 alertasDTO,
-                trafegoDTO);
+                trafegoDTO,
+                radaresDTO);
     }
 
     private VehicleProfile resolveProfile(TripEstimateRequestDTO request) {

@@ -37,6 +37,20 @@ enum TrafficSeverity {
     }
   }
 
+  /// Falado pelo TTS ao se aproximar de um relato de trânsito lento de outro
+  /// usuário durante a navegação (Fase 12) — mesmo padrão de
+  /// [RoadAlertType.vozTexto]. LEVE/MEDIO compartilham a mesma frase (a
+  /// diferença de intensidade não muda o que o motorista precisa saber).
+  String get vozTexto {
+    switch (this) {
+      case TrafficSeverity.leve:
+      case TrafficSeverity.medio:
+        return 'Atenção: trânsito lento à frente';
+      case TrafficSeverity.intenso:
+        return 'Atenção: trânsito intenso à frente';
+    }
+  }
+
   /// Amarelo puro é ilegível sobre o tile claro do mapa — amber.shade700 dá
   /// contraste sem perder a leitura "amarelo = pouco trânsito".
   Color get color {

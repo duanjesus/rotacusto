@@ -14,6 +14,7 @@ import org.springframework.web.client.RestClient;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.rotacusto.domain.OsmFuelStation;
+import com.rotacusto.domain.OsmSpeedCamera;
 import com.rotacusto.domain.OsmTollBooth;
 
 /**
@@ -96,6 +97,30 @@ public class OverpassClient {
             String marca = tags.path("brand").asText(null);
             String label = nome != null ? nome : (marca != null ? marca : "Posto de combustível (OpenStreetMap)");
             result.add(new OsmFuelStation(label, coords[0], coords[1]));
+        }
+        return result;
+    }
+
+    /** Câmeras de velocidade fixas (Fase 12) — infraestrutura permanente, ao contrário de
+     * alertas reportados por usuário: não expira, não é votada, só é consultada ao vivo. */
+    public List<OsmSpeedCamera> findSpeedCamerasInBoundingBox(double minLat, double minLon, double maxLat, double maxLon) {
+        String query = String.format(Locale.ROOT, """
+                [out:json][timeout:8][bbox:%f,%f,%f,%f];
+                (
+                  node["highway"="speed_camera"];
+                );
+                out center;
+                """, minLat, minLon, maxLat, maxLon);
+
+        JsonNode response = executeQuery(query);
+
+        List<OsmSpeedCamera> result = new ArrayList<>();
+        for (JsonNode el : response.path("elements")) {
+            double[] coords = extractCoordinates(el);
+            if (coords == null) {
+                continue;
+            }
+            result.add(new OsmSpeedCamera(coords[0], coords[1]));
         }
         return result;
     }
