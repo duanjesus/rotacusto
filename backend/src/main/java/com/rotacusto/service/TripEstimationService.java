@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 
 import com.rotacusto.domain.Coordinates;
 import com.rotacusto.domain.OsmFuelStation;
-import com.rotacusto.domain.OsmSpeedCamera;
+import com.rotacusto.domain.OsmRadar;
 import com.rotacusto.domain.RouteResult;
 import com.rotacusto.domain.TripCostBreakdown;
 import com.rotacusto.domain.TripCostCalculator;
@@ -120,14 +120,14 @@ public class TripEstimationService {
                 .supplyAsync(() -> roadAlertService.findNearRoute(route.geometria()));
         CompletableFuture<List<TrafficReport>> trafegoFuture = CompletableFuture
                 .supplyAsync(() -> trafficReportService.findNearRoute(route.geometria()));
-        CompletableFuture<List<OsmSpeedCamera>> radaresFuture = CompletableFuture
+        CompletableFuture<List<OsmRadar>> radaresFuture = CompletableFuture
                 .supplyAsync(() -> radarService.findCamerasNearRoute(route.geometria()));
 
         List<TollPlaza> praçasCruzadas = praçasFuture.join();
         List<OsmFuelStation> postos = postosFuture.join();
         List<RoadAlert> alertas = alertasFuture.join();
         List<TrafficReport> trafego = trafegoFuture.join();
-        List<OsmSpeedCamera> radares = radaresFuture.join();
+        List<OsmRadar> radares = radaresFuture.join();
 
         LocalDate hoje = LocalDate.now();
         TripCostBreakdown breakdown = TripCostCalculator.calculate(route.distanciaKm(), route.duracaoMin(), profile,
@@ -158,7 +158,7 @@ public class TripEstimationService {
                         t.getCriadoEm(), t.getExpiraEm()))
                 .toList();
         List<RadarResponseDTO> radaresDTO = radares.stream()
-                .map(r -> new RadarResponseDTO(r.lat(), r.lon()))
+                .map(r -> new RadarResponseDTO(r.tipo(), r.lat(), r.lon()))
                 .toList();
 
         return new TripCostBreakdownDTO(

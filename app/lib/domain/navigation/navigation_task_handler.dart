@@ -202,7 +202,7 @@ class NavigationTaskHandler extends TaskHandler {
     // próprio breakdown (sem polling separado).
     final radarProximo = _radarProximity.checkProximity(atual, breakdown.radaresNaRota);
     if (radarProximo != null && _modoVoz.falaAlertas) {
-      _tts.speak('Atenção: radar de velocidade à frente');
+      _tts.speak(radarProximo.tipo.vozTexto);
     }
 
     // Detecção automática de trânsito lento (Fase 6.7) — compara a

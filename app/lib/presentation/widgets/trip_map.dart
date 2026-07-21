@@ -175,9 +175,9 @@ class _TripMapState extends State<TripMap> {
                     point: LatLng(r.lat, r.lon),
                     width: 30,
                     height: 30,
-                    child: const Tooltip(
-                      message: 'Radar de velocidade',
-                      child: Icon(Icons.camera_alt_rounded, color: Colors.indigo, size: 24),
+                    child: Tooltip(
+                      message: r.tipo.label,
+                      child: Icon(r.tipo.icon, color: Colors.indigo, size: 24),
                     ),
                   ),
               ],

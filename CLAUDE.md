@@ -355,7 +355,7 @@ weekday/weekend/moto values).
   unless `WidgetsFlutterBinding.ensureInitialized()` runs first in the isolate's
   `@pragma('vm:entry-point')` entry function.
 
-## Navigation voice modes + speed-camera radar (Fase 12)
+## Navigation voice modes + radar alerts (Fase 12/12.1)
 
 - `NavigationVoiceMode` (`app/lib/domain/navigation/voice_mode.dart`): `tudo` (everything
   spoken, default — preserves pre-Fase-12 behavior), `apenasAlertas` (turn instruction
@@ -374,17 +374,33 @@ weekday/weekend/moto values).
   update its own `_modoVoz` field without restarting the service. The initial mode is
   also written via `saveData(key: kNavigationVoiceModeKey, ...)` before `startService`,
   since `onStart` only reads that value once.
-- Radar (speed camera) is **fixed OpenStreetMap infrastructure** (`highway=speed_camera`
-  via Overpass), not a user report — no expiration, no voting, no `/nearby` polling
-  endpoint like road alerts/traffic reports need. `RadarService` (backend) mirrors
-  `FuelStationService` almost exactly (bounding box + Haversine filter + try/catch →
-  empty list on Overpass failure). `radaresNaRota` rides along in the same
-  `TripCostBreakdownDTO` as everything else — a route recalculation naturally refreshes
-  it, same as tolls/fuel stations.
-- `RadarPoint` (frontend) has no id from the backend (just lat/lon, like
+- Radar is **fixed OpenStreetMap infrastructure** (via Overpass), not a user report — no
+  expiration, no voting, no `/nearby` polling endpoint like road alerts/traffic reports
+  need. `RadarService` (backend) mirrors `FuelStationService` almost exactly (bounding
+  box + Haversine filter + try/catch → empty list on Overpass failure). `radaresNaRota`
+  rides along in the same `TripCostBreakdownDTO` as everything else — a route
+  recalculation naturally refreshes it, same as tolls/fuel stations.
+- **Two radar types share one `RadarType` enum** (`VELOCIDADE`/`AVANCO_SINAL`,
+  `entity/enums/RadarType.java`), one Overpass query, one `OsmRadar`/`RadarPoint`/
+  `RadarService`/`RadarProximityChecker` — added AVANCO_SINAL (red-light camera) right
+  after Fase 12 shipped, when the user pointed out they expected both from the start.
+  **Speed cameras have one dominant, simple OSM tag** (`highway=speed_camera`); **red-light
+  cameras don't** — the "correct" OSM scheme is a `type=enforcement` relation with
+  `enforcement=traffic_signals`, but mappers in practice also tag loose nodes with
+  `highway=red_light_camera`, `enforcement=traffic_signals` (outside a relation),
+  `man_made=redlight_camera`, or `enforcement_camera=yes`. `OverpassClient.findRadarsInBoundingBox`
+  queries **all of these variants in one call** (nodes + the enforcement relation, unioned)
+  to maximize coverage; the element's `tags.highway` decides `VELOCIDADE` vs
+  `AVANCO_SINAL` during parsing (anything that isn't exactly `speed_camera` is a red-light
+  variant). **Coverage of red-light cameras in Brazil is much sparser than speed
+  cameras** — confirmed live: the Copacabana→Guarapari route returns 45 speed cameras but
+  only 4 red-light cameras. This is a real data-source limitation, documented rather than
+  "fixed" (same honesty as `custoDesgastePorKm` estimates elsewhere in this file).
+- `RadarPoint` (frontend) has no id from the backend (just `tipo`/lat/lon, like
   `OsmFuelStation`) — `RadarProximityChecker`'s "already announced" dedup set is keyed by
   the coordinate string (`'$lat,$lon'`), not an int id like `RoadAlertProximityChecker`
-  uses.
+  uses, and is agnostic to `tipo` (announces either kind the same way, just with a
+  different spoken phrase via `RadarType.vozTexto`).
 - "Slow traffic ahead" voice ties into the *existing* traffic-report polling
   (`_trafegoConhecido`, populated since Fase 6.7) via a new
   `TrafficReportProximityChecker` — **not** the automatic speed-based detector

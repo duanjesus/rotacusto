@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 
 import com.rotacusto.client.OverpassClient;
 import com.rotacusto.domain.Coordinates;
-import com.rotacusto.domain.OsmSpeedCamera;
+import com.rotacusto.domain.OsmRadar;
 import com.rotacusto.domain.geo.BoundingBoxCalculator;
 import com.rotacusto.domain.geo.HaversineDistance;
 
@@ -35,10 +35,10 @@ public class RadarService {
         this.detectionRadiusKm = detectionRadiusKm;
     }
 
-    public List<OsmSpeedCamera> findCamerasNearRoute(List<Coordinates> geometriaRota) {
+    public List<OsmRadar> findCamerasNearRoute(List<Coordinates> geometriaRota) {
         try {
             double[] bbox = BoundingBoxCalculator.compute(geometriaRota, BBOX_PADDING_DEGREES);
-            List<OsmSpeedCamera> candidates = overpassClient.findSpeedCamerasInBoundingBox(bbox[0], bbox[1], bbox[2], bbox[3]);
+            List<OsmRadar> candidates = overpassClient.findRadarsInBoundingBox(bbox[0], bbox[1], bbox[2], bbox[3]);
             return candidates.stream()
                     .filter(c -> isNearRoute(c, geometriaRota))
                     .toList();
@@ -48,8 +48,8 @@ public class RadarService {
         }
     }
 
-    private boolean isNearRoute(OsmSpeedCamera camera, List<Coordinates> geometriaRota) {
-        Coordinates ponto = new Coordinates(camera.lat(), camera.lon());
+    private boolean isNearRoute(OsmRadar radar, List<Coordinates> geometriaRota) {
+        Coordinates ponto = new Coordinates(radar.lat(), radar.lon());
         return geometriaRota.stream().anyMatch(p -> HaversineDistance.km(p, ponto) <= detectionRadiusKm);
     }
 }

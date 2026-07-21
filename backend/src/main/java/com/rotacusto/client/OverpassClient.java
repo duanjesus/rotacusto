@@ -14,8 +14,9 @@ import org.springframework.web.client.RestClient;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.rotacusto.domain.OsmFuelStation;
-import com.rotacusto.domain.OsmSpeedCamera;
+import com.rotacusto.domain.OsmRadar;
 import com.rotacusto.domain.OsmTollBooth;
+import com.rotacusto.entity.enums.RadarType;
 
 /**
  * Client do Overpass API (dados ao vivo do OpenStreetMap). Usado para achar
@@ -101,26 +102,46 @@ public class OverpassClient {
         return result;
     }
 
-    /** Câmeras de velocidade fixas (Fase 12) — infraestrutura permanente, ao contrário de
-     * alertas reportados por usuário: não expira, não é votada, só é consultada ao vivo. */
-    public List<OsmSpeedCamera> findSpeedCamerasInBoundingBox(double minLat, double minLon, double maxLat, double maxLon) {
+    /**
+     * Radares fixos (Fase 12/12.1) — infraestrutura permanente, ao contrário de alertas
+     * reportados por usuário: não expira, não é votada, só é consultada ao vivo. Uma
+     * query só cobre os dois tipos (evita 2 chamadas HTTP ao Overpass, que já é lento/
+     * instável às vezes — ver comentário no construtor).
+     *
+     * <p>Radar de velocidade tem uma tag única e dominante ({@code highway=speed_camera}).
+     * Radar de avanço de sinal **não tem** — a forma "correta" segundo o wiki do OSM é
+     * uma relation {@code type=enforcement}+{@code enforcement=traffic_signals}, mas na
+     * prática mapeadores também usam tags soltas direto no nó ({@code
+     * highway=red_light_camera}, {@code enforcement=traffic_signals} fora de relation,
+     * {@code man_made=redlight_camera}, {@code enforcement_camera=yes}). A query busca
+     * todas as variantes pra maximizar cobertura — mesmo cobertura esparsa é esperada e
+     * documentada, não um bug (ver CLAUDE.md).
+     */
+    public List<OsmRadar> findRadarsInBoundingBox(double minLat, double minLon, double maxLat, double maxLon) {
         String query = String.format(Locale.ROOT, """
                 [out:json][timeout:8][bbox:%f,%f,%f,%f];
                 (
                   node["highway"="speed_camera"];
+                  node["highway"="red_light_camera"];
+                  node["enforcement"="traffic_signals"];
+                  node["man_made"="redlight_camera"];
+                  node["enforcement_camera"="yes"];
+                  relation["type"="enforcement"]["enforcement"="traffic_signals"];
                 );
                 out center;
                 """, minLat, minLon, maxLat, maxLon);
 
         JsonNode response = executeQuery(query);
 
-        List<OsmSpeedCamera> result = new ArrayList<>();
+        List<OsmRadar> result = new ArrayList<>();
         for (JsonNode el : response.path("elements")) {
             double[] coords = extractCoordinates(el);
             if (coords == null) {
                 continue;
             }
-            result.add(new OsmSpeedCamera(coords[0], coords[1]));
+            boolean radarDeVelocidade = "speed_camera".equals(el.path("tags").path("highway").asText(null));
+            RadarType tipo = radarDeVelocidade ? RadarType.VELOCIDADE : RadarType.AVANCO_SINAL;
+            result.add(new OsmRadar(tipo, coords[0], coords[1]));
         }
         return result;
     }

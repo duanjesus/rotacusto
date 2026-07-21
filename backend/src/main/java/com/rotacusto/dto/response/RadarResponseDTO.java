@@ -1,4 +1,6 @@
 package com.rotacusto.dto.response;
 
-public record RadarResponseDTO(double lat, double lon) {
+import com.rotacusto.entity.enums.RadarType;
+
+public record RadarResponseDTO(RadarType tipo, double lat, double lon) {
 }
