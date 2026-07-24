@@ -13,12 +13,14 @@ import 'package:permission_handler/permission_handler.dart';
 
 import '../../data/api_client.dart';
 import '../../data/device_id.dart';
+import '../../data/tts_voice_prefs.dart';
 import '../../data/voice_mode_prefs.dart';
 import '../../domain/models/road_alert.dart';
 import '../../domain/models/road_alert_type.dart';
 import '../../domain/models/traffic_report.dart';
 import '../../domain/models/traffic_severity.dart';
 import '../../domain/models/trip_cost_breakdown.dart';
+import '../../domain/models/tts_voice.dart';
 import '../../domain/navigation/deviation_detector.dart';
 import '../../domain/navigation/navigation_task_handler.dart';
 import '../../domain/navigation/radar_proximity.dart';
@@ -29,6 +31,7 @@ import '../../domain/navigation/traffic_report_proximity.dart';
 import '../../domain/navigation/voice_mode.dart';
 import '../widgets/road_alert_picker.dart';
 import '../widgets/trip_map.dart';
+import '../widgets/tts_voice_picker.dart';
 import '../widgets/voice_mode_picker.dart';
 
 enum _NavStatus { carregando, semPermissao, semServico, ativo }
@@ -95,6 +98,8 @@ class _NavigationScreenState extends State<NavigationScreen> {
   // Modo de voz (Fase 12) — controla os pontos de fala nos dois ramos
   // (Android via onReceiveData no NavigationTaskHandler, Windows direto aqui).
   NavigationVoiceMode _modoVoz = navigationVoiceModeNotifier.value;
+  // Voz do TTS escolhida (Fase 12.2) — null = voz padrão do sistema.
+  TtsVoice? _vozTts = selectedTtsVoiceNotifier.value;
 
   // --- Só usados no ramo Windows/outras plataformas (sem serviço em segundo
   // plano) — no Android essa lógica vive inteira em NavigationTaskHandler. ---
@@ -119,6 +124,13 @@ class _NavigationScreenState extends State<NavigationScreen> {
     // _iniciar() ainda tem permissão/serviço de localização pra resolver.
     loadNavigationVoiceMode().then((_) {
       if (mounted) setState(() => _modoVoz = navigationVoiceModeNotifier.value);
+    });
+    // Mesma tolerância de carregamento assíncrono do modo de voz acima — a voz
+    // padrão do `setLanguage` já cobre o intervalo até isso resolver.
+    loadSelectedTtsVoice().then((_) {
+      final voz = selectedTtsVoiceNotifier.value;
+      if (voz != null) _tts.setVoice(voz.toMap());
+      if (mounted) setState(() => _vozTts = voz);
     });
     _iniciar();
   }
@@ -220,6 +232,10 @@ class _NavigationScreenState extends State<NavigationScreen> {
       await FlutterForegroundTask.saveData(key: kNavigationPrecoPorKWhKey, value: widget.precoPorKWh!);
     }
     await FlutterForegroundTask.saveData(key: kNavigationVoiceModeKey, value: _modoVoz.name);
+    if (_vozTts != null) {
+      await FlutterForegroundTask.saveData(key: kNavigationTtsVoiceNameKey, value: _vozTts!.name);
+      await FlutterForegroundTask.saveData(key: kNavigationTtsVoiceLocaleKey, value: _vozTts!.locale);
+    }
 
     FlutterForegroundTask.addTaskDataCallback(_onDadosDoServico);
     await FlutterForegroundTask.startService(
@@ -523,7 +539,50 @@ class _NavigationScreenState extends State<NavigationScreen> {
       // Propaga ao vivo pro isolate de segundo plano — sem isso, o
       // NavigationTaskHandler só pegaria o novo modo reiniciando a
       // navegação (ele lê o valor salvo só uma vez, no onStart).
-      FlutterForegroundTask.sendDataToTask(modo.name);
+      FlutterForegroundTask.sendDataToTask({'tipo': 'modoVoz', 'valor': modo.name});
+    }
+  }
+
+  // --- Voz do TTS (Fase 12.2) — mesmo padrão do modo de voz: a troca em si
+  // fica só aqui, o NavigationTaskHandler só RECEBE via onReceiveData. ---
+
+  void _abrirSeletorDeVoz() {
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) => TtsVoicePicker(
+        vozesFuture: _carregarVozesPtBr(),
+        vozAtual: _vozTts,
+        onSelected: (voz) {
+          Navigator.of(context).pop();
+          _mudarVoz(voz);
+        },
+      ),
+    );
+  }
+
+  /// Lista as vozes do motor de TTS do aparelho, filtradas pra português — o
+  /// app é 100% em português, mostrar vozes de outros idiomas só poluiria a
+  /// lista. No Windows, hoje só existe a API SAPI5 clássica (ver CLAUDE.md
+  /// pra detalhes e a limitação conhecida).
+  Future<List<TtsVoice>> _carregarVozesPtBr() async {
+    final vozes = await _tts.getVoices;
+    if (vozes is! List) return [];
+    return vozes
+        .whereType<Map>()
+        .map((v) => TtsVoice.fromMap(v))
+        .where((v) => v.locale.toLowerCase().startsWith('pt'))
+        .toList();
+  }
+
+  Future<void> _mudarVoz(TtsVoice? voz) async {
+    setState(() => _vozTts = voz);
+    await saveSelectedTtsVoice(voz);
+    if (voz != null) {
+      await _tts.setVoice(voz.toMap());
+    }
+    if (_isAndroid) {
+      FlutterForegroundTask.sendDataToTask({'tipo': 'vozTts', 'nome': voz?.name, 'locale': voz?.locale});
     }
   }
 
@@ -573,6 +632,11 @@ class _NavigationScreenState extends State<NavigationScreen> {
           onPressed: () => Navigator.of(context).pop(),
         ),
         actions: [
+          IconButton(
+            icon: const Icon(Icons.record_voice_over_rounded),
+            tooltip: 'Voz da navegação',
+            onPressed: _abrirSeletorDeVoz,
+          ),
           IconButton(
             icon: Icon(_modoVoz.icon),
             tooltip: _modoVoz.label,

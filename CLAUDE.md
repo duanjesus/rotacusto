@@ -409,6 +409,51 @@ weekday/weekend/moto values).
   while the proximity checker is "someone else reported slow traffic ahead of you" (worth
   a heads-up).
 
+## TTS voice selection (Fase 12.2)
+
+- User-selectable navigation voice, sourced entirely from **voices already installed on
+  the device's TTS engine** — no cloud TTS, no new package. `flutter_tts` (`^4.2.5`,
+  already a dependency) exposes `getVoices()`/`setVoice(...)` on both Android and
+  Windows; `TtsVoicePicker` filters the result to `locale.startsWith('pt')` (the app is
+  Portuguese-only) and lets the user pick, persisted via `tts_voice_prefs.dart` (same
+  `ValueNotifier` + `shared_preferences` shape as `voice_mode_prefs.dart`). `null` =
+  system default, zero behavior change from before this feature.
+- **Windows voice availability is inconsistent between reading the plugin source/registry
+  and what the actual compiled app shows — verified live, not just reasoned about.**
+  `flutter_tts`'s Windows implementation enumerates the classic SAPI5 voice category
+  (`SpEnumTokens(SPCAT_VOICES, ...)`, see `flutter_tts-4.2.5/windows/flutter_tts_plugin.cpp:392`).
+  Querying that same category directly (`HKLM\SOFTWARE\Microsoft\Speech\Voices\Tokens`,
+  and via .NET's `System.Speech.Synthesis.SpeechSynthesizer.GetInstalledVoices()`, which
+  wraps the identical SAPI5 API) on this dev machine returns only 2 old "Desktop" voices
+  ("Microsoft Maria Desktop" pt-BR, "Microsoft Zira Desktop" en-US) — **but the actual
+  compiled Windows app's voice picker, tested live, lists "Microsoft Maria" and
+  "Microsoft Daniel" (pt-BR) too** — the same names as the much more natural OneCore/
+  Narrator voices. The exact bridging mechanism wasn't pinned down (checked
+  `Speech_OneCore\Voices\Tokens`, `HKCU\...\Speech\Voices\Tokens` — neither obviously
+  explains it), but the empirical result is unambiguous: selecting "Microsoft Daniel" in
+  the picker works, persists, and the checkmark moves correctly. **Don't assume Windows
+  voice availability from reading the registry alone — check what the picker actually
+  lists on the machine in question**, since it may already be better than expected.
+  Android doesn't have any of this ambiguity — Google's TTS engine exposes multiple
+  decent pt-BR voices through the same standard API, consistently.
+- **Optional fix, deliberately not automated by this codebase**: the open-source
+  [NaturalVoiceSAPIAdapter](https://github.com/gexgd0419/NaturalVoiceSAPIAdapter)
+  registers the OneCore/Narrator/Edge natural voices as classic SAPI5 tokens — once a
+  user installs it themselves (admin rights, their choice), `flutter_tts` sees and can
+  select those voices with **zero app code changes**, since it only ever queries
+  `SPCAT_VOICES`. Flagged honestly rather than silently worked around: this tool works by
+  extracting undocumented encryption keys from system files (not an official Microsoft
+  API), so it can break on a Windows update. Installing third-party system software with
+  admin rights is a decision for the user to make on their own machine, not something
+  this project installs or scripts.
+- Cross-isolate wiring for Android mirrors the voice-mode pattern exactly: the chosen
+  voice is written via `FlutterForegroundTask.saveData` (`kNavigationTtsVoiceNameKey`/
+  `kNavigationTtsVoiceLocaleKey`) before `startService`, read once in
+  `NavigationTaskHandler.onStart`, and live-updated via `sendDataToTask`/`onReceiveData`.
+  Adding this required promoting `sendDataToTask`'s payload from a raw `String` (only
+  ever the voice-mode name) to a `Map` with a `'tipo'` discriminator (`'modoVoz'` vs
+  `'vozTts'`) — the same shape `sendDataToMain` already used in the opposite direction.
+
 ## Road alerts (community-reported hazards)
 
 Anyone can report a hazard (pothole, police checkpoint, fog, broken-down car, accident,

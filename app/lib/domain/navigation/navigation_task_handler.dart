@@ -12,6 +12,7 @@ import '../models/road_alert.dart';
 import '../models/traffic_report.dart';
 import '../models/traffic_severity.dart';
 import '../models/trip_cost_breakdown.dart';
+import '../models/tts_voice.dart';
 import 'deviation_detector.dart';
 import 'radar_proximity.dart';
 import 'road_alert_proximity.dart';
@@ -38,6 +39,8 @@ const kNavigationVehicleModelIdKey = 'navigation_vehicleModelId';
 const kNavigationPrecoPorLitroKey = 'navigation_precoPorLitro';
 const kNavigationPrecoPorKWhKey = 'navigation_precoPorKWh';
 const kNavigationVoiceModeKey = 'navigation_voiceMode';
+const kNavigationTtsVoiceNameKey = 'navigation_ttsVoiceName';
+const kNavigationTtsVoiceLocaleKey = 'navigation_ttsVoiceLocale';
 
 /// Callback de entrada do isolate de segundo plano (Android, Fase 6.3) — tem
 /// que ser top-level e marcada `vm:entry-point` pro sistema conseguir
@@ -102,6 +105,11 @@ class NavigationTaskHandler extends TaskHandler {
     final modoSalvo = await FlutterForegroundTask.getData<String>(key: kNavigationVoiceModeKey);
     if (modoSalvo != null) {
       _modoVoz = NavigationVoiceMode.values.byName(modoSalvo);
+    }
+    final vozNome = await FlutterForegroundTask.getData<String>(key: kNavigationTtsVoiceNameKey);
+    final vozLocale = await FlutterForegroundTask.getData<String>(key: kNavigationTtsVoiceLocaleKey);
+    if (vozNome != null && vozLocale != null) {
+      await _tts.setVoice({'name': vozNome, 'locale': vozLocale});
     }
 
     _positionSub = Geolocator.getPositionStream(
@@ -267,14 +275,23 @@ class NavigationTaskHandler extends TaskHandler {
     }
   }
 
-  /// Recebe a troca de modo de voz feita ao vivo pela UI (Fase 12) —
-  /// `FlutterForegroundTask.sendDataToTask(modo.name)` do lado de
-  /// `NavigationScreen`. Confirmado existir em
+  /// Recebe trocas ao vivo feitas pela UI (`FlutterForegroundTask.sendDataToTask`
+  /// do lado de `NavigationScreen`) — modo de voz (Fase 12) e voz do TTS (Fase
+  /// 12.2), discriminadas por `data['tipo']` (mesmo padrão de `_onDadosDoServico`
+  /// no sentido contrário). Confirmado existir em
   /// `flutter_foreground_task-10.0.0/lib/task_handler.dart`.
   @override
   void onReceiveData(Object data) {
-    if (data is String) {
-      _modoVoz = NavigationVoiceMode.values.byName(data);
+    if (data is! Map) return;
+    switch (data['tipo']) {
+      case 'modoVoz':
+        _modoVoz = NavigationVoiceMode.values.byName(data['valor'] as String);
+      case 'vozTts':
+        final nome = data['nome'] as String?;
+        final locale = data['locale'] as String?;
+        if (nome != null && locale != null) {
+          _tts.setVoice(TtsVoice(name: nome, locale: locale).toMap());
+        }
     }
   }
 
