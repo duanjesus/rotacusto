@@ -10,18 +10,23 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.rotacusto.domain.Coordinates;
+import com.rotacusto.domain.FoodStopSuggestion;
 import com.rotacusto.domain.OsmFuelStation;
 import com.rotacusto.domain.OsmRadar;
 import com.rotacusto.domain.RouteResult;
 import com.rotacusto.domain.TripCostBreakdown;
 import com.rotacusto.domain.TripCostCalculator;
 import com.rotacusto.domain.VehicleProfile;
+import com.rotacusto.domain.cost.FoodStopCostCalculator;
 import com.rotacusto.domain.cost.TollCostCalculator;
+import com.rotacusto.domain.geo.HaversineDistance;
 import com.rotacusto.dto.request.TripEstimateRequestDTO;
 import com.rotacusto.dto.request.VehicleProfileRequestDTO;
 import com.rotacusto.dto.response.CoordinateDTO;
+import com.rotacusto.dto.response.FoodStopSuggestionDTO;
 import com.rotacusto.dto.response.FuelStationResponseDTO;
 import com.rotacusto.dto.response.RadarResponseDTO;
+import com.rotacusto.dto.response.RestaurantResponseDTO;
 import com.rotacusto.dto.response.RoadAlertResponseDTO;
 import com.rotacusto.dto.response.RouteStepDTO;
 import com.rotacusto.dto.response.TollPlazaResponseDTO;
@@ -44,12 +49,14 @@ public class TripEstimationService {
     private final RoadAlertService roadAlertService;
     private final TrafficReportService trafficReportService;
     private final RadarService radarService;
+    private final RestaurantService restaurantService;
     private final double foodStopIntervalHours;
     private final double foodStopAverageCost;
 
     public TripEstimationService(GeocodingService geocodingService, RoutingService routingService,
             VehicleModelService vehicleModelService, TollService tollService, FuelStationService fuelStationService,
             RoadAlertService roadAlertService, TrafficReportService trafficReportService, RadarService radarService,
+            RestaurantService restaurantService,
             @Value("${rotacusto.food-stop.interval-hours}") double foodStopIntervalHours,
             @Value("${rotacusto.food-stop.average-cost}") double foodStopAverageCost) {
         this.geocodingService = geocodingService;
@@ -60,6 +67,7 @@ public class TripEstimationService {
         this.roadAlertService = roadAlertService;
         this.trafficReportService = trafficReportService;
         this.radarService = radarService;
+        this.restaurantService = restaurantService;
         this.foodStopIntervalHours = foodStopIntervalHours;
         this.foodStopAverageCost = foodStopAverageCost;
     }
@@ -122,12 +130,17 @@ public class TripEstimationService {
                 .supplyAsync(() -> trafficReportService.findNearRoute(route.geometria()));
         CompletableFuture<List<OsmRadar>> radaresFuture = CompletableFuture
                 .supplyAsync(() -> radarService.findCamerasNearRoute(route.geometria()));
+        long numeroParadasLanche = FoodStopCostCalculator.numeroDeParadas(route.duracaoMin(), foodStopIntervalHours);
+        CompletableFuture<List<FoodStopSuggestion>> paradasLancheFuture = CompletableFuture.supplyAsync(
+                () -> restaurantService.suggestStops(route.geometria(), route.passos(), numeroParadasLanche,
+                        foodStopIntervalHours));
 
         List<TollPlaza> praçasCruzadas = praçasFuture.join();
         List<OsmFuelStation> postos = postosFuture.join();
         List<RoadAlert> alertas = alertasFuture.join();
         List<TrafficReport> trafego = trafegoFuture.join();
         List<OsmRadar> radares = radaresFuture.join();
+        List<FoodStopSuggestion> paradasLanche = paradasLancheFuture.join();
 
         LocalDate hoje = LocalDate.now();
         TripCostBreakdown breakdown = TripCostCalculator.calculate(route.distanciaKm(), route.duracaoMin(), profile,
@@ -160,6 +173,13 @@ public class TripEstimationService {
         List<RadarResponseDTO> radaresDTO = radares.stream()
                 .map(r -> new RadarResponseDTO(r.tipo(), r.lat(), r.lon()))
                 .toList();
+        List<FoodStopSuggestionDTO> paradasLancheDTO = paradasLanche.stream()
+                .map(p -> new FoodStopSuggestionDTO(p.ponto().lat(), p.ponto().lon(),
+                        p.restaurantes().stream()
+                                .map(r -> new RestaurantResponseDTO(r.nome(), r.lat(), r.lon(),
+                                        HaversineDistance.km(p.ponto(), new Coordinates(r.lat(), r.lon()))))
+                                .toList()))
+                .toList();
 
         return new TripCostBreakdownDTO(
                 breakdown.distanciaKm(),
@@ -177,7 +197,8 @@ public class TripEstimationService {
                 paradasNaRota,
                 alertasDTO,
                 trafegoDTO,
-                radaresDTO);
+                radaresDTO,
+                paradasLancheDTO);
     }
 
     private VehicleProfile resolveProfile(TripEstimateRequestDTO request) {

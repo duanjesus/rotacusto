@@ -55,3 +55,6 @@ rotacusto:
     ttl-minutes: 15
   radars:
     detection-radius-km: 0.3
+  restaurants:
+    detection-radius-km: 3.0
+    max-por-parada: 8

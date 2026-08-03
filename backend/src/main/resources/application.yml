@@ -94,3 +94,9 @@ rotacusto:
   # pista, não uma área ampla.
   radars:
     detection-radius-km: 0.3
+  # Restaurantes reais nas paradas pra lanche (Fase 13) — raio bem mais largo que
+  # posto/pedágio/radar de propósito: esses têm que estar quase em cima da via,
+  # restaurante tipicamente fica um pouco fora da rodovia.
+  restaurants:
+    detection-radius-km: 3.0
+    max-por-parada: 8

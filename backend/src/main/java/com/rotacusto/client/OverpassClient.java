@@ -15,6 +15,7 @@ import org.springframework.web.client.RestClient;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.rotacusto.domain.OsmFuelStation;
 import com.rotacusto.domain.OsmRadar;
+import com.rotacusto.domain.OsmRestaurant;
 import com.rotacusto.domain.OsmTollBooth;
 import com.rotacusto.entity.enums.RadarType;
 
@@ -142,6 +143,31 @@ public class OverpassClient {
             boolean radarDeVelocidade = "speed_camera".equals(el.path("tags").path("highway").asText(null));
             RadarType tipo = radarDeVelocidade ? RadarType.VELOCIDADE : RadarType.AVANCO_SINAL;
             result.add(new OsmRadar(tipo, coords[0], coords[1]));
+        }
+        return result;
+    }
+
+    /** Restaurantes reais na rota (Fase 13) — usados pra sugerir onde parar pra
+     * lanche, uma lista pro usuário escolher, não um dado fixo. */
+    public List<OsmRestaurant> findRestaurantsInBoundingBox(double minLat, double minLon, double maxLat, double maxLon) {
+        String query = String.format(Locale.ROOT, """
+                [out:json][timeout:8][bbox:%f,%f,%f,%f];
+                (
+                  node["amenity"="restaurant"];
+                );
+                out center;
+                """, minLat, minLon, maxLat, maxLon);
+
+        JsonNode response = executeQuery(query);
+
+        List<OsmRestaurant> result = new ArrayList<>();
+        for (JsonNode el : response.path("elements")) {
+            double[] coords = extractCoordinates(el);
+            if (coords == null) {
+                continue;
+            }
+            String nome = el.path("tags").path("name").asText(null);
+            result.add(new OsmRestaurant(nome != null ? nome : "Restaurante (OpenStreetMap)", coords[0], coords[1]));
         }
         return result;
     }

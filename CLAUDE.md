@@ -454,6 +454,33 @@ weekday/weekend/moto values).
   ever the voice-mode name) to a `Map` with a `'tipo'` discriminator (`'modoVoz'` vs
   `'vozTts'`) — the same shape `sendDataToMain` already used in the opposite direction.
 
+## Food stop suggestions (restaurants, Fase 13)
+
+- Turns the existing food-stop-cost estimate into real restaurant suggestions the user
+  can pick from. `FoodStopCostCalculator` already computed *how many* stops a trip needs
+  (`duracaoHoras / intervalHours`, floored) — that logic was extracted into a public
+  `numeroDeParadas(...)` so it can be reused outside the cost calculation itself.
+- **Stop points are found by accumulated TIME, not distance** — unlike
+  `FuelStationService.suggestStop` (which walks accumulated km, since tank range is a
+  distance concept), a food stop triggers on elapsed hours. `domain/cost/FoodStopPointCalculator.java`
+  walks `RouteStep.duracaoS` accumulating seconds until crossing each multiple of
+  `intervalHours`, then indexes into `route.geometria()` via that step's `wayPointInicio`
+  — no new external call, reuses data ORS already returns for turn-by-turn.
+- `RestaurantService` mirrors `FuelStationService` (Overpass `amenity=restaurant`, bbox +
+  Haversine filter) but with a wider detection radius (3km vs. 0.3km for fuel/toll/radar)
+  — deliberate: a restaurant is normally a bit off the highway, unlike a toll gate or a
+  fuel station right on the shoulder. For each computed stop point, the found restaurants
+  are re-sorted by distance to that point and capped
+  (`rotacusto.restaurants.max-por-parada`, default 8) — a list to choose from, not a
+  single auto-pick like `postoSugerido`.
+- Frontend selection (`home_screen.dart`, `_restauranteEscolhidoPorParada`) is purely
+  local UI state — tapping a restaurant just highlights it, nothing is sent to the
+  backend or persisted. It's a decision aid while planning, not trip data.
+- Verified live end-to-end (not just curl): Copacabana to Guarapari (real ORS route,
+  about 7.6h) produced 2 stops with real OSM restaurants at the correct computed points,
+  matching the curl-verified backend response exactly, confirmed by expanding the
+  ExpansionTile and tapping a restaurant to see the checkmark/highlight update.
+
 ## Road alerts (community-reported hazards)
 
 Anyone can report a hazard (pothole, police checkpoint, fog, broken-down car, accident,

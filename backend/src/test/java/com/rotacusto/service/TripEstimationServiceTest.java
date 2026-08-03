@@ -50,6 +50,9 @@ class TripEstimationServiceTest {
     @Mock
     private RadarService radarService;
 
+    @Mock
+    private RestaurantService restaurantService;
+
     private TripEstimationService tripEstimationService;
 
     /**
@@ -63,11 +66,14 @@ class TripEstimationServiceTest {
     void setUp() {
         tripEstimationService = new TripEstimationService(
                 geocodingService, routingService, vehicleModelService, tollService, fuelStationService,
-                roadAlertService, trafficReportService, radarService, 1000.0, 25.0);
-        // Alertas/relatos de trânsito/radares (Fases 6.6/6.7/12) são consultados em
-        // toda estimativa, mas não são o foco da maioria dos testes aqui — lenient()
-        // evita falha de "unnecessary stubbing" nos poucos que não chegam a usar
-        // o retorno.
+                roadAlertService, trafficReportService, radarService, restaurantService, 1000.0, 25.0);
+        // Alertas/relatos de trânsito/radares/restaurantes (Fases 6.6/6.7/12/13) são
+        // consultados em toda estimativa, mas não são o foco da maioria dos testes
+        // aqui — lenient() evita falha de "unnecessary stubbing" nos poucos que não
+        // chegam a usar o retorno.
+        org.mockito.Mockito.lenient().when(restaurantService.suggestStops(org.mockito.ArgumentMatchers.any(),
+                org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.anyLong(),
+                org.mockito.ArgumentMatchers.anyDouble())).thenReturn(List.of());
         org.mockito.Mockito.lenient().when(roadAlertService.findNearRoute(org.mockito.ArgumentMatchers.any()))
                 .thenReturn(List.of());
         org.mockito.Mockito.lenient().when(trafficReportService.findNearRoute(org.mockito.ArgumentMatchers.any()))
@@ -268,7 +274,7 @@ class TripEstimationServiceTest {
         // setUp() padrão (que desliga lanche pra não afetar os outros testes).
         tripEstimationService = new TripEstimationService(
                 geocodingService, routingService, vehicleModelService, tollService, fuelStationService,
-                roadAlertService, trafficReportService, radarService, 3.0, 25.0);
+                roadAlertService, trafficReportService, radarService, restaurantService, 3.0, 25.0);
         org.mockito.Mockito.lenient().when(radarService.findCamerasNearRoute(org.mockito.ArgumentMatchers.any()))
                 .thenReturn(List.of());
         RouteResult route = new RouteResult(700.0, 480.0, List.of(origem, destino), List.of());

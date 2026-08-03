@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:latlong2/latlong.dart';
 
+import 'package:rotacusto_app/domain/models/food_stop_suggestion.dart';
 import 'package:rotacusto_app/domain/models/fuel_station.dart';
 import 'package:rotacusto_app/domain/models/radar_point.dart';
 import 'package:rotacusto_app/domain/models/road_alert.dart';
@@ -26,6 +27,7 @@ TripCostBreakdown _breakdown({
   List<RoadAlert> alertasNaRota = const [],
   List<TrafficReport> trafegoNaRota = const [],
   List<RadarPoint> radaresNaRota = const [],
+  List<FoodStopSuggestion> paradasParaLanche = const [],
 }) {
   return TripCostBreakdown(
     distanciaKm: distanciaKm,
@@ -44,6 +46,7 @@ TripCostBreakdown _breakdown({
     alertasNaRota: alertasNaRota,
     trafegoNaRota: trafegoNaRota,
     radaresNaRota: radaresNaRota,
+    paradasParaLanche: paradasParaLanche,
   );
 }
 

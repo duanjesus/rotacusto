@@ -182,6 +182,24 @@ class _TripMapState extends State<TripMap> {
                   ),
               ],
             ),
+          // Paradas pra lanche (Fase 13) — marca só o PONTO de parada, não
+          // cada restaurante individual (poluiria o mapa); a lista de
+          // restaurantes daquele ponto já é mostrada na seção de baixo.
+          if (breakdown != null && breakdown.paradasParaLanche.isNotEmpty)
+            MarkerLayer(
+              markers: [
+                for (final p in breakdown.paradasParaLanche)
+                  Marker(
+                    point: LatLng(p.lat, p.lon),
+                    width: 32,
+                    height: 32,
+                    child: Tooltip(
+                      message: '${p.restaurantes.length} restaurante(s) por perto',
+                      child: const Icon(Icons.restaurant_rounded, color: Colors.brown, size: 26),
+                    ),
+                  ),
+              ],
+            ),
           if (posicaoAtual != null)
             MarkerLayer(markers: [
               Marker(

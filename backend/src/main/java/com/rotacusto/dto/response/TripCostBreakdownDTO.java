@@ -18,5 +18,6 @@ public record TripCostBreakdownDTO(
         List<CoordinateDTO> paradasNaRota,
         List<RoadAlertResponseDTO> alertasNaRota,
         List<TrafficReportResponseDTO> trafegoNaRota,
-        List<RadarResponseDTO> radaresNaRota) {
+        List<RadarResponseDTO> radaresNaRota,
+        List<FoodStopSuggestionDTO> paradasParaLanche) {
 }

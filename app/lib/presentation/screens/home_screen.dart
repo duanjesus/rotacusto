@@ -7,6 +7,8 @@ import '../../data/favorite_destinations.dart';
 import '../../data/last_trip_cache.dart';
 import '../../data/recent_destinations.dart';
 import '../../domain/models/address_suggestion.dart';
+import '../../domain/models/food_stop_suggestion.dart';
+import '../../domain/models/restaurant.dart';
 import '../../domain/models/tipo_combustivel.dart';
 import '../../domain/models/trip_cost_breakdown.dart';
 import '../../domain/models/vehicle_model.dart';
@@ -79,6 +81,10 @@ class _HomeScreenState extends State<HomeScreen> {
   // vivo — se o usuário desmarcar depois de calcular sem recalcular, o
   // resumo exibido continua rotulado corretamente.
   bool _breakdownIdaEVolta = false;
+  // Restaurante escolhido pelo usuário em cada parada pra lanche (Fase 13) —
+  // só apoio visual de decisão durante o planejamento, chave é o índice da
+  // parada em b.paradasParaLanche; nunca persistido no back-end.
+  final Map<int, Restaurant> _restauranteEscolhidoPorParada = {};
   String? _errorMessage;
   bool _salvandoNoHistorico = false;
   LastTrip? _ultimaViagem;
@@ -1016,6 +1022,16 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             ),
           ],
+          if (b.paradasParaLanche.isNotEmpty) ...[
+            const SizedBox(height: 16),
+            Text(
+              'Paradas pra lanche',
+              style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
+            ),
+            const SizedBox(height: 8),
+            for (int i = 0; i < b.paradasParaLanche.length; i++)
+              _buildParadaLancheTile(context, i, b.paradasParaLanche[i]),
+          ],
           if (b.passosRota.isNotEmpty) ...[
             const SizedBox(height: 12),
             OutlinedButton.icon(
@@ -1066,6 +1082,45 @@ class _HomeScreenState extends State<HomeScreen> {
               );
             },
           ),
+        ],
+      ),
+    );
+  }
+
+  /// Uma parada pra lanche calculada + os restaurantes reais mais próximos
+  /// dela (Fase 13) — tocar num restaurante só marca ele como escolhido
+  /// visualmente (destaque local), sem persistir nada no back-end; é só
+  /// apoio de decisão durante o planejamento.
+  Widget _buildParadaLancheTile(BuildContext context, int indice, FoodStopSuggestion parada) {
+    final scheme = Theme.of(context).colorScheme;
+    final escolhido = _restauranteEscolhidoPorParada[indice];
+
+    return Card(
+      margin: const EdgeInsets.only(bottom: 8),
+      clipBehavior: Clip.antiAlias,
+      child: ExpansionTile(
+        leading: Icon(Icons.restaurant_rounded, color: scheme.tertiary),
+        title: Text('Parada ${indice + 1}'),
+        subtitle: Text(
+          escolhido != null ? 'Escolhido: ${escolhido.nome}' : '${parada.restaurantes.length} restaurante(s) por perto',
+        ),
+        children: [
+          if (parada.restaurantes.isEmpty)
+            const Padding(
+              padding: EdgeInsets.fromLTRB(16, 0, 16, 12),
+              child: Text('Nenhum restaurante encontrado perto deste ponto.'),
+            ),
+          for (final restaurante in parada.restaurantes)
+            ListTile(
+              dense: true,
+              leading: Icon(
+                escolhido == restaurante ? Icons.check_circle_rounded : Icons.circle_outlined,
+                color: escolhido == restaurante ? scheme.primary : scheme.outline,
+              ),
+              title: Text(restaurante.nome),
+              subtitle: Text('a ${restaurante.distanciaKm.toStringAsFixed(1)} km do ponto de parada'),
+              onTap: () => setState(() => _restauranteEscolhidoPorParada[indice] = restaurante),
+            ),
         ],
       ),
     );
