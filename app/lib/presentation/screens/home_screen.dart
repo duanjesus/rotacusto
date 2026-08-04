@@ -63,6 +63,12 @@ class _HomeScreenState extends State<HomeScreen> {
   // separado — evita o problema clássico de "minha própria escrita
   // programática dispara meu próprio listener".
   Map<String, Map<TipoCombustivel, double>> _precosRegionais = {};
+  // Fase 14: preço por município, chave normalizada "MUNICIPIO|UF" (maiúsculo,
+  // sem acento — ver _chaveMunicipio) porque a fonte ANP não tem acento nos
+  // nomes ("SAO PAULO") mas o município vindo do autocomplete tem ("São
+  // Paulo"); comparar direto sem normalizar nunca bateria pras cidades
+  // acentuadas.
+  Map<String, Map<TipoCombustivel, double>> _precosPorMunicipio = {};
   String? _ultimoPrecoSugerido = _precoPadraoPorCombustivel[TipoCombustivel.gasolina];
 
   VehicleType _selectedTipo = VehicleType.carro;
@@ -138,26 +144,61 @@ class _HomeScreenState extends State<HomeScreen> {
     _apiClient.fetchFuelPrices().then((lista) {
       if (!mounted) return;
       final porUf = <String, Map<TipoCombustivel, double>>{};
+      final porMunicipio = <String, Map<TipoCombustivel, double>>{};
       for (final preco in lista) {
-        porUf.putIfAbsent(preco.uf, () => {})[preco.tipoCombustivel] = preco.precoMedio;
+        if (preco.municipio == null) {
+          porUf.putIfAbsent(preco.uf, () => {})[preco.tipoCombustivel] = preco.precoMedio;
+        } else {
+          final chave = _chaveMunicipio(preco.municipio!, preco.uf);
+          porMunicipio.putIfAbsent(chave, () => {})[preco.tipoCombustivel] = preco.precoMedio;
+        }
       }
-      setState(() => _precosRegionais = porUf);
+      setState(() {
+        _precosRegionais = porUf;
+        _precosPorMunicipio = porMunicipio;
+      });
     }).catchError((_) {});
   }
 
-  /// Atualiza o preço sugerido no formulário — regional (ANP) se a UF da
-  /// Origem e o combustível do veículo forem conhecidos e a tabela tiver
-  /// entrada, senão cai na média nacional de sempre. Só escreve se o campo
-  /// ainda tem um valor sugerido (o usuário nunca editou manualmente).
+  /// Chave normalizada "MUNICIPIO|UF" (maiúsculo, sem acento) usada tanto pra
+  /// indexar [_precosPorMunicipio] quanto pra procurar nela — garante que
+  /// "São Paulo" (Photon, com acento) e "SAO PAULO" (fonte ANP, sem acento)
+  /// batam na mesma entrada.
+  String _chaveMunicipio(String municipio, String uf) {
+    const comAcento = 'áàâãäéèêëíìîïóòôõöúùûüçÁÀÂÃÄÉÈÊËÍÌÎÏÓÒÔÕÖÚÙÛÜÇ';
+    const semAcento = 'aaaaaeeeeiiiiooooouuuucAAAAAEEEEIIIIOOOOOUUUUC';
+    final buffer = StringBuffer();
+    for (final char in municipio.toUpperCase().trim().split('')) {
+      final idx = comAcento.indexOf(char);
+      buffer.write(idx >= 0 ? semAcento[idx].toUpperCase() : char);
+    }
+    return '$buffer|${uf.toUpperCase()}';
+  }
+
+  /// Atualiza o preço sugerido no formulário em 3 níveis de fallback (Fase
+  /// 14): tenta MUNICÍPIO+UF primeiro (mais granular), cai pra só UF
+  /// (comportamento da Fase 11) se não achar entrada específica, e cai pro
+  /// preço nacional fixo se nem isso existir. Só escreve se o campo ainda tem
+  /// um valor sugerido (o usuário nunca editou manualmente).
   void _atualizarPrecoSugerido() {
     final aindaEhSugerido = _ultimoPrecoSugerido == null || _precoController.text == _ultimoPrecoSugerido;
     if (!aindaEhSugerido) return;
     final combustivel = _selectedVehicle?.tipoCombustivel;
     if (combustivel == null) return;
+
     final uf = _origemSelecionada?.uf;
-    final tabelaDaUf = uf != null ? _precosRegionais[uf] : null;
-    final precoRegional = tabelaDaUf != null ? tabelaDaUf[combustivel] : null;
-    final novoPreco = precoRegional?.toStringAsFixed(2) ?? _precoPadraoPorCombustivel[combustivel]!;
+    final municipio = _origemSelecionada?.municipio;
+    double? preco;
+    if (uf != null && municipio != null) {
+      final tabelaDoMunicipio = _precosPorMunicipio[_chaveMunicipio(municipio, uf)];
+      preco = tabelaDoMunicipio != null ? tabelaDoMunicipio[combustivel] : null;
+    }
+    if (preco == null && uf != null) {
+      final tabelaDaUf = _precosRegionais[uf];
+      preco = tabelaDaUf != null ? tabelaDaUf[combustivel] : null;
+    }
+
+    final novoPreco = preco?.toStringAsFixed(2) ?? _precoPadraoPorCombustivel[combustivel]!;
     _precoController.text = novoPreco;
     _ultimoPrecoSugerido = novoPreco;
   }

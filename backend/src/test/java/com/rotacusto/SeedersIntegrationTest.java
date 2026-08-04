@@ -325,28 +325,45 @@ class SeedersIntegrationTest {
 
     @Test
     void fuelPriceSeedDataIsLoadedOnStartup() {
-        // 27 UFs x 3 combustíveis (gasolina/etanol/diesel) — dado real extraído do
-        // Levantamento de Preços de Combustíveis da ANP (semana 12-18/07/2026),
-        // ver FuelPriceSeeder. GLP/GNV não entram (o app não modela esses
-        // combustíveis) nem ELETRICO (a ANP não pesquisa preço de recarga).
-        assertEquals(81, fuelPriceRepository.count());
+        // Fase 14: 81 linhas de fallback por UF (27 UFs x 3 combustíveis, mesma
+        // extração de sempre) + 1137 linhas específicas de município — dado real
+        // extraído do arquivo de revenda por posto individual da ANP (semana
+        // 26/07-01/08/2026, ver FuelPriceSeeder). GLP/GNV/GASOLINA
+        // ADITIVADA/DIESEL S500 não entram (mesmo filtro de sempre) nem ELETRICO
+        // (a ANP não pesquisa preço de recarga).
+        assertEquals(1218, fuelPriceRepository.count());
         var todosPrecos = fuelPriceRepository.findAll();
 
-        assertTrue(todosPrecos.stream().map(p -> p.getUf()).distinct().count() == 27,
-                "deveria ter preço pras 27 UFs (26 estados + DF)");
+        var fallbackPorUf = todosPrecos.stream().filter(p -> p.getMunicipio() == null).toList();
+        assertEquals(81, fallbackPorUf.size(), "deveria ter 81 linhas de fallback por UF (27 UFs x 3 combustíveis)");
+        assertTrue(fallbackPorUf.stream().map(p -> p.getUf()).distinct().count() == 27,
+                "deveria ter preço de fallback pras 27 UFs (26 estados + DF)");
         for (TipoCombustivel tipo : new TipoCombustivel[] { TipoCombustivel.GASOLINA, TipoCombustivel.ETANOL,
                 TipoCombustivel.DIESEL }) {
-            assertEquals(27, todosPrecos.stream().filter(p -> p.getTipoCombustivel() == tipo).count(),
-                    "deveria ter preço de " + tipo + " pras 27 UFs");
+            assertEquals(27, fallbackPorUf.stream().filter(p -> p.getTipoCombustivel() == tipo).count(),
+                    "deveria ter preço de fallback de " + tipo + " pras 27 UFs");
         }
 
         // São Paulo é notoriamente o estado com etanol mais barato do país (maior
         // produtor) — checagem de sanidade de que o dado real bate com uma
         // expectativa conhecida, não só "tem 81 linhas".
-        var etanolSp = todosPrecos.stream()
+        var etanolSp = fallbackPorUf.stream()
                 .filter(p -> p.getUf().equals("SP") && p.getTipoCombustivel() == TipoCombustivel.ETANOL)
                 .findFirst().orElseThrow();
         assertTrue(etanolSp.getPrecoMedio() < 4.5,
                 "etanol em SP deveria ser notavelmente mais barato que a média nacional");
+
+        // Cidade grande conhecida (Rio de Janeiro) deveria ter as 3 linhas
+        // município-específicas, com preço plausível (não confundido com o valor
+        // de fallback do estado inteiro). Nome do município vem SEM acento na
+        // fonte ANP — ver Javadoc de FuelPriceSeeder — daí "Rio de Janeiro" bater
+        // porque não tem diacrítico, mas cidades acentuadas (ex. "São Paulo")
+        // ficam salvas como "Sao Paulo" de propósito (a comparação normalizada é
+        // responsabilidade do cliente, não deste teste).
+        var rioDeJaneiro = todosPrecos.stream()
+                .filter(p -> "RJ".equals(p.getUf()) && "Rio de Janeiro".equals(p.getMunicipio()))
+                .toList();
+        assertEquals(3, rioDeJaneiro.size(), "Rio de Janeiro deveria ter preço município-específico dos 3 combustíveis");
+        assertTrue(rioDeJaneiro.stream().allMatch(p -> p.getPrecoMedio() > 0));
     }
 }

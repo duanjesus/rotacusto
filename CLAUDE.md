@@ -141,6 +141,45 @@ two refinements on top of the basic `distância / consumo × preço` formula:
   bounds — implying ~70 km of the trip classified as urban, a plausible split for a route that
   starts/ends in city streets either side of a long BR-101 stretch.
 
+## Fuel price granularity — per município (Fase 14)
+
+The 81-row per-UF table above was the whole story through Fase 11. Fase 14 added a
+second, more granular tier without touching the UF fallback:
+
+- **Same ANP page, a different weekly file**: `gov.br/anp/.../arquivos-lpc/<ano>/`
+  publishes both `resumo_semanal_lpc_*.xlsx` (state averages, used above) and
+  `revendas_lpc_*.xlsx` (per-individual-station data, ~19,750 rows: CNPJ, RAZÃO,
+  ENDEREÇO, MUNICÍPIO, ESTADO, PRODUTO, PREÇO DE REVENDA, etc.) — no lat/lon, so
+  per-station map plotting is out of reach without mass-geocoding (would blow past
+  Nominatim's ~1 req/s public-instance etiquette). What the file gives for free instead:
+  aggregating by MUNICÍPIO+ESTADO+PRODUTO yields a per-city average, no geocoding
+  needed. `fuelprices.json` is now built from this file alone (1218 rows: 81 UF-fallback
+  + 1137 município-specific), making the old `resumo_semanal_lpc_*` redundant.
+- **ANP strips accents from place names** (`"SAO PAULO"`, not `"SÃO PAULO"`) — a real
+  finding from inspecting the raw data, not assumed. Photon's `city`/`state` fields (used
+  for the autocomplete) keep accents. `FuelPrice.municipio` is stored exactly as ANP
+  wrote it (unaccented); matching against the Origem's `AddressSuggestion.municipio`
+  (accented) requires normalizing *both* sides — uppercase + strip diacritics — done in
+  `HomeScreen._chaveMunicipio`, never a direct string comparison.
+- **3-tier fallback**: `HomeScreen._atualizarPrecoSugerido` tries município+UF first,
+  falls back to UF-only (Fase 11 behavior), falls back to the flat national default —
+  strictly additive, no existing tier removed. Verified live that Photon's own
+  suggestion for "São Paulo, Brasil" (the city searched by its own name) doesn't
+  populate `city` at all — Photon only fills it for addresses *inside* a place, not for
+  the place itself — so that particular pick correctly lands on the UF tier, not a bug.
+- **Backend plumbing mirrors Fase 11's `uf` pattern exactly**: `FuelPrice.municipio`
+  (nullable), `FuelPriceResponseDTO.municipio`, and — same as `uf` needed
+  `AddressSuggestion`/`AddressSuggestionResponseDTO`/`PhotonClient` changes back then —
+  `municipio` needed the identical three-file change (`props.path("city")` was already
+  being read for display text, just never promoted to a structured field until now).
+- **Idempotent seeders + a persistent database don't mix well across data-format
+  changes**: swapping `fuelprices.json` for a new shape did nothing on its own — the
+  Postgres data directory (`~/.rotacusto/pgdata`, Fase 6.4a) still had the old 81 rows
+  from a prior run, and `FuelPriceSeeder`'s `if (repository.count() > 0) return` guard
+  (there specifically to avoid re-seeding on every restart) skipped the reload. Had to
+  manually clear the `fuel_prices` table before restarting for the new data to load —
+  worth remembering for any future seed-data reshape, not just this one.
+
 ## Tolls
 
 `backend/src/main/resources/data/tollplazas.json` is a **national curated seed** (159

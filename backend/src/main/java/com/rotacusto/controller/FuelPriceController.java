@@ -28,8 +28,8 @@ public class FuelPriceController {
     @GetMapping
     public List<FuelPriceResponseDTO> listAll() {
         return service.findAll().stream()
-                .map(p -> new FuelPriceResponseDTO(p.getUf(), p.getTipoCombustivel(), p.getPrecoMedio(),
-                        p.getSemanaReferencia()))
+                .map(p -> new FuelPriceResponseDTO(p.getUf(), p.getMunicipio(), p.getTipoCombustivel(),
+                        p.getPrecoMedio(), p.getSemanaReferencia()))
                 .toList();
     }
 }

@@ -29,6 +29,16 @@ public class FuelPrice {
     @Column(nullable = false, length = 2)
     private String uf;
 
+    /**
+     * Nulo nas linhas de fallback por UF (média de todo o estado); preenchido
+     * nas linhas específicas de município (Fase 14). Comparado sempre em forma
+     * normalizada (maiúsculo, sem acento) pelo cliente — a fonte ANP já vem sem
+     * acento (ex. "SAO PAULO"), então a comparação exata com o nome vindo do
+     * Photon/Nominatim (que tem acento) não bateria.
+     */
+    @Column(nullable = true)
+    private String municipio;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "tipo_combustivel", nullable = false)
     private TipoCombustivel tipoCombustivel;
@@ -56,6 +66,14 @@ public class FuelPrice {
 
     public void setUf(String uf) {
         this.uf = uf;
+    }
+
+    public String getMunicipio() {
+        return municipio;
+    }
+
+    public void setMunicipio(String municipio) {
+        this.municipio = municipio;
     }
 
     public TipoCombustivel getTipoCombustivel() {

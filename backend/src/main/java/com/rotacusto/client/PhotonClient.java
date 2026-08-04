@@ -60,7 +60,8 @@ public class PhotonClient {
                 continue; // mesmo lugar já retornado (Photon às vezes duplica)
             }
             String uf = EstadoUtils.siglaPorNomeCompleto(props.path("state").asText(null));
-            results.add(new AddressSuggestion(displayName, lat, lon, uf));
+            String municipio = props.path("city").asText(null);
+            results.add(new AddressSuggestion(displayName, lat, lon, uf, municipio));
             if (results.size() >= limit) {
                 break;
             }
