@@ -142,7 +142,8 @@ class _TripMapState extends State<TripMap> {
                     width: 36,
                     height: 36,
                     child: Tooltip(
-                      message: 'Parada sugerida\n${breakdown.postoSugerido!.nome}',
+                      message: 'Parada sugerida\n${breakdown.postoSugerido!.nome}'
+                          '${breakdown.postoSugerido!.precoMedio != null ? '\nR\$ ${breakdown.postoSugerido!.precoMedio!.toStringAsFixed(2)}' : ''}',
                       child: const Icon(Icons.local_gas_station, color: Colors.green, size: 28),
                     ),
                   ),

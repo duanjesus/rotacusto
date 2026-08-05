@@ -60,6 +60,13 @@ rotacusto:
   # gratuita de preço por posto em tempo real no Brasil.
   fuel-stations:
     detection-radius-km: 0.3
+    # Fase 15 — sugestão de posto com melhor preço: só os K postos mais
+    # próximos do meio geométrico da rota são reverse-geocodificados (custo de
+    # rede sequencial, ver reverse-geocode-delay-ms), não todos os candidatos.
+    melhor-preco-candidatos-k: 5
+    # Etiqueta do Nominatim público (~1 req/s) — 1.1s de margem entre
+    # chamadas sequenciais de reverse geocoding.
+    reverse-geocode-delay-ms: 1100
   # Relatos de "veículo não encontrado no catálogo" (link no app) — ver
   # VehicleReportService. Continua indo pra arquivo (não pro banco, mesmo
   # agora com Postgres persistente) por simplicidade: é um log de baixo

@@ -42,6 +42,8 @@ rotacusto:
     default-tarifa-moto: 4.00
   fuel-stations:
     detection-radius-km: 0.3
+    melhor-preco-candidatos-k: 5
+    reverse-geocode-delay-ms: 0
   vehicle-reports:
     file: vehicle-reports.log
   jwt:

@@ -13,6 +13,7 @@ import com.rotacusto.domain.Coordinates;
 import com.rotacusto.domain.FoodStopSuggestion;
 import com.rotacusto.domain.OsmFuelStation;
 import com.rotacusto.domain.OsmRadar;
+import com.rotacusto.domain.PricedFuelStation;
 import com.rotacusto.domain.RouteResult;
 import com.rotacusto.domain.TripCostBreakdown;
 import com.rotacusto.domain.TripCostCalculator;
@@ -124,6 +125,14 @@ public class TripEstimationService {
         CompletableFuture<List<OsmFuelStation>> postosFuture = eletrico
                 ? CompletableFuture.completedFuture(List.of())
                 : CompletableFuture.supplyAsync(() -> fuelStationService.findStationsNearRoute(route.geometria()));
+        // Encadeada em postosFuture (não síncrona depois do .join() das outras
+        // futures) — o reverse geocoding sequencial de até K candidatos (Fase 15)
+        // soma ~K x reverseGeocodeDelayMs só nesta future; encadear garante que
+        // isso roda EM PARALELO com pedágio/alertas/trânsito/radar/lanche, não
+        // depois deles.
+        CompletableFuture<Optional<PricedFuelStation>> postoSugeridoFuture = postosFuture.thenApplyAsync(
+                lista -> eletrico ? Optional.<PricedFuelStation>empty()
+                        : fuelStationService.suggestBestPricedStop(lista, route.geometria(), profile.tipoCombustivel()));
         CompletableFuture<List<RoadAlert>> alertasFuture = CompletableFuture
                 .supplyAsync(() -> roadAlertService.findNearRoute(route.geometria()));
         CompletableFuture<List<TrafficReport>> trafegoFuture = CompletableFuture
@@ -141,12 +150,11 @@ public class TripEstimationService {
         List<TrafficReport> trafego = trafegoFuture.join();
         List<OsmRadar> radares = radaresFuture.join();
         List<FoodStopSuggestion> paradasLanche = paradasLancheFuture.join();
+        Optional<PricedFuelStation> postoSugerido = postoSugeridoFuture.join();
 
         LocalDate hoje = LocalDate.now();
         TripCostBreakdown breakdown = TripCostCalculator.calculate(route.distanciaKm(), route.duracaoMin(), profile,
                 praçasCruzadas, foodStopIntervalHours, foodStopAverageCost, hoje, route.passos());
-        Optional<OsmFuelStation> postoSugerido = eletrico ? Optional.empty()
-                : fuelStationService.suggestStop(postos, route.geometria());
 
         List<CoordinateDTO> geometria = route.geometria().stream()
                 .map(c -> new CoordinateDTO(c.lat(), c.lon()))
@@ -156,7 +164,7 @@ public class TripEstimationService {
                         p.getLng(), TollCostCalculator.calculate(List.of(p), profile, hoje)))
                 .toList();
         List<FuelStationResponseDTO> postosDTO = postos.stream()
-                .map(p -> new FuelStationResponseDTO(p.nome(), p.lat(), p.lon()))
+                .map(p -> new FuelStationResponseDTO(p.nome(), p.lat(), p.lon(), null, null))
                 .toList();
         List<RouteStepDTO> passos = route.passos().stream()
                 .map(s -> new RouteStepDTO(s.instrucao(), s.distanciaM(), s.duracaoS(), s.wayPointInicio(), s.wayPointFim()))
@@ -192,7 +200,8 @@ public class TripEstimationService {
                 geometria,
                 pedagios,
                 postosDTO,
-                postoSugerido.map(p -> new FuelStationResponseDTO(p.nome(), p.lat(), p.lon())).orElse(null),
+                postoSugerido.map(p -> new FuelStationResponseDTO(p.station().nome(), p.station().lat(),
+                        p.station().lon(), p.precoMedio(), p.municipio())).orElse(null),
                 passos,
                 paradasNaRota,
                 alertasDTO,

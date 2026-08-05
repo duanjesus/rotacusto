@@ -15,6 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import com.rotacusto.domain.Coordinates;
 import com.rotacusto.domain.OsmFuelStation;
+import com.rotacusto.domain.PricedFuelStation;
 import com.rotacusto.domain.RouteResult;
 import com.rotacusto.dto.request.TripEstimateRequestDTO;
 import com.rotacusto.dto.response.TripCostBreakdownDTO;
@@ -80,6 +81,11 @@ class TripEstimationServiceTest {
                 .thenReturn(List.of());
         org.mockito.Mockito.lenient().when(radarService.findCamerasNearRoute(org.mockito.ArgumentMatchers.any()))
                 .thenReturn(List.of());
+        // Fase 15: suggestBestPricedStop substitui a chamada síncrona antiga de
+        // suggestStop — default vazio pros testes que não são sobre posto sugerido.
+        org.mockito.Mockito.lenient().when(fuelStationService.suggestBestPricedStop(
+                org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.any(),
+                org.mockito.ArgumentMatchers.any())).thenReturn(java.util.Optional.empty());
     }
 
     @Test
@@ -193,13 +199,14 @@ class TripEstimationServiceTest {
         mobi.setConsumoEstradaKmL(10.0);
         mobi.setNumeroEixos(2);
         mobi.setCustoDesgastePorKm(0.35);
+        mobi.setTipoCombustivel(TipoCombustivel.GASOLINA);
         when(vehicleModelService.findById(1L)).thenReturn(mobi);
 
         OsmFuelStation posto1 = new OsmFuelStation("Posto Ipiranga", -21.8, -42.0);
         OsmFuelStation posto2 = new OsmFuelStation("Posto Shell", -21.5, -41.5);
         when(fuelStationService.findStationsNearRoute(route.geometria())).thenReturn(List.of(posto1, posto2));
-        when(fuelStationService.suggestStop(List.of(posto1, posto2), route.geometria()))
-                .thenReturn(java.util.Optional.of(posto1));
+        when(fuelStationService.suggestBestPricedStop(List.of(posto1, posto2), route.geometria(), TipoCombustivel.GASOLINA))
+                .thenReturn(java.util.Optional.of(new PricedFuelStation(posto1, 5.99, "Campos dos Goytacazes")));
 
         TripEstimateRequestDTO request = new TripEstimateRequestDTO(
                 "Copacabana, RJ", "Guarapari, ES", 1L, null, 6.0, null, null);
@@ -208,6 +215,8 @@ class TripEstimationServiceTest {
 
         assertEquals(2, result.postosNaRota().size());
         assertEquals("Posto Ipiranga", result.postoSugerido().nome());
+        assertEquals(5.99, result.postoSugerido().precoMedio());
+        assertEquals("Campos dos Goytacazes", result.postoSugerido().municipio());
     }
 
     @Test

@@ -8,6 +8,7 @@ import '../../data/last_trip_cache.dart';
 import '../../data/recent_destinations.dart';
 import '../../domain/models/address_suggestion.dart';
 import '../../domain/models/food_stop_suggestion.dart';
+import '../../domain/models/fuel_station.dart';
 import '../../domain/models/restaurant.dart';
 import '../../domain/models/tipo_combustivel.dart';
 import '../../domain/models/trip_cost_breakdown.dart';
@@ -225,6 +226,24 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _removerParada(int index) {
     setState(() => _paradas.removeAt(index).controller.dispose());
+  }
+
+  /// Aceita o posto de melhor preço sugerido (Fase 15) como uma parada real —
+  /// mesmo mecanismo de múltiplas paradas da Fase 6.2, só que preenchido
+  /// programaticamente em vez de digitado. Não chama [_adicionarParada]
+  /// direto (esse só adiciona um campo VAZIO); precisa também preencher
+  /// `controller.text`/`selecionada` no mesmo `setState`. Só fica disponível
+  /// (ver botão em `_buildBreakdown`) quando `_paradas` está vazio — o posto
+  /// só está ancorado ao meio aproximado da rota, sem noção de posição
+  /// relativa a paradas já escolhidas pelo usuário.
+  void _aceitarPostoSugerido(FuelStation posto) {
+    setState(() {
+      _paradas.add(_ParadaField()
+        ..controller.text = posto.nome
+        ..selecionada = AddressSuggestion(displayName: posto.nome, lat: posto.lat, lon: posto.lon));
+      _idaEVolta = false; // mesma regra de _adicionarParada — não coexistem
+    });
+    _calcular();
   }
 
   IconData _iconeTipo(VehicleType tipo) {
@@ -1056,12 +1075,36 @@ class _HomeScreenState extends State<HomeScreen> {
                 const SizedBox(width: 6),
                 Expanded(
                   child: Text(
-                    'Sugestão de parada: ${b.postoSugerido!.nome}',
+                    b.postoSugerido!.precoMedio != null
+                        ? 'Melhor preço encontrado: ${currency(b.postoSugerido!.precoMedio!)} em '
+                            '${b.postoSugerido!.municipio} — ${b.postoSugerido!.nome}'
+                        : 'Sugestão de parada: ${b.postoSugerido!.nome}',
                     style: Theme.of(context).textTheme.bodySmall,
                   ),
                 ),
               ],
             ),
+            // Botão só aparece quando há um preço de verdade associado (Fase
+            // 15) — sem preço, não faria sentido oferecer "aceitar o melhor
+            // preço" quando nenhuma otimização de preço aconteceu. Desabilitado
+            // (não escondido) quando já há paradas: o posto sugerido só está
+            // ancorado ao meio aproximado da rota, sem noção de posição
+            // relativa a paradas já escolhidas — inserir num índice específico
+            // seria ambíguo, mesmo raciocínio já usado pra desabilitar "Ida e
+            // volta" quando há paradas.
+            if (b.postoSugerido!.precoMedio != null) ...[
+              const SizedBox(height: 6),
+              Tooltip(
+                message: _paradas.isEmpty
+                    ? ''
+                    : 'Só disponível sem paradas já adicionadas manualmente.',
+                child: OutlinedButton.icon(
+                  onPressed: _paradas.isEmpty ? () => _aceitarPostoSugerido(b.postoSugerido!) : null,
+                  icon: const Icon(Icons.add_road_rounded, size: 18),
+                  label: const Text('Aceitar e adicionar parada'),
+                ),
+              ),
+            ],
           ],
           if (b.paradasParaLanche.isNotEmpty) ...[
             const SizedBox(height: 16),

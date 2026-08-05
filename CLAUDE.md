@@ -180,6 +180,66 @@ second, more granular tier without touching the UF fallback:
   manually clear the `fuel_prices` table before restarting for the new data to load —
   worth remembering for any future seed-data reshape, not just this one.
 
+## Best-priced fuel station suggestion + auto stop (Fase 15)
+
+`FuelStationService.suggestStop` used to pick the gas station closest to the route's
+geometric midpoint, with zero price awareness. Fase 15 upgraded that to
+`suggestBestPricedStop`, which picks the cheapest station **among a small local
+candidate pool**, not the true cheapest on the whole route:
+
+- **No per-station price exists** (see Fase 14 above — the ANP per-station file has no
+  coordinates). The only way to differentiate stations is to find out which município
+  each one is in and use that município's already-known average price. That requires
+  **reverse geocoding** (coordinate → city), which didn't exist anywhere in this
+  codebase before — added as `NominatimClient.reverseGeocode(lat, lon)`
+  (`GET /reverse?...&zoom=10`; `zoom=10` targets city-level granularity, since the
+  default building-level zoom often leaves `address.city` empty for an isolated highway
+  gas station with no street address).
+- **Only K=5 candidates are reverse-geocoded**, the nearest ones to the route's midpoint
+  (`rotacusto.fuel-stations.melhor-preco-candidatos-k`) — a route through a dense city
+  can have 100+ stations, and reverse-geocoding all of them against Nominatim's public
+  ~1 req/s etiquette isn't viable. This means "best price" is honestly "best price
+  among the K candidates nearest the midpoint," not a route-wide guarantee — documented
+  in `FuelStationService.suggestBestPricedStop`'s Javadoc, not hidden.
+- **Sequential, rate-limited, and tolerant of partial failure**: each candidate is
+  reverse-geocoded one at a time (never in parallel) with a `Thread.sleep` between
+  calls (`reverse-geocode-delay-ms: 1100`, in a `finally` block so it applies even on
+  failure) — respecting the same Nominatim etiquette this project already documents for
+  the forward `/search` calls. Any single candidate's failure (Nominatim down, no
+  município match in the price table) doesn't abort the loop; if **none** of the K
+  candidates end up priced, the whole thing degrades to the old nearest-to-midpoint
+  behavior (`suggestStop`, still present and still used as the fallback) — the
+  suggestion never just disappears because reverse geocoding had a bad day.
+- **Latency: encoded into the existing parallel `CompletableFuture` pipeline, not
+  bolted on after it.** Before this fase, `postoSugerido` was computed synchronously
+  *after* all the other parallel lookups (pedágio/alertas/trânsito/radar/lanche) had
+  already joined. Since the new logic can take up to ~5.5s (5 candidates × 1.1s) in the
+  worst case, leaving it where it was would have added that on top of everything else's
+  time. Fixed by chaining it onto the existing `postosFuture` via `.thenApplyAsync(...)`
+  so it runs *concurrently* with the other five lookups instead of after them.
+- **Frontend**: the `postoSugerido` row in the trip summary shows a price + município
+  and an "Aceitar e adicionar parada" button only when a real price was found
+  (`precoMedio != null`) — no price, no button, same read-only text as before. Accepting
+  reuses the exact multi-stop mechanism from Fase 6.2 (`_paradas`, `"lat,lon"`
+  passthrough) — it's just a `_ParadaField` pre-filled programmatically instead of
+  typed. The button is disabled (not hidden) whenever a manual stop already exists,
+  mirroring the existing round-trip/paradas mutual-exclusion pattern — the suggested
+  station is only ever anchored to the route's rough midpoint, so inserting it at a
+  specific position among already-chosen stops would be genuinely ambiguous, not just
+  inconvenient.
+- **Verification note**: the public Overpass API had a live outage while this fase was
+  being verified (confirmed independently — hitting `overpass-api.de` directly, bypassing
+  this project's backend entirely, returned the same "server too busy" error) — every
+  Overpass-backed feature (tolls/radar/restaurants/fuel stations) degraded gracefully at
+  once, which is itself proof the existing try/catch fallback pattern works under a real
+  outage, not just in tests. The new logic itself is covered by backend unit tests with
+  realistic mocked Nominatim/price responses (best-price selection among candidates,
+  degrade-to-nearest-midpoint when none price, K-candidate cap), and the real Nominatim
+  `/reverse` endpoint was confirmed live (independent of Overpass) to return exactly the
+  `address.municipality`/`address.state` shape the parsing code expects. The one thing
+  *not* confirmed live end-to-end is a real "posto with a real price, accepted as a real
+  stop" — that needs Overpass back up, which is out of anyone's control here.
+
 ## Tolls
 
 `backend/src/main/resources/data/tollplazas.json` is a **national curated seed** (159
