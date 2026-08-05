@@ -103,6 +103,7 @@ class ApiClient {
     double? precoPorLitro,
     double? precoPorKWh,
     List<String>? paradas,
+    DateTime? dataHoraPartida,
   }) async {
     final response = await _dio.post('/trips/estimate', data: {
       'origem': origem,
@@ -111,6 +112,11 @@ class ApiClient {
       'precoPorLitro': ?precoPorLitro,
       'precoPorKWh': ?precoPorKWh,
       if (paradas != null && paradas.isNotEmpty) 'paradas': paradas,
+      // Sem .toUtc() de propósito — o back-end espera hora LOCAL (o app é
+      // 100% Brasil), não um instante UTC; toIso8601String() num DateTime
+      // local já produz a string sem sufixo de fuso, formato que o
+      // LocalDateTime do back-end espera (ver Fase 16).
+      if (dataHoraPartida != null) 'dataHoraPartida': dataHoraPartida.toIso8601String(),
     });
     return TripCostBreakdown.fromJson(response.data as Map<String, dynamic>);
   }
@@ -124,6 +130,7 @@ class ApiClient {
     required int vehicleModelId,
     double? precoPorLitro,
     double? precoPorKWh,
+    DateTime? dataHoraPartida,
   }) async {
     final response = await _dio.post('/trips/estimate/alternatives', data: {
       'origem': origem,
@@ -131,6 +138,7 @@ class ApiClient {
       'vehicleModelId': vehicleModelId,
       'precoPorLitro': ?precoPorLitro,
       'precoPorKWh': ?precoPorKWh,
+      if (dataHoraPartida != null) 'dataHoraPartida': dataHoraPartida.toIso8601String(),
     });
     return (response.data as List<dynamic>)
         .map((json) => TripCostBreakdown.fromJson(json as Map<String, dynamic>))

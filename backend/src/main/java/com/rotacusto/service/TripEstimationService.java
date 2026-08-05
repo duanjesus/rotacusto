@@ -1,6 +1,9 @@
 package com.rotacusto.service;
 
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -74,6 +77,7 @@ public class TripEstimationService {
     }
 
     public TripCostBreakdownDTO estimate(TripEstimateRequestDTO request) {
+        validarDataHoraPartida(request.dataHoraPartida());
         Coordinates origem = geocodingService.resolve(request.origem());
         List<Coordinates> paradas = request.paradas() == null ? List.of()
                 : request.paradas().stream().map(geocodingService::resolve).toList();
@@ -86,7 +90,7 @@ public class TripEstimationService {
         RouteResult route = routingService.route(waypoints);
 
         VehicleProfile profile = resolveProfile(request);
-        return buildBreakdownDTO(route, profile, paradas);
+        return buildBreakdownDTO(route, profile, paradas, request.dataHoraPartida());
     }
 
     /**
@@ -100,16 +104,42 @@ public class TripEstimationService {
         if (request.paradas() != null && !request.paradas().isEmpty()) {
             throw new IllegalArgumentException("Rotas alternativas só estão disponíveis pra viagens sem paradas.");
         }
+        validarDataHoraPartida(request.dataHoraPartida());
         Coordinates origem = geocodingService.resolve(request.origem());
         Coordinates destino = geocodingService.resolve(request.destino());
         VehicleProfile profile = resolveProfile(request);
 
         List<RouteResult> rotas = routingService.routes(List.of(origem, destino));
-        return rotas.stream().map(rota -> buildBreakdownDTO(rota, profile, List.of())).toList();
+        return rotas.stream()
+                .map(rota -> buildBreakdownDTO(rota, profile, List.of(), request.dataHoraPartida()))
+                .toList();
     }
 
+    private static final ZoneId FUSO_BRASIL = ZoneId.of("America/Sao_Paulo");
+
+    /** Valida cedo, antes de qualquer geocode/rota — mesmo espírito da checagem
+     * de paradas já existente em {@link #estimateAlternatives}, falha rápido
+     * sem gastar chamada de API com um request que já sabemos que será rejeitado. */
+    private void validarDataHoraPartida(LocalDateTime dataHoraPartida) {
+        if (dataHoraPartida != null && dataHoraPartida.isBefore(LocalDateTime.now(FUSO_BRASIL))) {
+            throw new IllegalArgumentException("Horário de partida não pode ser no passado.");
+        }
+    }
+
+    /**
+     * {@code dataHoraPartida} (Fase 16, já validada por {@link #validarDataHoraPartida})
+     * é nula = "agora" (comportamento de sempre). Preenchida, vira a
+     * referência de tempo pra tudo que já é sensível a data/hora no cálculo:
+     * pedágio de fim de semana ({@link TollCostCalculator}) e expiração de
+     * relatos da comunidade ({@link RoadAlertService#findNearRoute}/
+     * {@link TrafficReportService#findNearRoute}) — mesmos mecanismos de
+     * sempre, só param de assumir "agora" implicitamente.
+     */
     private TripCostBreakdownDTO buildBreakdownDTO(RouteResult route, VehicleProfile profile,
-            List<Coordinates> paradas) {
+            List<Coordinates> paradas, LocalDateTime dataHoraPartida) {
+        LocalDateTime referencia = dataHoraPartida != null ? dataHoraPartida : LocalDateTime.now(FUSO_BRASIL);
+        LocalDate dataViagem = referencia.toLocalDate();
+        Instant instanteReferencia = referencia.atZone(FUSO_BRASIL).toInstant();
         // Pedágios, postos, alertas de trânsito, relatos de trânsito lento e radares
         // são cinco consultas independentes — rodar em paralelo corta o pior caso de
         // latência (cada uma já tem timeout/fallback próprio, mas em série os piores
@@ -134,9 +164,9 @@ public class TripEstimationService {
                 lista -> eletrico ? Optional.<PricedFuelStation>empty()
                         : fuelStationService.suggestBestPricedStop(lista, route.geometria(), profile.tipoCombustivel()));
         CompletableFuture<List<RoadAlert>> alertasFuture = CompletableFuture
-                .supplyAsync(() -> roadAlertService.findNearRoute(route.geometria()));
+                .supplyAsync(() -> roadAlertService.findNearRoute(route.geometria(), instanteReferencia));
         CompletableFuture<List<TrafficReport>> trafegoFuture = CompletableFuture
-                .supplyAsync(() -> trafficReportService.findNearRoute(route.geometria()));
+                .supplyAsync(() -> trafficReportService.findNearRoute(route.geometria(), instanteReferencia));
         CompletableFuture<List<OsmRadar>> radaresFuture = CompletableFuture
                 .supplyAsync(() -> radarService.findCamerasNearRoute(route.geometria()));
         long numeroParadasLanche = FoodStopCostCalculator.numeroDeParadas(route.duracaoMin(), foodStopIntervalHours);
@@ -152,16 +182,15 @@ public class TripEstimationService {
         List<FoodStopSuggestion> paradasLanche = paradasLancheFuture.join();
         Optional<PricedFuelStation> postoSugerido = postoSugeridoFuture.join();
 
-        LocalDate hoje = LocalDate.now();
         TripCostBreakdown breakdown = TripCostCalculator.calculate(route.distanciaKm(), route.duracaoMin(), profile,
-                praçasCruzadas, foodStopIntervalHours, foodStopAverageCost, hoje, route.passos());
+                praçasCruzadas, foodStopIntervalHours, foodStopAverageCost, dataViagem, route.passos());
 
         List<CoordinateDTO> geometria = route.geometria().stream()
                 .map(c -> new CoordinateDTO(c.lat(), c.lon()))
                 .toList();
         List<TollPlazaResponseDTO> pedagios = praçasCruzadas.stream()
                 .map(p -> new TollPlazaResponseDTO(p.getNome(), p.getRodovia(), p.getConcessionaria(), p.getLat(),
-                        p.getLng(), TollCostCalculator.calculate(List.of(p), profile, hoje)))
+                        p.getLng(), TollCostCalculator.calculate(List.of(p), profile, dataViagem)))
                 .toList();
         List<FuelStationResponseDTO> postosDTO = postos.stream()
                 .map(p -> new FuelStationResponseDTO(p.nome(), p.lat(), p.lon(), null, null))

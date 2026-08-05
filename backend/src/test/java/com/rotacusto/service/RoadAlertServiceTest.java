@@ -88,7 +88,7 @@ class RoadAlertServiceTest {
                 new Coordinates(-22.85, -42.90), // exatamente sobre o alerta
                 new Coordinates(-22.80, -42.50));
 
-        List<RoadAlert> cruzados = service.findNearRoute(rota);
+        List<RoadAlert> cruzados = service.findNearRoute(rota, Instant.now());
 
         assertEquals(1, cruzados.size());
         assertTrue(cruzados.contains(naRota));
@@ -103,9 +103,29 @@ class RoadAlertServiceTest {
 
         List<Coordinates> rota = List.of(new Coordinates(-22.90, -43.30), new Coordinates(-22.80, -42.50));
 
-        List<RoadAlert> cruzados = service.findNearRoute(rota);
+        List<RoadAlert> cruzados = service.findNearRoute(rota, Instant.now());
 
         assertTrue(cruzados.isEmpty());
+    }
+
+    @Test
+    void findNearRouteUsesGivenReferenceInsteadOfNow() {
+        // Fase 16: repository.findByExpiraEmAfter já é responsável por filtrar
+        // por "ainda válido" — o teste confirma que o service passa a
+        // referência recebida pra ele em vez de sempre Instant.now(), e não
+        // filtra de novo por cima (o repositório mockado já devolve só o que
+        // "seria válido" pra referência dada).
+        RoadAlertService service = newService();
+        Instant partidaAgendada = Instant.now().plus(Duration.ofHours(3));
+        RoadAlert aindaValidoNaPartida = alertAt(RoadAlertType.BURACO, -22.85, -42.90,
+                partidaAgendada.plusSeconds(60));
+        when(repository.findByExpiraEmAfter(partidaAgendada)).thenReturn(List.of(aindaValidoNaPartida));
+
+        List<Coordinates> rota = List.of(new Coordinates(-22.85, -42.90));
+        List<RoadAlert> cruzados = service.findNearRoute(rota, partidaAgendada);
+
+        assertEquals(1, cruzados.size());
+        assertTrue(cruzados.contains(aindaValidoNaPartida));
     }
 
     @Test

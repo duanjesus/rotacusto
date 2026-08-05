@@ -82,6 +82,11 @@ class _HomeScreenState extends State<HomeScreen> {
   AddressSuggestion? _destinoSelecionado;
   final List<_ParadaField> _paradas = [];
   bool _idaEVolta = false;
+  // Horário de partida agendado (Fase 16) — nulo = "sair agora" (comportamento
+  // de sempre). Vale pras duas pernas quando ida-e-volta (mesma simplificação
+  // que já existia implicitamente: as duas pernas já assumiam "hoje" pro
+  // cálculo de pedágio antes desta fase).
+  DateTime? _dataHoraPartida;
   bool _loadingEstimate = false;
   TripCostBreakdown? _breakdown;
   // Guarda se o _breakdown atual é de ida e volta separado do checkbox ao
@@ -244,6 +249,38 @@ class _HomeScreenState extends State<HomeScreen> {
       _idaEVolta = false; // mesma regra de _adicionarParada — não coexistem
     });
     _calcular();
+  }
+
+  /// Abre o seletor de data + hora de partida (Fase 16) — dois widgets
+  /// padrão do Flutter (`showDatePicker`/`showTimePicker`), sem pacote novo.
+  /// `firstDate: DateTime.now()` já impede escolher uma data passada; como
+  /// isso não cobre "hoje, mas uma hora que já passou", valida o combinado
+  /// no fim e avisa em vez de aplicar uma data inválida.
+  Future<void> _escolherDataHoraPartida() async {
+    final agora = DateTime.now();
+    final data = await showDatePicker(
+      context: context,
+      initialDate: _dataHoraPartida ?? agora,
+      firstDate: agora,
+      lastDate: agora.add(const Duration(days: 365)),
+    );
+    if (data == null || !mounted) return;
+
+    final hora = await showTimePicker(
+      context: context,
+      initialTime: _dataHoraPartida != null
+          ? TimeOfDay.fromDateTime(_dataHoraPartida!)
+          : TimeOfDay.fromDateTime(agora),
+    );
+    if (hora == null || !mounted) return;
+
+    final escolhido = DateTime(data.year, data.month, data.day, hora.hour, hora.minute);
+    if (escolhido.isBefore(DateTime.now())) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text('Esse horário já passou — escolha um horário futuro.')));
+      return;
+    }
+    setState(() => _dataHoraPartida = escolhido);
   }
 
   IconData _iconeTipo(VehicleType tipo) {
@@ -420,6 +457,7 @@ class _HomeScreenState extends State<HomeScreen> {
             precoPorLitro: isEletrico ? null : preco,
             precoPorKWh: isEletrico ? preco : null,
             paradas: paradas,
+            dataHoraPartida: _dataHoraPartida,
           );
 
       TripCostBreakdown result;
@@ -439,6 +477,7 @@ class _HomeScreenState extends State<HomeScreen> {
           vehicleModelId: _selectedVehicle!.id,
           precoPorLitro: isEletrico ? null : preco,
           precoPorKWh: isEletrico ? preco : null,
+          dataHoraPartida: _dataHoraPartida,
         );
         alternativas.sort((a, b) => a.total.compareTo(b.total));
         if (alternativas.length == 1) {
@@ -828,6 +867,39 @@ class _HomeScreenState extends State<HomeScreen> {
                     ],
                   ),
                 ),
+              ),
+              // Horário de partida agendado (Fase 16) — nulo mostra "Sair
+              // agora" (comportamento de sempre), sem interação nenhuma
+              // necessária. Não é sobre previsão de trânsito (não temos essa
+              // fonte de dado) — só organiza o que já é sensível a data/hora
+              // (pedágio de fim de semana, expiração de relatos da
+              // comunidade) em torno de um horário escolhido.
+              Row(
+                children: [
+                  Icon(Icons.schedule_rounded, size: 18, color: Theme.of(context).colorScheme.onSurfaceVariant),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      _dataHoraPartida == null
+                          ? 'Sair agora'
+                          : 'Partida: ${_dataHoraPartida!.day.toString().padLeft(2, '0')}/'
+                              '${_dataHoraPartida!.month.toString().padLeft(2, '0')}/${_dataHoraPartida!.year} '
+                              'às ${_dataHoraPartida!.hour.toString().padLeft(2, '0')}:'
+                              '${_dataHoraPartida!.minute.toString().padLeft(2, '0')}',
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
+                  ),
+                  if (_dataHoraPartida != null)
+                    IconButton(
+                      icon: const Icon(Icons.close_rounded, size: 18),
+                      tooltip: 'Voltar a sair agora',
+                      onPressed: () => setState(() => _dataHoraPartida = null),
+                    ),
+                  TextButton(
+                    onPressed: _escolherDataHoraPartida,
+                    child: Text(_dataHoraPartida == null ? 'Agendar partida' : 'Alterar'),
+                  ),
+                ],
               ),
             ],
           ),

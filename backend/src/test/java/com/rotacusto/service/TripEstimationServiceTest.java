@@ -1,10 +1,13 @@
 package com.rotacusto.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
+import java.time.DayOfWeek;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -75,10 +78,10 @@ class TripEstimationServiceTest {
         org.mockito.Mockito.lenient().when(restaurantService.suggestStops(org.mockito.ArgumentMatchers.any(),
                 org.mockito.ArgumentMatchers.any(), org.mockito.ArgumentMatchers.anyLong(),
                 org.mockito.ArgumentMatchers.anyDouble())).thenReturn(List.of());
-        org.mockito.Mockito.lenient().when(roadAlertService.findNearRoute(org.mockito.ArgumentMatchers.any()))
-                .thenReturn(List.of());
-        org.mockito.Mockito.lenient().when(trafficReportService.findNearRoute(org.mockito.ArgumentMatchers.any()))
-                .thenReturn(List.of());
+        org.mockito.Mockito.lenient().when(roadAlertService.findNearRoute(org.mockito.ArgumentMatchers.any(),
+                org.mockito.ArgumentMatchers.any())).thenReturn(List.of());
+        org.mockito.Mockito.lenient().when(trafficReportService.findNearRoute(org.mockito.ArgumentMatchers.any(),
+                org.mockito.ArgumentMatchers.any())).thenReturn(List.of());
         org.mockito.Mockito.lenient().when(radarService.findCamerasNearRoute(org.mockito.ArgumentMatchers.any()))
                 .thenReturn(List.of());
         // Fase 15: suggestBestPricedStop substitui a chamada síncrona antiga de
@@ -112,7 +115,7 @@ class TripEstimationServiceTest {
         when(vehicleModelService.findById(1L)).thenReturn(mobi);
 
         TripEstimateRequestDTO request = new TripEstimateRequestDTO(
-                "Copacabana, RJ", "Guarapari, ES", 1L, null, 6.0, null, null);
+                "Copacabana, RJ", "Guarapari, ES", 1L, null, 6.0, null, null, null);
 
         TripCostBreakdownDTO result = tripEstimationService.estimate(request);
 
@@ -135,7 +138,7 @@ class TripEstimationServiceTest {
         var manualProfile = new com.rotacusto.dto.request.VehicleProfileRequestDTO(
                 VehicleType.MOTO, TipoCombustivel.GASOLINA, 20.0, 2, 0.15);
         TripEstimateRequestDTO request = new TripEstimateRequestDTO(
-                "A", "B", null, manualProfile, 6.0, null, null);
+                "A", "B", null, manualProfile, 6.0, null, null, null);
 
         TripCostBreakdownDTO result = tripEstimationService.estimate(request);
 
@@ -173,7 +176,7 @@ class TripEstimationServiceTest {
         when(tollService.findCrossedPlazas(route.geometria())).thenReturn(List.of(praca));
 
         TripEstimateRequestDTO request = new TripEstimateRequestDTO(
-                "Copacabana, RJ", "Guarapari, ES", 1L, null, 6.0, null, null);
+                "Copacabana, RJ", "Guarapari, ES", 1L, null, 6.0, null, null, null);
 
         TripCostBreakdownDTO result = tripEstimationService.estimate(request);
 
@@ -209,7 +212,7 @@ class TripEstimationServiceTest {
                 .thenReturn(java.util.Optional.of(new PricedFuelStation(posto1, 5.99, "Campos dos Goytacazes")));
 
         TripEstimateRequestDTO request = new TripEstimateRequestDTO(
-                "Copacabana, RJ", "Guarapari, ES", 1L, null, 6.0, null, null);
+                "Copacabana, RJ", "Guarapari, ES", 1L, null, 6.0, null, null, null);
 
         TripCostBreakdownDTO result = tripEstimationService.estimate(request);
 
@@ -239,7 +242,7 @@ class TripEstimationServiceTest {
         when(vehicleModelService.findById(2L)).thenReturn(bolt);
 
         TripEstimateRequestDTO request = new TripEstimateRequestDTO(
-                "Copacabana, RJ", "Guarapari, ES", 2L, null, null, 0.90, null);
+                "Copacabana, RJ", "Guarapari, ES", 2L, null, null, 0.90, null, null);
 
         TripCostBreakdownDTO result = tripEstimationService.estimate(request);
 
@@ -266,7 +269,7 @@ class TripEstimationServiceTest {
         bolt.setCustoDesgastePorKm(0.40);
         when(vehicleModelService.findById(2L)).thenReturn(bolt);
 
-        TripEstimateRequestDTO request = new TripEstimateRequestDTO("A", "B", 2L, null, 6.0, null, null);
+        TripEstimateRequestDTO request = new TripEstimateRequestDTO("A", "B", 2L, null, 6.0, null, null, null);
 
         org.junit.jupiter.api.Assertions.assertThrows(IllegalArgumentException.class,
                 () -> tripEstimationService.estimate(request));
@@ -298,7 +301,7 @@ class TripEstimationServiceTest {
         when(vehicleModelService.findById(1L)).thenReturn(mobi);
 
         TripEstimateRequestDTO request = new TripEstimateRequestDTO(
-                "Copacabana, RJ", "Guarapari, ES", 1L, null, 6.0, null, null);
+                "Copacabana, RJ", "Guarapari, ES", 1L, null, 6.0, null, null, null);
 
         TripCostBreakdownDTO result = tripEstimationService.estimate(request);
 
@@ -327,7 +330,7 @@ class TripEstimationServiceTest {
         when(vehicleModelService.findById(1L)).thenReturn(mobi);
 
         TripEstimateRequestDTO request = new TripEstimateRequestDTO(
-                "Copacabana, RJ", "Guarapari, ES", 1L, null, 6.0, null, List.of("Búzios, RJ"));
+                "Copacabana, RJ", "Guarapari, ES", 1L, null, 6.0, null, List.of("Búzios, RJ"), null);
 
         TripCostBreakdownDTO result = tripEstimationService.estimate(request);
 
@@ -356,7 +359,7 @@ class TripEstimationServiceTest {
         when(vehicleModelService.findById(1L)).thenReturn(mobi);
 
         TripEstimateRequestDTO request = new TripEstimateRequestDTO(
-                "Copacabana, RJ", "Guarapari, ES", 1L, null, 6.0, null, null);
+                "Copacabana, RJ", "Guarapari, ES", 1L, null, 6.0, null, null, null);
 
         TripCostBreakdownDTO result = tripEstimationService.estimate(request);
 
@@ -366,7 +369,7 @@ class TripEstimationServiceTest {
     @Test
     void estimateAlternativesThrowsWhenParadasArePresent() {
         TripEstimateRequestDTO request = new TripEstimateRequestDTO(
-                "Copacabana, RJ", "Guarapari, ES", 1L, null, 6.0, null, List.of("Búzios, RJ"));
+                "Copacabana, RJ", "Guarapari, ES", 1L, null, 6.0, null, List.of("Búzios, RJ"), null);
 
         org.junit.jupiter.api.Assertions.assertThrows(IllegalArgumentException.class,
                 () -> tripEstimationService.estimateAlternatives(request));
@@ -392,12 +395,64 @@ class TripEstimationServiceTest {
         when(vehicleModelService.findById(1L)).thenReturn(mobi);
 
         TripEstimateRequestDTO request = new TripEstimateRequestDTO(
-                "Copacabana, RJ", "Guarapari, ES", 1L, null, 6.0, null, null);
+                "Copacabana, RJ", "Guarapari, ES", 1L, null, 6.0, null, null, null);
 
         List<TripCostBreakdownDTO> resultados = tripEstimationService.estimateAlternatives(request);
 
         assertEquals(2, resultados.size());
         assertEquals(500.0, resultados.get(0).distanciaKm(), 0.001);
         assertEquals(480.0, resultados.get(1).distanciaKm(), 0.001);
+    }
+
+    @Test
+    void estimateThrowsWhenDataHoraPartidaIsInThePast() {
+        LocalDateTime ontem = LocalDateTime.now().minusDays(1);
+        TripEstimateRequestDTO request = new TripEstimateRequestDTO(
+                "Copacabana, RJ", "Guarapari, ES", 1L, null, 6.0, null, null, ontem);
+
+        assertThrows(IllegalArgumentException.class, () -> tripEstimationService.estimate(request));
+    }
+
+    @Test
+    void appliesWeekendTollFareWhenScheduledDepartureFallsOnASaturday() {
+        Coordinates origem = new Coordinates(-22.9711, -43.1822);
+        Coordinates destino = new Coordinates(-20.6633, -40.4967);
+        when(geocodingService.resolve("Copacabana, RJ")).thenReturn(origem);
+        when(geocodingService.resolve("Guarapari, ES")).thenReturn(destino);
+
+        RouteResult route = new RouteResult(500.0, 360.0, List.of(origem, destino), List.of());
+        when(routingService.route(List.of(origem, destino))).thenReturn(route);
+
+        VehicleModel mobi = new VehicleModel();
+        mobi.setId(1L);
+        mobi.setTipo(VehicleType.CARRO);
+        mobi.setConsumoEstradaKmL(10.0);
+        mobi.setNumeroEixos(2);
+        mobi.setCustoDesgastePorKm(0.35);
+        when(vehicleModelService.findById(1L)).thenReturn(mobi);
+
+        TollPlaza viaLagos = new TollPlaza();
+        viaLagos.setNome("Via Lagos");
+        viaLagos.setRodovia("RJ-124");
+        viaLagos.setConcessionaria("CCR ViaLagos");
+        viaLagos.setLat(-22.72);
+        viaLagos.setLng(-42.62);
+        viaLagos.setTarifaPorEixo(9.20);
+        viaLagos.setTarifaPorEixoFimDeSemana(15.30);
+        when(tollService.findCrossedPlazas(route.geometria())).thenReturn(List.of(viaLagos));
+
+        // Achar o próximo sábado a partir de agora, sempre no futuro (nunca cai
+        // no passado, então nunca dispara a validação testada acima).
+        LocalDateTime proximoSabado = LocalDateTime.now().plusDays(1);
+        while (proximoSabado.getDayOfWeek() != DayOfWeek.SATURDAY) {
+            proximoSabado = proximoSabado.plusDays(1);
+        }
+        TripEstimateRequestDTO request = new TripEstimateRequestDTO(
+                "Copacabana, RJ", "Guarapari, ES", 1L, null, 6.0, null, null, proximoSabado);
+
+        TripCostBreakdownDTO result = tripEstimationService.estimate(request);
+
+        // Carro (2 eixos): 15,30 * 2 = 30,60 (fim de semana), não 9,20 * 2 = 18,40
+        assertEquals(30.60, result.custoPedagio(), 0.001);
     }
 }

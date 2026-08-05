@@ -120,8 +120,16 @@ public class RoadAlertService {
         return repository.save(alert);
     }
 
-    public List<RoadAlert> findNearRoute(List<Coordinates> geometriaRota) {
-        List<RoadAlert> ativos = repository.findByExpiraEmAfter(Instant.now());
+    /**
+     * {@code referencia} (Fase 16) é o momento contra o qual "ainda válido"
+     * é avaliado — {@code Instant.now()} pra uma estimativa sem partida
+     * agendada, ou o horário de partida escolhido pelo usuário quando há um.
+     * Reaproveita o mesmo mecanismo de expiração de sempre, só troca o ponto
+     * de referência: um alerta que já teria expirado até a partida agendada
+     * naturalmente não aparece, sem precisar de nenhum corte especial.
+     */
+    public List<RoadAlert> findNearRoute(List<Coordinates> geometriaRota, Instant referencia) {
+        List<RoadAlert> ativos = repository.findByExpiraEmAfter(referencia);
         return ativos.stream()
                 .filter(a -> geometriaRota.stream()
                         .anyMatch(p -> HaversineDistance.km(p, new Coordinates(a.getLat(), a.getLng())) <= detectionRadiusKm))

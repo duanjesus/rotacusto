@@ -1,5 +1,6 @@
 package com.rotacusto.dto.request;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import jakarta.validation.constraints.NotBlank;
@@ -16,6 +17,13 @@ import jakarta.validation.constraints.Positive;
  * {@code paradas} são zero ou mais pontos intermediários (texto livre ou "lat,lon",
  * mesmo formato de origem/destino), visitados nesta ordem entre origem e destino — uma
  * rota única contínua, não N viagens separadas. Nulo ou vazio = comportamento de sempre.
+ *
+ * {@code dataHoraPartida} (Fase 16) é nula = "agora" (comportamento de sempre). Quando
+ * preenchida, vale como referência pra tudo que já é sensível a data/hora no cálculo
+ * (pedágio de fim de semana, expiração de relatos da comunidade) — ver
+ * TripEstimationService. Tipo {@code LocalDateTime} (sem fuso) de propósito: o app é
+ * 100% Brasil, então "hora local escolhida" já é hora de Brasília sem precisar carregar
+ * timezone pela rede.
  */
 public record TripEstimateRequestDTO(
         @NotBlank String origem,
@@ -24,5 +32,6 @@ public record TripEstimateRequestDTO(
         VehicleProfileRequestDTO vehicleProfile,
         @Positive Double precoPorLitro,
         @Positive Double precoPorKWh,
-        List<String> paradas) {
+        List<String> paradas,
+        LocalDateTime dataHoraPartida) {
 }

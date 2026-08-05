@@ -240,6 +240,43 @@ candidate pool**, not the true cheapest on the whole route:
   *not* confirmed live end-to-end is a real "posto with a real price, accepted as a real
   stop" — that needs Overpass back up, which is out of anyone's control here.
 
+## Scheduled departure time (Fase 16)
+
+User asked for something like Apple Maps' "leave later" planner (pick an arrival time,
+see a graph of predicted traffic by time slot). That graph needs historical/predictive
+traffic data — no free, open source of that exists, and paying for one would break the
+project's no-paid-API rule since day one. Clarified scope with the user and built the
+feasible version instead: a **scheduled departure date/time** that the estimate uses
+wherever the app was already implicitly assuming "right now."
+
+- **Only two things in the backend were ever time-sensitive**, and both already took a
+  clean plug-in point: weekend toll pricing (`TollCostCalculator`, day-of-week check,
+  Via Lagos is the one real case) and community-report expiration (`RoadAlertService`/
+  `TrafficReportService`, both filter by `expiraEm > referência`). `TripEstimationService`
+  used to hardcode that reference to `LocalDate.now()`/`Instant.now()` — Fase 16 just
+  stopped assuming "now" and let a scheduled `LocalDateTime` flow through instead,
+  defaulting to now when absent (so no schedule = byte-for-byte the old behavior).
+- **The expiration fix needed no new logic, just a different reference instant.**
+  `findNearRoute(geometria, referencia)` replaces `Instant.now()` internally with
+  whatever `referencia` is passed. A traffic report (15-min TTL) created right now
+  naturally fails to be "still valid" by a departure scheduled 3 hours out — no special
+  cutoff needed, the existing TTL mechanism just gets pointed at a different clock.
+- **`LocalDateTime`, not `Instant`, on the wire** — deliberate: the app is 100% Brazil
+  already (Nominatim `countrycodes=br` etc.), so "the local time the user picked" already
+  *is* Brasília time. The Flutter side sends `DateTime.toIso8601String()` **without**
+  `.toUtc()` (a local `DateTime`'s ISO string has no zone suffix, which is exactly what
+  Java's `LocalDateTime` parses) — converted to an `Instant` only internally, once, via a
+  fixed `ZoneId.of("America/Sao_Paulo")`.
+- **Validation happens before any geocoding/routing call**, same principle as the
+  existing "no paradas on alternatives" check — reject a request that's already known to
+  be invalid (departure in the past) before spending an API call on it.
+- **UI**: two stock `showDatePicker`/`showTimePicker` dialogs, no new package. Verified
+  live via `curl` that a departure scheduled for a future Saturday flips Via Lagos to its
+  weekend rate (R$30.60 vs. R$18.40 on a weekday) and that a past date is rejected with
+  400 — the actual click-through of the date/time picker dialog in the Windows app itself
+  wasn't verified live this round (see session notes; nothing wrong found, just an
+  environment interruption), worth a quick manual pass.
+
 ## Tolls
 
 `backend/src/main/resources/data/tollplazas.json` is a **national curated seed** (159

@@ -67,8 +67,17 @@ public class TrafficReportService {
         return findNearPoint(ponto, detectionRadiusKm);
     }
 
-    public List<TrafficReport> findNearRoute(List<Coordinates> geometriaRota) {
-        List<TrafficReport> ativos = repository.findByExpiraEmAfter(Instant.now());
+    /**
+     * {@code referencia} (Fase 16) é o momento contra o qual "ainda válido" é
+     * avaliado — {@code Instant.now()} pra uma estimativa sem partida
+     * agendada, ou o horário de partida escolhido pelo usuário quando há um.
+     * Como o TTL aqui é curto (minutos), um relato criado agora naturalmente
+     * já expira sozinho pra qualquer partida agendada mais que alguns
+     * minutos no futuro — mesmo mecanismo de expiração de sempre, só muda o
+     * ponto de referência, sem precisar de corte especial.
+     */
+    public List<TrafficReport> findNearRoute(List<Coordinates> geometriaRota, Instant referencia) {
+        List<TrafficReport> ativos = repository.findByExpiraEmAfter(referencia);
         return ativos.stream()
                 .filter(r -> geometriaRota.stream()
                         .anyMatch(p -> HaversineDistance.km(p, new Coordinates(r.getLat(), r.getLng())) <= detectionRadiusKm))

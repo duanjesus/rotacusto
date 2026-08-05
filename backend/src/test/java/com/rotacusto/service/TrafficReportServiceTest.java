@@ -76,7 +76,7 @@ class TrafficReportServiceTest {
                 new Coordinates(-22.85, -42.90), // exatamente sobre o relato
                 new Coordinates(-22.80, -42.50));
 
-        List<TrafficReport> cruzados = service.findNearRoute(rota);
+        List<TrafficReport> cruzados = service.findNearRoute(rota, Instant.now());
 
         assertEquals(1, cruzados.size());
         assertTrue(cruzados.contains(naRota));
@@ -91,8 +91,23 @@ class TrafficReportServiceTest {
 
         List<Coordinates> rota = List.of(new Coordinates(-22.90, -43.30), new Coordinates(-22.80, -42.50));
 
-        List<TrafficReport> cruzados = service.findNearRoute(rota);
+        List<TrafficReport> cruzados = service.findNearRoute(rota, Instant.now());
 
         assertTrue(cruzados.isEmpty());
+    }
+
+    @Test
+    void findNearRouteUsesGivenReferenceInsteadOfNow() {
+        // Fase 16: um relato com TTL curto criado agora naturalmente já teria
+        // expirado pra uma partida agendada daqui a 3h — o service só precisa
+        // repassar a referência recebida pro repositório, sem lógica nova.
+        TrafficReportService service = newService();
+        Instant partidaAgendada = Instant.now().plus(java.time.Duration.ofHours(3));
+        when(repository.findByExpiraEmAfter(partidaAgendada)).thenReturn(List.of());
+
+        List<Coordinates> rota = List.of(new Coordinates(-22.85, -42.90));
+        List<TrafficReport> cruzados = service.findNearRoute(rota, partidaAgendada);
+
+        assertTrue(cruzados.isEmpty(), "relato de TTL curto criado agora não sobrevive até uma partida daqui a 3h");
     }
 }
