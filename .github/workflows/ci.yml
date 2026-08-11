@@ -84,3 +84,22 @@ jobs:
       # pro alvo iOS, sem acesso a Mac físico algum neste ambiente.
       - name: Build iOS (--no-codesign)
         run: flutter build ios --release --no-codesign
+
+  security:
+    name: Security – Secret scanning
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # Fase 17 — escaneia o repo/diff por segredo commitado (chave de API, token
+      # etc.). Gratuito, sem precisar de conta/API key própria. Scan de dependência
+      # vulnerável fica a cargo do Dependabot (.github/dependabot.yml) — mais barato
+      # em CI do que baixar a base NVD inteira via plugin Maven.
+      - name: Gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

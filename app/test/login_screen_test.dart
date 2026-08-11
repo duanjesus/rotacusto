@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -7,9 +8,41 @@ import 'package:rotacusto_app/presentation/screens/login_screen.dart';
 import 'package:rotacusto_app/theme/auth_controller.dart';
 
 void main() {
+  // Fase 17 — auth_controller.dart passou a usar flutter_secure_storage em vez
+  // de shared_preferences (token/e-mail criptografados em disco). O plugin não
+  // tem canal nativo disponível no ambiente de teste widget — sem esse mock,
+  // toda chamada write/read/delete trava sem nunca resolver a Future, o que
+  // travava pumpAndSettle. Fake em memória simples, mesmo espírito do
+  // SharedPreferences.setMockInitialValues logo abaixo.
+  const secureStorageChannel = MethodChannel('plugins.it_nomads.com/flutter_secure_storage');
+  final fakeSecureStorage = <String, String>{};
+
   setUp(() {
     SharedPreferences.setMockInitialValues({});
     authSessionNotifier.value = null;
+    fakeSecureStorage.clear();
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger.setMockMethodCallHandler(
+      secureStorageChannel,
+      (MethodCall call) async {
+        switch (call.method) {
+          case 'write':
+            fakeSecureStorage[call.arguments['key'] as String] = call.arguments['value'] as String;
+            return null;
+          case 'read':
+            return fakeSecureStorage[call.arguments['key'] as String];
+          case 'delete':
+            fakeSecureStorage.remove(call.arguments['key'] as String);
+            return null;
+          default:
+            return null;
+        }
+      },
+    );
+  });
+
+  tearDown(() {
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(secureStorageChannel, null);
   });
 
   // Empilha LoginScreen sobre uma tela placeholder — voltar a ver "início"

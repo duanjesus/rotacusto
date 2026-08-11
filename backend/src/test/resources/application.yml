@@ -23,6 +23,8 @@ server:
   port: 8080
 
 rotacusto:
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:*}
   geocoding:
     base-url: https://nominatim.openstreetmap.org
     user-agent: "RotaCusto/0.1 (contato: duanjesus30@gmail.com)"

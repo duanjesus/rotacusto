@@ -23,6 +23,11 @@ server:
 
 # Configurações do RotaCusto
 rotacusto:
+  # CORS (Fase 17) — "*" liberado por padrão pro dev local. Definir
+  # CORS_ALLOWED_ORIGINS (separado por vírgula) antes de qualquer deploy real,
+  # apontando só pro domínio de produção do app.
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:*}
   # Nominatim (geocoding do endereço final) + Photon (autocomplete, aceita
   # busca por prefixo — o Nominatim não aceita). Ambos sobre dados OSM.
   geocoding:

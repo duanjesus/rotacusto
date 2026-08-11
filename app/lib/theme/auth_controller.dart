@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 /// Sessão de login — compartilhada pelo app inteiro, mesmo padrão do
 /// theme_controller.dart. Login é opcional (o app inteiro funciona sem
@@ -16,27 +16,30 @@ final ValueNotifier<AuthSession?> authSessionNotifier = ValueNotifier(null);
 const _kTokenKey = 'auth_token';
 const _kEmailKey = 'auth_email';
 
+// Fase 17 — token/e-mail passam a ficar em storage criptografado (Keychain no
+// iOS, Windows Credential Manager, Android Keystore) em vez de shared_preferences
+// puro (arquivo em texto claro em disco). Mesma API read/write/delete, troca
+// mecânica — nenhum outro código deste arquivo muda.
+const _secureStorage = FlutterSecureStorage();
+
 /// Carrega a sessão salva (se houver) — chamado uma vez no início do app,
 /// pra sobreviver a fechar/reabrir sem precisar logar de novo toda hora.
 Future<void> restoreAuthSession() async {
-  final prefs = await SharedPreferences.getInstance();
-  final token = prefs.getString(_kTokenKey);
-  final email = prefs.getString(_kEmailKey);
+  final token = await _secureStorage.read(key: _kTokenKey);
+  final email = await _secureStorage.read(key: _kEmailKey);
   if (token != null && email != null) {
     authSessionNotifier.value = AuthSession(token: token, email: email);
   }
 }
 
 Future<void> saveAuthSession(AuthSession session) async {
-  final prefs = await SharedPreferences.getInstance();
-  await prefs.setString(_kTokenKey, session.token);
-  await prefs.setString(_kEmailKey, session.email);
+  await _secureStorage.write(key: _kTokenKey, value: session.token);
+  await _secureStorage.write(key: _kEmailKey, value: session.email);
   authSessionNotifier.value = session;
 }
 
 Future<void> clearAuthSession() async {
-  final prefs = await SharedPreferences.getInstance();
-  await prefs.remove(_kTokenKey);
-  await prefs.remove(_kEmailKey);
+  await _secureStorage.delete(key: _kTokenKey);
+  await _secureStorage.delete(key: _kEmailKey);
   authSessionNotifier.value = null;
 }

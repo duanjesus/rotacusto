@@ -38,6 +38,13 @@ public class AuthController {
         if (userRepository.existsByEmailIgnoreCase(request.email())) {
             throw new IllegalArgumentException("Já existe uma conta com esse e-mail.");
         }
+        // Regra de complexidade só no registro — nunca no login. AuthRequestDTO é
+        // compartilhado pelos dois fluxos (mesmo @Size(min = 6) do record), e login
+        // precisa continuar aceitando senhas antigas mais fracas já cadastradas.
+        String senha = request.senha();
+        if (senha.length() < 8 || !senha.matches(".*[A-Za-z].*") || !senha.matches(".*\\d.*")) {
+            throw new IllegalArgumentException("A senha precisa ter pelo menos 8 caracteres, com letra e número.");
+        }
         User user = new User();
         user.setEmail(request.email());
         user.setSenhaHash(passwordEncoder.encode(request.senha()));

@@ -948,6 +948,16 @@ screen, one gotcha discovered live against the real ORS API.
   "report a missing vehicle" flow moved from opening a GitHub issue to an in-app
   dialog — most users aren't familiar with GitHub. Don't reintroduce it without a
   concrete new need.
+- **`flutter_secure_storage` needs the "C++ ATL for latest v143 build tools" VS
+  component on Windows** (`atlstr.h`, used by `flutter_secure_storage_windows`'s
+  native plugin for Credential Manager access) — not installed by default even
+  with the "Desktop development with C++" workload already in place. Unlike the
+  original Build Tools install (blocked by an unanswerable UAC prompt from a
+  plain `vs_buildtools.exe --quiet` call), `Start-Process -Verb RunAs` against
+  `vs_installer.exe modify --add Microsoft.VisualStudio.Component.VC.ATL --quiet`
+  elevated cleanly in this sandbox and installed it in a few minutes — worth
+  trying that pattern again before assuming any VS component change needs the
+  user's hands.
 - **`embedded-postgres` two gotchas hit during setup, both fixed and worth remembering**:
   (1) Spring Boot 3.3.5 manages `commons-lang3` at a version older than what
   `embedded-postgres`'s `commons-compress` needs, breaking binary extraction with
@@ -960,6 +970,42 @@ screen, one gotcha discovered live against the real ORS API.
   breaks reads with "Objetos Grandes não podem ser usados no modo de efetivação
   automática" — use `@Column(columnDefinition = "TEXT")` instead for any future
   arbitrary-length text column (see `TripHistoryEntry.breakdownJson`).
+
+## Security layers (Fase 17)
+
+- **Rate limiting** — `security/RateLimitFilter.java`, in-memory token bucket
+  (Bucket4j) keyed by `rule + IP` (`request.getRemoteAddr()`), registered before
+  `JwtAuthFilter` so rejections are cheap. 6 hardcoded rules (road-alert
+  report/vote, traffic-report, vehicle-report, auth register/login) — doesn't
+  account for a reverse proxy (`X-Forwarded-For`) because the app isn't behind
+  one today.
+- **CORS** — `WebConfig.java` now reads `rotacusto.cors.allowed-origins`
+  (env var `CORS_ALLOWED_ORIGINS`), default `"*"` so local dev is unchanged.
+  Set `CORS_ALLOWED_ORIGINS` to the real production origin before any real
+  deploy.
+- **Security headers** — `SecurityConfig.java` adds a CSP (`default-src 'none'`,
+  safe since this is a pure JSON API that never serves HTML/JS) and HSTS
+  (no-op over local HTTP, only takes effect over real HTTPS).
+- **Password complexity** — enforced only in `AuthController.register()` (min 8
+  chars, letter + digit), never in `login()` — `AuthRequestDTO` is shared
+  between the two flows, and login must keep accepting weaker passwords already
+  on file for existing accounts.
+- **Token storage (Flutter)** — `auth_controller.dart` moved from plain
+  `shared_preferences` to `flutter_secure_storage` (Keychain/Windows Credential
+  Manager/Android Keystore) for the JWT/e-mail — same read/write/delete shape.
+- **CI security job** — new `security` job in `ci.yml` runs
+  `gitleaks/gitleaks-action@v2` on every push/PR (free, no API key). Dependency
+  vulnerability scanning is `.github/dependabot.yml` (maven/pub/github-actions,
+  weekly) — deliberately not the Maven `owasp/dependency-check-maven` plugin,
+  which downloads the full NVD feed and is slow/flaky in CI without a
+  registered NVD API key.
+- **GitHub's native secret scanning** (Settings → Code security) is a
+  repository toggle, not a code change — only the user can enable it, same
+  category as installing Visual Studio Build Tools.
+- **Deliberately out of scope this round**: JWT refresh/revocation (token is
+  still a fixed 24h with no blocklist), rate limiting on already-authenticated
+  endpoints (login is already a much higher bar), and any WAF/infra-level
+  protection (only relevant once the app is actually hosted publicly).
 
 ## Known gaps (not started, or deliberately out of scope)
 
