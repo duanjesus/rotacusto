@@ -110,6 +110,6 @@ jobs:
       # vulnerável fica a cargo do Dependabot (.github/dependabot.yml) — mais barato
       # em CI do que baixar a base NVD inteira via plugin Maven.
       - name: Gitleaks
-        uses: gitleaks/gitleaks-action@v2
+        uses: gitleaks/gitleaks-action@v3
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
