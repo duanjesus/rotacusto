@@ -32,6 +32,12 @@ set(CMAKE_CXX_FLAGS_PROFILE "${CMAKE_CXX_FLAGS_RELEASE}")
 # Use Unicode for all projects.
 add_definitions(-DUNICODE -D_UNICODE)
 
+# Plugins C++/WinRT (permission_handler_windows e outros) ainda compilam com /await
+# e <experimental/coroutine>, que o MSVC do Visual Studio 2026 trata como erro
+# (STL1011). Esta definição devolve o comportamento antigo; some quando os plugins
+# migrarem pra <coroutine> do C++20.
+add_definitions(-D_SILENCE_EXPERIMENTAL_COROUTINE_DEPRECATION_WARNINGS)
+
 # Compilation settings that should be applied to most targets.
 #
 # Be cautious about adding new options here, as plugins use this function by
