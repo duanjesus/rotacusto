@@ -18,6 +18,8 @@ on:
   pull_request:
     paths:
       - ".github/workflows/release.yml"
+      - "app/windows/**"
+      - "app/android/**"
 
 permissions:
   contents: read
