@@ -23,6 +23,8 @@ server:
   port: 8080
 
 rotacusto:
+  rate-limit:
+    client-ip-header: ${RATE_LIMIT_CLIENT_IP_HEADER:}
   cors:
     allowed-origins: ${CORS_ALLOWED_ORIGINS:*}
   geocoding:
@@ -46,8 +48,6 @@ rotacusto:
     detection-radius-km: 0.3
     melhor-preco-candidatos-k: 5
     reverse-geocode-delay-ms: 0
-  vehicle-reports:
-    file: vehicle-reports.log
   jwt:
     secret: ${JWT_SECRET:test-secret-key-only-for-automated-tests-not-for-real-use}
     expiration-hours: 24

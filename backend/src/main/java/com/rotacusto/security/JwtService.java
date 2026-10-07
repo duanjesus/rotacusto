@@ -8,6 +8,8 @@ import java.util.UUID;
 
 import javax.crypto.SecretKey;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -24,6 +26,8 @@ import io.jsonwebtoken.security.Keys;
 @Service
 public class JwtService {
 
+    private static final Logger log = LoggerFactory.getLogger(JwtService.class);
+
     private final SecretKey key;
     private final long expirationHours;
 
@@ -34,6 +38,10 @@ public class JwtService {
         // login/histórico continuam funcionando enquanto o processo estiver de pé,
         // mas todo mundo precisa logar de novo a cada restart do back-end. Definir
         // JWT_SECRET (32+ caracteres) é o esperado fora de teste/dev rápido.
+        if (!StringUtils.hasText(secret)) {
+            log.warn("JWT_SECRET não definido — usando segredo aleatório; toda sessão cai a cada restart. "
+                    + "Em produção isso significa deslogar todo mundo sempre que a instância dorme e acorda.");
+        }
         String effectiveSecret = StringUtils.hasText(secret) ? secret : UUID.randomUUID() + "-" + UUID.randomUUID();
         this.key = Keys.hmacShaKeyFor(effectiveSecret.getBytes(StandardCharsets.UTF_8));
         this.expirationHours = expirationHours;

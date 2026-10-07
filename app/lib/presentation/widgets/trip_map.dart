@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
-import 'package:flutter_map_cache/flutter_map_cache.dart';
 import 'package:latlong2/latlong.dart';
 
 import '../../data/tile_cache.dart';
@@ -44,7 +43,7 @@ class TripMap extends StatefulWidget {
 class _TripMapState extends State<TripMap> {
   // Construído uma vez (não a cada rebuild) — abrir o cache em disco é
   // assíncrono, e recriar o provider toda hora perderia o sentido do cache.
-  late final Future<CachedTileProvider> _tileProviderFuture = buildTileProvider();
+  late final Future<TileProvider?> _tileProviderFuture = buildTileProvider();
 
   @override
   Widget build(BuildContext context) {
@@ -86,7 +85,7 @@ class _TripMapState extends State<TripMap> {
           // o cache termina de abrir — enquanto isso, o TileLayer já
           // funciona normalmente (sem cache) pra não travar o mapa esperando
           // I/O de arquivo. Depois que resolve uma vez, fica resolvido.
-          FutureBuilder<CachedTileProvider>(
+          FutureBuilder<TileProvider?>(
             future: _tileProviderFuture,
             builder: (context, snapshot) {
               return TileLayer(

@@ -6,6 +6,7 @@ import '../../data/api_client.dart';
 import '../../data/favorite_destinations.dart';
 import '../../data/last_trip_cache.dart';
 import '../../data/recent_destinations.dart';
+import '../../data/server_wake_up.dart';
 import '../../domain/models/address_suggestion.dart';
 import '../../domain/models/food_stop_suggestion.dart';
 import '../../domain/models/fuel_station.dart';
@@ -50,8 +51,39 @@ class _ParadaField {
   AddressSuggestion? selecionada;
 }
 
+class _ServidorAcordandoBanner extends StatelessWidget {
+  const _ServidorAcordandoBanner();
+
+  @override
+  Widget build(BuildContext context) {
+    final cores = Theme.of(context).colorScheme;
+    return Container(
+      width: double.infinity,
+      color: cores.secondaryContainer,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      child: Row(
+        children: [
+          SizedBox(
+            width: 16,
+            height: 16,
+            child: CircularProgressIndicator(strokeWidth: 2, color: cores.onSecondaryContainer),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              'Acordando o servidor, pode levar cerca de 1 minuto.',
+              style: TextStyle(color: cores.onSecondaryContainer),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class _HomeScreenState extends State<HomeScreen> {
   final ApiClient _apiClient = ApiClient();
+  late final ServerWakeUp _serverWakeUp = ServerWakeUp(_apiClient.ping);
   final _origemController = TextEditingController(text: _origemPadrao);
   final _destinoController = TextEditingController(text: 'Guarapari, ES');
   final _precoController = TextEditingController(text: _precoPadraoPorCombustivel[TipoCombustivel.gasolina]);
@@ -126,6 +158,8 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+    // Já vai acordando o servidor enquanto o usuário preenche o formulário.
+    _serverWakeUp.ensureAwake();
     // Modo offline (Fase 6.5): se tinha uma viagem calculada antes de
     // fechar o app, oferece continuar de onde parou sem precisar do
     // back-end — útil se reabrir numa área sem sinal.
@@ -433,6 +467,10 @@ class _HomeScreenState extends State<HomeScreen> {
       _alternativas = null;
     });
 
+    // Se o servidor dormiu enquanto o formulário ficou aberto, espera ele
+    // acordar aqui (timeout longo) em vez de estourar o timeout do cálculo.
+    await _serverWakeUp.ensureAwake();
+
     try {
       // Se o usuário escolheu uma sugestão do dropdown, manda a coordenada
       // exata direto (o back-end já aceita "lat,lon"), evitando um novo
@@ -508,7 +546,7 @@ class _HomeScreenState extends State<HomeScreen> {
       } else if (e.type == DioExceptionType.receiveTimeout || e.type == DioExceptionType.connectionTimeout) {
         message = 'A busca de pedágios/postos está lenta (fonte pública sobrecarregada). Tente de novo em instantes.';
       } else if (e.type == DioExceptionType.connectionError) {
-        message = 'Não foi possível falar com o back-end. Ele está rodando em localhost:8080?';
+        message = 'Não foi possível conectar ao servidor. Verifique sua internet e tente de novo.';
       } else {
         message = 'Erro ao calcular a viagem.';
       }
@@ -729,39 +767,52 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              final form = _buildForm();
-              final map = ClipRRect(
-                borderRadius: BorderRadius.circular(20),
-                child: TripMap(breakdown: _breakdown),
-              );
-              final isWide = constraints.maxWidth > 900;
-
-              if (isWide) {
-                return Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(width: 400, child: SingleChildScrollView(child: form)),
-                    const SizedBox(width: 20),
-                    Expanded(child: map),
-                  ],
-                );
-              }
-              return SingleChildScrollView(
-                child: Column(
-                  children: [
-                    form,
-                    const SizedBox(height: 16),
-                    SizedBox(height: 320, child: map),
-                  ],
-                ),
-              );
-            },
-          ),
+        child: Column(
+          children: [
+            ValueListenableBuilder<bool>(
+              valueListenable: _serverWakeUp.acordando,
+              builder: (context, acordando, _) =>
+                  acordando ? const _ServidorAcordandoBanner() : const SizedBox.shrink(),
+            ),
+            Expanded(child: _buildBody()),
+          ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildBody() {
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final form = _buildForm();
+          final map = ClipRRect(
+            borderRadius: BorderRadius.circular(20),
+            child: TripMap(breakdown: _breakdown),
+          );
+          final isWide = constraints.maxWidth > 900;
+
+          if (isWide) {
+            return Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(width: 400, child: SingleChildScrollView(child: form)),
+                const SizedBox(width: 20),
+                Expanded(child: map),
+              ],
+            );
+          }
+          return SingleChildScrollView(
+            child: Column(
+              children: [
+                form,
+                const SizedBox(height: 16),
+                SizedBox(height: 320, child: map),
+              ],
+            ),
+          );
+        },
       ),
     );
   }

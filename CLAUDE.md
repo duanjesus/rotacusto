@@ -10,9 +10,10 @@ navigation** with voice guidance. Monorepo:
 
 ```
 rotacusto/
-├── backend/   Spring Boot 3 REST API (Java 21, H2 in-memory, no auth)
-├── app/       Flutter client — Windows desktop + Android, same codebase
-└── .github/workflows/ci.yml   backend (mvnw test) + frontend (flutter analyze/test)
+├── backend/   Spring Boot 3 REST API (Java 21, Postgres, optional JWT login)
+├── app/       Flutter client — Windows desktop + Android + web, same codebase
+├── render.yaml                API deploy blueprint (see "Deploy (Fase 18)")
+└── .github/workflows/ci.yml   backend (mvnw test + docker build) + frontend (flutter analyze/test/build web)
 ```
 
 The **cost/routing "brain" lives entirely in the backend** — the Flutter app never
@@ -52,8 +53,8 @@ This is also why **CI needs zero external services** — no Postgres container, 
 
 Login is **entirely optional** — every endpoint that existed before accounts were added
 stays public; only `/api/trip-history/**` requires a JWT (`Authorization: Bearer …`,
-via `SecurityConfig`/`JwtAuthFilter`). "Missing vehicle" reports still go to a flat file
-(`vehicle-reports.log`), not the database — see below for why.
+via `SecurityConfig`/`JwtAuthFilter`). "Missing vehicle" reports go to the
+`vehicle_reports` table.
 
 ## Vehicle catalog — the part with the most nuance
 
@@ -974,11 +975,11 @@ screen, one gotcha discovered live against the real ORS API.
 ## Security layers (Fase 17)
 
 - **Rate limiting** — `security/RateLimitFilter.java`, in-memory token bucket
-  (Bucket4j) keyed by `rule + IP` (`request.getRemoteAddr()`), registered before
-  `JwtAuthFilter` so rejections are cheap. 6 hardcoded rules (road-alert
-  report/vote, traffic-report, vehicle-report, auth register/login) — doesn't
-  account for a reverse proxy (`X-Forwarded-For`) because the app isn't behind
-  one today.
+  (Bucket4j) keyed by `rule + IP`, registered before `JwtAuthFilter` so rejections
+  are cheap. 9 hardcoded rules (road-alert report/vote, traffic-report,
+  vehicle-report, auth register/login, plus trip estimate/alternatives and
+  geocoding suggest since Fase 18). The IP is `request.getRemoteAddr()` unless
+  `RATE_LIMIT_CLIENT_IP_HEADER` names a proxy header — see "Deploy (Fase 18)".
 - **CORS** — `WebConfig.java` now reads `rotacusto.cors.allowed-origins`
   (env var `CORS_ALLOWED_ORIGINS`), default `"*"` so local dev is unchanged.
   Set `CORS_ALLOWED_ORIGINS` to the real production origin before any real
@@ -1006,6 +1007,74 @@ screen, one gotcha discovered live against the real ORS API.
   still a fixed 24h with no blocklist), rate limiting on already-authenticated
   endpoints (login is already a much higher bar), and any WAF/infra-level
   protection (only relevant once the app is actually hosted publicly).
+
+## Deploy (Fase 18)
+
+Target: API on **Render** (free plan, Docker runtime, `render.yaml` Blueprint at the
+repo root), database on **Neon** Postgres (free plan), web client on AWS Amplify.
+Render free has no São Paulo region — API and database both go in Virginia (the DB
+has to sit next to the API, not next to the user).
+
+- **External database switch** — `RotaCustoApplication.main()` only starts the
+  embedded Postgres when `SPRING_DATASOURCE_URL` is unset. In production
+  `SPRING_DATASOURCE_URL/USERNAME/PASSWORD` override `application.yml` through plain
+  Spring env binding; there is no `prod` profile. Use Neon's **direct** connection
+  string (not the `-pooler` host) as `jdbc:postgresql://<host>/<db>?sslmode=require`.
+  The Hikari settings in `application.yml` (`minimum-idle: 0`, `max-lifetime` 4 min)
+  exist because Neon suspends after 5 idle minutes and drops open connections.
+- **Ephemeral disk** — nothing may be written to the local filesystem in production.
+  "Missing vehicle" reports moved from `vehicle-reports.log` to the `vehicle_reports`
+  table for this reason (read them with SQL in the Neon console).
+- **Seeding on first boot** — the seeders are `CommandLineRunner`s, which run *after*
+  the web server is already answering. For a few seconds after the very first boot
+  against an empty database, `/api/health` is UP while the catalog is still loading.
+- **Cold start** — the free instance sleeps after 15 minutes without traffic and
+  wakes on a fraction of a CPU, so boot is CPU-bound. Measured locally with
+  `docker run --cpus=0.1 --memory=512m` against an already-seeded Postgres: 195 s
+  for a plain `java -jar`, 125 s adding `-XX:TieredStopAtLevel=1`, **57 s** with that
+  plus the extracted jar and CDS archive the `Dockerfile` builds (170 MB used). Don't
+  simplify those Dockerfile steps away without re-measuring. The CDS training run
+  boots the Spring context at image-build time with no database, which is why it
+  passes `hibernate.boot.allow_jdbc_metadata_access=false`; a new bean that touches
+  the database during context refresh would break the image build. The app
+  handles the wait with `ServerWakeUp` (`app/lib/data/server_wake_up.dart`): a
+  long-timeout ping to `/api/health` on open and before each calculation, with a
+  "waking the server" banner once the wait passes 2 s. `@Scheduled` cleanups don't run
+  while asleep; harmless, since alert/traffic reads already filter by expiry.
+- **Client IP behind the proxy** — `RateLimitFilter` reads the client IP from the
+  header named in `RATE_LIMIT_CLIENT_IP_HEADER` (empty = `getRemoteAddr()`, the dev
+  default). It must be a header the hosting proxy *overwrites*; a client-controlled
+  one would let anyone pick their own bucket. To see what the host actually sends, set
+  `LOGGING_LEVEL_COM_ROTACUSTO_SECURITY=DEBUG` temporarily — the filter logs
+  `remoteAddr`, `X-Forwarded-For`, `CF-Connecting-IP` and `True-Client-IP` per
+  rate-limited request.
+- **Quota protection** — `/api/trips/estimate`, `/estimate/alternatives` and
+  `/api/geocoding/suggest` are rate-limited per IP because one free OpenRouteService
+  key serves every user. ORS answering 429/403 surfaces as a 503 with a specific
+  message (`OpenRouteServiceClient`).
+- **App builds** — the API URL is baked in at build time:
+  `--dart-define=API_BASE_URL=https://<host>/api` on `flutter build apk|windows|web
+  --release`. Without it the app keeps the local `localhost`/`10.0.2.2` rule. Changing
+  the API host therefore means shipping new builds.
+- **Release builds run in GitHub Actions, not on this machine** —
+  `.github/workflows/release.yml` (manual `workflow_dispatch`, input `api_base_url`)
+  builds the Android APK, the Windows folder and the web site as run artifacts. This
+  machine no longer has the Flutter SDK, Android SDK or Visual Studio Build Tools;
+  `ci.yml` is also the only place `flutter analyze`/`flutter test` run. Android
+  signing in that workflow comes from four repo secrets: `ANDROID_KEYSTORE_BASE64`,
+  `ANDROID_KEYSTORE_PASSWORD`, `ANDROID_KEY_ALIAS`, `ANDROID_KEY_PASSWORD` — absent,
+  it warns and produces a debug-signed APK.
+- **Android signing** — `android/app/build.gradle.kts` signs release builds with the
+  keystore described by `android/key.properties` (git-ignored: `storeFile`,
+  `storePassword`, `keyAlias`, `keyPassword`) and falls back to the debug key when the
+  file is absent, so CI and fresh clones still compile. A debug-signed APK is not
+  distributable.
+- **Web build** — `tile_cache.dart` returns no disk cache under `kIsWeb` (no
+  filesystem in the browser). Background navigation does not exist on web.
+- **JVM tests on this machine** — `./mvnw test` can fail every `@SpringBootTest` with
+  `Unable to establish loopback connection` when the temp directory path is long (the
+  JDK opens a Unix-domain socket there). Workaround:
+  `JAVA_TOOL_OPTIONS='-Djdk.net.unixdomain.tmpdir=<short path>'`.
 
 ## Known gaps (not started, or deliberately out of scope)
 
