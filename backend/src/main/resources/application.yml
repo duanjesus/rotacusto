@@ -10,6 +10,14 @@ spring:
     driver-class-name: org.postgresql.Driver
     username: postgres
     password:
+    # Pool pequeno e sem conexão ociosa presa: em produção o banco (Neon) suspende
+    # após 5 min sem uso e derruba conexões abertas — max-lifetime abaixo disso
+    # evita entregar conexão morta. Sem efeito prático no Postgres embutido local.
+    hikari:
+      maximum-pool-size: 5
+      minimum-idle: 0
+      idle-timeout: 120000
+      max-lifetime: 240000
   jpa:
     hibernate:
       # NUNCA create-drop aqui — apagaria histórico de viagens/contas a cada
@@ -19,10 +27,17 @@ spring:
     open-in-view: false
 
 server:
-  port: 8080
+  # PORT é injetada pela hospedagem (Render); 8080 em dev local.
+  port: ${PORT:8080}
 
 # Configurações do RotaCusto
 rotacusto:
+  # Atrás de um proxy reverso (produção), getRemoteAddr() é o IP do proxy, não do
+  # cliente — RATE_LIMIT_CLIENT_IP_HEADER diz de qual header ler o IP real. Vazio
+  # (dev local, sem proxy) usa getRemoteAddr(). Só definir um header que o proxy
+  # da hospedagem sobrescreve — um header que o cliente controla anularia o limite.
+  rate-limit:
+    client-ip-header: ${RATE_LIMIT_CLIENT_IP_HEADER:}
   # CORS (Fase 17) — "*" liberado por padrão pro dev local. Definir
   # CORS_ALLOWED_ORIGINS (separado por vírgula) antes de qualquer deploy real,
   # apontando só pro domínio de produção do app.
@@ -72,12 +87,6 @@ rotacusto:
     # Etiqueta do Nominatim público (~1 req/s) — 1.1s de margem entre
     # chamadas sequenciais de reverse geocoding.
     reverse-geocode-delay-ms: 1100
-  # Relatos de "veículo não encontrado no catálogo" (link no app) — ver
-  # VehicleReportService. Continua indo pra arquivo (não pro banco, mesmo
-  # agora com Postgres persistente) por simplicidade: é um log de baixo
-  # volume só pra eu revisar depois, não precisa de modelo relacional.
-  vehicle-reports:
-    file: vehicle-reports.log
   # Autenticação (Fase 6.4b) — segredo do JWT via env var, nunca versionado.
   jwt:
     secret: ${JWT_SECRET:}

@@ -38,6 +38,14 @@ cd app
 flutter run -d windows   # or -d chrome / -d edge
 ```
 
+## Deploying
+
+The API ships as a Docker image ([`backend/Dockerfile`](backend/Dockerfile)) described
+by the Render Blueprint in [`render.yaml`](render.yaml), backed by an external
+Postgres set through `SPRING_DATASOURCE_URL`. Release builds of the app point at
+it with `--dart-define=API_BASE_URL=https://<host>/api`. Details and the reasoning
+behind each setting are in `CLAUDE.md`, section "Deploy (Fase 18)".
+
 ## Status
 
 Core roadmap complete: multi-vehicle cost calculation (fuel/energy, tolls, wear,

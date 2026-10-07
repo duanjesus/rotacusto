@@ -88,7 +88,7 @@ public class OpenRouteServiceClient {
             if (!jaTemRotaParecida) {
                 rotas.add(rotaSemPedagio);
             }
-        } catch (RestClientException e) {
+        } catch (RestClientException | IllegalStateException e) {
             // Opcional — se essa chamada falhar (rede/ORS instável), as rotas já
             // coletadas acima (ou nenhuma, degradando pra rota única em TripEstimationService)
             // continuam válidas; não vale derrubar o endpoint inteiro por uma tentativa extra.
@@ -123,13 +123,21 @@ public class OpenRouteServiceClient {
         // o endpoint /geojson com o array "coordinates" no corpo. Autenticação por
         // header aqui (o GET usa "api_key" como query param, mas o corpo POST usa
         // "Authorization" — convenção da própria API do ORS, não deste projeto).
-        return restClient.post()
-                .uri("/v2/directions/driving-car/geojson")
-                .header("Authorization", apiKey)
-                .contentType(MediaType.APPLICATION_JSON)
-                .body(body)
-                .retrieve()
-                .body(JsonNode.class);
+        try {
+            return restClient.post()
+                    .uri("/v2/directions/driving-car/geojson")
+                    .header("Authorization", apiKey)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(body)
+                    .retrieve()
+                    .body(JsonNode.class);
+        } catch (HttpClientErrorException.TooManyRequests | HttpClientErrorException.Forbidden e) {
+            // A chave gratuita do ORS é uma só pra todos os usuários do app — 429 é o
+            // teto por minuto, 403 o teto diário. Vira 503 com mensagem própria
+            // (GlobalExceptionHandler) em vez de um erro genérico.
+            throw new IllegalStateException(
+                    "O serviço de rotas atingiu o limite de uso gratuito. Tente de novo mais tarde.", e);
+        }
     }
 
     private RouteResult parseFeature(JsonNode feature) {

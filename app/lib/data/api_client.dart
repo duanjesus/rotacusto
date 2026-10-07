@@ -22,7 +22,14 @@ import '../theme/auth_controller.dart';
 /// precisa do alias especial `10.0.2.2`. Um Android físico na mesma
 /// rede (sem `adb reverse`) precisaria do IP de LAN real do PC, não coberto
 /// aqui (fora do escopo de teste local).
+///
+/// Builds de release apontam pra produção fixando a URL no próprio build:
+/// `--dart-define=API_BASE_URL=https://<host>/api`. Sem isso (dev), vale a
+/// regra de `localhost` acima.
+const String _apiBaseUrlDoBuild = String.fromEnvironment('API_BASE_URL');
+
 String _defaultBaseUrl() {
+  if (_apiBaseUrlDoBuild.isNotEmpty) return _apiBaseUrlDoBuild;
   if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
     return 'http://10.0.2.2:8080/api';
   }
@@ -53,6 +60,12 @@ class ApiClient {
       }
       handler.next(options);
     }));
+  }
+
+  /// Chamada barata só pra acordar o servidor (ver ServerWakeUp) — timeout
+  /// bem maior que o padrão porque o despertar pode passar de um minuto.
+  Future<void> ping() async {
+    await _dio.get('/health', options: Options(receiveTimeout: const Duration(seconds: 150)));
   }
 
   /// Passo 1 da escolha de veículo: marca+modelo distintos (sem ano ainda).

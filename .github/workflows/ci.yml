@@ -31,6 +31,11 @@ jobs:
       - name: Executar testes (JUnit + Mockito)
         run: ./mvnw -B test
 
+      # Fase 18 — a hospedagem (Render) publica a partir deste mesmo Dockerfile;
+      # construir aqui pega um Dockerfile quebrado antes do deploy, não durante.
+      - name: Build da imagem Docker
+        run: docker build -t rotacusto-backend:ci .
+
   frontend:
     name: Frontend – Analyze & Test
     runs-on: ubuntu-latest
@@ -57,6 +62,11 @@ jobs:
 
       - name: Testes
         run: flutter test
+
+      # Fase 18 — a versão web é publicada; este build pega código que compila
+      # pra desktop/mobile mas não pro navegador.
+      - name: Build web
+        run: flutter build web --release
 
   ios:
     name: iOS – Build (sem assinatura)

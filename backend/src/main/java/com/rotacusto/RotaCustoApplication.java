@@ -16,8 +16,19 @@ import io.zonky.test.db.postgres.embedded.EmbeddedPostgres;
 public class RotaCustoApplication {
 
     public static void main(String[] args) throws IOException {
-        startEmbeddedPostgres();
+        if (shouldStartEmbeddedPostgres(System.getenv("SPRING_DATASOURCE_URL"))) {
+            startEmbeddedPostgres();
+        }
         SpringApplication.run(RotaCustoApplication.class, args);
+    }
+
+    /**
+     * Em produção o banco é um Postgres externo, apontado por SPRING_DATASOURCE_URL
+     * (que o Spring já usa pra sobrescrever o datasource do application.yml) — o
+     * embutido só sobe quando essa variável não existe, ou seja, em dev local.
+     */
+    static boolean shouldStartEmbeddedPostgres(String externalDatasourceUrl) {
+        return externalDatasourceUrl == null || externalDatasourceUrl.isBlank();
     }
 
     /**
